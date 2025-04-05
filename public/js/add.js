@@ -3,11 +3,15 @@ $('#saveMember').on('click', function () {
     addPerson();
 });
 
-var userJson = {};
+var userJson = [];
+var sapphireJson = [];
 
 function addPerson() {
     const nm = $('#memberName').val();
-    const data = { name: nm };
+    const grp = $("#memberGroup").val();
+
+    const data = { name: nm , group : grp};
+
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/addUser");
     xhttp.setRequestHeader('Content-Type', 'application/json');
@@ -17,14 +21,23 @@ function addPerson() {
     // loadNames();
     addName(nm);
     $("#newPersonName").html(nm);
-
+    $('#memberName').val("");
     $('.add_alert').removeClass("hide").addClass("show");
     setTimeout(function () { $('.add_alert').removeClass("show").addClass("hide"); }, 6000);
 }
 
 function addName(name) {
-    userJson.push({ name: name, namelist: "" });
-    generateNamesTable(userJson);
+    if($("#memberGroup").val() == "SKB"){
+        // userJson.push({ name: name, namelist: ""});
+        // generateNamesTable(userJson);
+        $("#groupSelect").val("SKB").change();
+    }
+    else{
+        // sapphireJson.push({ name: name});
+        // generateNamesTable(sapphireJson, "Sapphire");
+        $("#groupSelect").val("Sapphire").change();
+    }
+    
 }
 
 function loadNames() {
@@ -34,40 +47,92 @@ function loadNames() {
 
         const response = JSON.parse(this.responseText);
         userJson = response;
-        generateNamesTable(response);
+        if(userJson.length > 0){
+            generateNamesTable(response);
+        }else{
+            $(".loading").addClass("hide");
+        }
+        
 
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send();
 }
 
-function generateNamesTable(response) {
+function loadSapphire() {
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/getNamesSapphire");
+    xhttp.onload = function () {
+        const response = JSON.parse(this.responseText);
+        sapphireJson = response;
+        if(sapphireJson.length > 0){
+            generateNamesTable(response, "Sapphire");
+        }else{
+            $(".loading").addClass("hide");
+        }
+        
+
+    }
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send();
+}
+
+function changeGroup(){
+    const grp = $("#groupSelect").val();
+    $(".loading").removeClass("hide");
+    $(".names").html("");
+    if(grp == "SKB"){
+        loadNames();
+    }else{
+        loadSapphire();
+    }
+}
+
+function generateNamesTable(response, group="SKB") {
     $(".names").html("");
     for (let i = 0; i < response.length; i++) {
-        $(".names").append(`
-        <tr>
-        <th scope="row">${i + 1}</th>
-        <td>${response[i].name}</td>
-        <td class="namelist_container">
-        
-        <div class="row g-3">
-            <div class="col-auto">
-            <a href="${response[i].namelist == "" ? "#" : response[i].namelist}" id="${response[i].name}-link" target="_blank" class=${response[i].namelist == "" ? "text-danger" : "text-success"}>${response[i].name}'s Namelist</a>
-               <input class="form-control hide" type="text" id="${response[i].name}-text"/> 
-            </div>
-            <div class="col-auto">
-                <button id="${response[i].name}-btnCancel" class="btn btn-info btn-sm hide" onclick="cancel_edit('${response[i].name}')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="col-auto">
-                <button id="${response[i].name}-btn" class="btn btn-info btn-sm" onclick="show_editText('${response[i].name}')"><i class="fa-solid fa-pen"></i></button>
-            </div>
-        </div>
-        </td>
-        <td>
-        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteMemberModal" data-bs-name='${response[i].name}'>Delete Person</button>
-        </td>
-      </tr>
-        `);
+
+        if(group == "SKB"){
+            $(".names").append(`
+                <tr>
+                    <th scope="row">${i + 1}</th>
+                    <td>${response[i].name}</td>
+                    <td class="namelist_container">
+                    
+                    <div class="row g-3">
+                        <div class="col-auto">
+                        <a href="${response[i].namelist == "" ? "#" : response[i].namelist}" id="${response[i].name}-link" target="_blank" class=${response[i].namelist == "" ? "text-danger" : "text-success"}>${response[i].name}'s Namelist</a>
+                           <input class="form-control hide" type="text" id="${response[i].name}-text"/> 
+                        </div>
+                        <div class="col-auto">
+                            <button id="${response[i].name}-btnCancel" class="btn btn-info btn-sm hide" onclick="cancel_edit('${response[i].name}')"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <div class="col-auto">
+                            <button id="${response[i].name}-btn" class="btn btn-info btn-sm" onclick="show_editText('${response[i].name}')"><i class="fa-solid fa-pen"></i></button>
+                        </div>
+                    </div>
+                    </td>
+                    <td><b>${group}</b></td>
+                    <td>
+                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteMemberModal" data-bs-name='${response[i].name}' data-bs-group = "SKB">Delete Person</button>
+                    </td>
+                </tr>
+                    `);
+        }else{
+            $(".names").append(`
+                <tr>
+                    <th scope="row">${i + 1}</th>
+                    <td>${response[i].name}</td>
+                    <td>
+                    </td>
+                    <td><b>${group}</b></td>
+                    <td>
+                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteMemberModal" data-bs-name='${response[i].name}' data-bs-group = "Sapphire">Delete Person</button>
+                    </td>
+                </tr>
+                    `);
+        }
+       
 
         $(".loading").addClass("hide");
     }
@@ -124,16 +189,20 @@ deleteModal.addEventListener('show.bs.modal', function (event) {
     var button = event.relatedTarget;
     // Extract info from data-bs-* attributes
     var name = button.getAttribute('data-bs-name');
+    var group = button.getAttribute('data-bs-group');
     // If necessary, you could initiate an AJAX request here
     // and then do the updating in a callback.
     //
     // Update the modal's content.
     $("#userName").html(name);
+    $("#groupDeleteModal").html(group);
 })
 
 function deleteUser() {
     const nm = $("#userName").html();
-    const data = { name: nm };
+    const group = $("#groupDeleteModal").html();
+
+    const data = { name: nm , group : group};
     // alert(name);
     // location.href = "/delete?name=" + name;
 
@@ -142,14 +211,25 @@ function deleteUser() {
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
 
-    for (let i = 0; i < userJson.length; i++) {
-        if (userJson[i].name == nm) {
-            // delete userJson[i];
-            userJson.splice(i, 1);
-            break;
+    if(group == "SKB"){
+        for (let i = 0; i < userJson.length; i++) {
+            if (userJson[i].name == nm) {
+                // delete userJson[i];
+                userJson.splice(i, 1);
+                break;
+            }
         }
+        generateNamesTable(userJson);
+    }else{
+        for (let i = 0; i < sapphireJson.length; i++) {
+            if (sapphireJson[i].name == nm) {
+                // delete userJson[i];
+                sapphireJson.splice(i, 1);
+                break;
+            }
+        }
+        generateNamesTable(sapphireJson,"Sapphire");
     }
-    generateNamesTable(userJson);
 
     $("#deletePersonName").html(nm);
     $('.delete_alert').removeClass("hide").addClass("show");
@@ -158,18 +238,37 @@ function deleteUser() {
 
 function search() {
     const searchStr = $("#search_text").val();
+    const grp = $("#groupSelect").val();
+
     resultJson = [];
 
-    if (searchStr != "") {
-        for (let i = 0; i < userJson.length; i++) {
-            if (userJson[i].name.toLowerCase().match(searchStr.toLowerCase())) {
-                resultJson.push(userJson[i]);
+    if(grp == "SKB"){
+        if (searchStr != "") {
+            for (let i = 0; i < userJson.length; i++) {
+                if (userJson[i].name.toLowerCase().match(searchStr.toLowerCase())) {
+                    resultJson.push(userJson[i]);
+                }
             }
+        } else {
+            resultJson = userJson;
         }
-    } else {
-        resultJson = userJson;
+       
+    }else{
+        if (searchStr != "") {
+            for (let i = 0; i < sapphireJson.length; i++) {
+                if (sapphireJson[i].name.toLowerCase().match(searchStr.toLowerCase())) {
+                    resultJson.push(sapphireJson[i]);
+                }
+            }
+        } else {
+            resultJson = sapphireJson;
+        }
+        
     }
-    generateNamesTable(resultJson);
+
+    generateNamesTable(resultJson, grp);
+
+    
 }
 
 loadNames();

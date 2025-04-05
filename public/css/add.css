@@ -6,7 +6,7 @@
     color: red !important;
 }
 
-#newPersonName, #userName, #deletePersonName{
+#newPersonName, #userName, #deletePersonName, #groupDeleteModal{
     font-weight: bold;
 }
 
@@ -33,4 +33,8 @@
 
 .text-success, .text-danger{
     font-weight: bold !important;
+}
+
+.team-member-header{
+    margin-top: 6px;
 }
