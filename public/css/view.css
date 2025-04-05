@@ -1,0 +1,35 @@
+td, .middle{
+    vertical-align: middle !important;
+    
+}
+
+.done_data{
+    background-color: #f8fad7 !important;
+}
+
+.bg-plan{
+    background-color: #ebd7fa !important;
+}
+
+
+.txt-align-center{
+    text-align: center !important;
+}
+
+.list,.networkingTarget, .infosTarget, .reinfosTarget, .meetupsTarget, .invisTarget, .plans
+{
+    font-weight:bold;
+}
+
+.remarks{
+    min-width: 100px !important;
+}
+
+.card-title{
+    margin-top: 20px;
+    margin-left: 15px;
+}
+
+.text-success{
+    font-weight: bold !important;
+}
