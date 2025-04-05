@@ -39,6 +39,25 @@ class Activity {
   }
 }
 
+class Sapphire {
+  constructor(sl, name, nodeCount, networkingDone, infosDone, reinfosDone, meetupsDone,
+    invisDone, plans, pendingPlans, second_meeting, uv, remarks) {
+    (this.sl = sl),
+      (this.name = name),
+      (this.nodeCount = nodeCount),
+      (this.networkingDone = networkingDone),
+      (this.infosDone = infosDone),  
+      (this.reinfosDone = reinfosDone),  
+      (this.meetupsDone = meetupsDone),    
+      (this.invisDone = invisDone),
+      (this.plans = plans),
+      (this.pendingPlans = pendingPlans),
+      (this.secondMeetings = second_meeting),
+      (this.uv = uv),
+      (this.remarks = remarks);
+  }
+}
+
 admin.initializeApp({
   credential: admin.credential.cert(credentials)
 });
@@ -77,7 +96,17 @@ app.post("/getData", requireAuth, async (req, res) => {
   try {
     const year = req.body.year;
     const week = req.body.week;
-    const data = await getCollectionData('users', year, week);
+    const group = req.body.group;
+
+    var data = [];
+
+    if(group == "SKB"){
+      data = await getCollectionData('users', year, week);
+    }else{
+      data = await getCollectionData('sapphire', year, week);
+    }
+
+
     res.send(data);
   } catch (err) {
     res.send(err);
@@ -92,6 +121,8 @@ app.post("/updateUser", requireAuth, async (req, res) => {
     const year = req.body.year;
     const fieldName = req.body.fieldName;
     const value = req.body.value;
+    const group = req.body.group;
+
 
     var userJson = '{"' + fieldName + '" : ' + value + '}';
     if (fieldName == "remarks") {
@@ -101,9 +132,12 @@ app.post("/updateUser", requireAuth, async (req, res) => {
     const obj = JSON.parse(userJson);
     // console.log(obj);
 
-
-    db.collection("users").doc(name).collection(year).doc(week).update(obj);
-
+    if(group == "SKB"){
+      db.collection("users").doc(name).collection(year).doc(week).update(obj);
+    }else{
+      db.collection("sapphire").doc(name).collection(year).doc(week).update(obj);
+    }
+    
     // const response = db.collection("users").doc(name).collection("2025").doc(week).set(userJson);
     res.send("success");
   } catch (err) {
@@ -116,20 +150,37 @@ async function getCollectionData(collection, year, week) {
   const snapshot = await db.collection(collection).listDocuments();
   const docArray = [];
 
+  if(collection == "users"){
+    for (let i = 0; i < snapshot.length; i++) {
 
-  for (let i = 0; i < snapshot.length; i++) {
+      const snap = await db.collection(collection).doc(snapshot[i].id).collection(year).doc(week).get();
+  
+      const activity = new Activity(
+        i + 1, snapshot[i].id, snap.data().list, snap.data().networkingDone, snap.data().networkingTarget, snap.data().infosDone, snap.data().infosTarget,
+        snap.data().reinfosDone, snap.data().reinfosTarget, snap.data().meetupsDone, snap.data().meetupsTarget,
+        snap.data().invisDone, snap.data().invisTarget, snap.data().plans, snap.data().pendingPlans,snap.data().remarks
+      );
+  
+      docArray.push(activity);
+  
+    }
+  }else{
+    for (let i = 0; i < snapshot.length; i++) {
 
-    const snap = await db.collection(collection).doc(snapshot[i].id).collection(year).doc(week).get();
-
-    const activity = new Activity(
-      i + 1, snapshot[i].id, snap.data().list, snap.data().networkingDone, snap.data().networkingTarget, snap.data().infosDone, snap.data().infosTarget,
-      snap.data().reinfosDone, snap.data().reinfosTarget, snap.data().meetupsDone, snap.data().meetupsTarget,
-      snap.data().invisDone, snap.data().invisTarget, snap.data().plans, snap.data().pendingPlans, snap.data().remarks
-    );
-
-    docArray.push(activity);
-
+      const snap = await db.collection(collection).doc(snapshot[i].id).collection(year).doc(week).get();
+  
+      const sapphire = new Sapphire(
+        i + 1, snapshot[i].id, snap.data().nodeCount, snap.data().networkingDone, snap.data().infosDone,
+        snap.data().reinfosDone, snap.data().meetupsDone,
+        snap.data().invisDone, snap.data().plans, snap.data().pendingPlans, snap.data().secondMeetings, snap.data().uv, snap.data().remarks
+      );
+  
+      docArray.push(sapphire);
+  
+    }
   }
+
+  
 
   return docArray;
 }
