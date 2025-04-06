@@ -34,7 +34,11 @@ function loadNames() {
 
         const response = JSON.parse(this.responseText);
         userJson = response;
-        generateNamesTable(response);
+        if(userJson.length > 0){
+            generateNamesTable(response);
+        }else{
+            $(".loading").addClass("hide");
+        }
 
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
