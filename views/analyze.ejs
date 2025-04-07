@@ -52,7 +52,7 @@
                       </div>
                       <div>
                         <label for="groupSelect" class="form-label">Group</label>
-                        <select class="form-select" id="groupSelect">
+                        <select class="form-select" id="groupSelect" onchange="generateNameDropDown()">
                           <option value="SKB">SKB</option>
                           <option value="Sapphire">Sapphire</option>
                         </select>
@@ -84,8 +84,8 @@
                 </div>
                 <div id="dataTable" class="card table-card container hide" style="overflow-x:auto;">
                   <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h6>Data : <span class="text-success" id="searchName"></span></h6>
-                    <button id="screenshot" class="btn btn-warning"><i class="fa-solid fa-image"></i></button>
+                    <h6>Data : <span class="text-success" id="searchNameSKB"></span> &nbsp; &nbsp; Group : <span class="text-success" id="searchGroupSKB"></span></h6>
+                    <button id="screenshot_SKB" class="btn btn-warning"><i class="fa-solid fa-image"></i></button>
                   </div>
                   <table class="table table-bordered table-hover table-sm">
 
@@ -167,6 +167,39 @@
                   </div>
 
                 </div>
+
+                <div id="dataTableSapphire" class="card table-card container hide" style="overflow-x:auto;">
+                  <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h6>Data : <span class="text-success" id="searchNameSapphire"></span> &nbsp; &nbsp; Group : <span class="text-primary" id="searchGroupSapphire"></span></h6>
+                    <button id="screenshot_Sapphire" class="btn btn-warning"><i class="fa-solid fa-image"></i></button>
+                  </div>
+                  <div class="card-body">
+
+                  <table class="table table-bordered table-hover table-sm">
+                      
+                      <thead class="">
+                        <tr>
+                          <th scope="col" class="txt-align-center text-light bg-dark">#</th>
+                          <th scope="col" class="txt-align-center text-light bg-dark">Week</th>
+                          <th scope="col" class="txt-align-center text-light bg-dark">Node Count</th>
+                          <th scope="col" class="txt-align-center text-light bg-dark" >Networking</th>
+                          <th scope="col" class="txt-align-center text-light bg-dark" >Fresh Infos</th>
+                          <th scope="col" class="txt-align-center text-light bg-dark" >Reinfos</th>
+                          <th scope="col" class="txt-align-center text-light bg-dark" >Meetups</th>
+                          <th scope="col" class="txt-align-center text-light bg-dark" >Invi</th>
+                          <th scope="col" class="txt-align-center text-light bg-dark">Plan</th>
+                          <th scope="col" class="txt-align-center text-light bg-dark" >2nd Meeting</th>
+                          <th scope="col" class="txt-align-center text-light bg-dark" >UV</th>
+                        </tr>
+                        
+                      </thead>
+                      <tbody class="sapphireData table-striped">
+                       
+                      </tbody>
+                    </table>
+                    </div>
+              
+              </div>
               </div>
             </div>
           </div>

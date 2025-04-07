@@ -234,8 +234,7 @@ function getData() {
 
             $("#dataTableSapphire").removeClass("hide");
         }
-
-
+        
         $(".loading").addClass("hide");
 
         if (wk > 1 && groupSearch == "SKB") {

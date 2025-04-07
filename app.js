@@ -318,8 +318,17 @@ app.post("/delete", requireAuth, async (req, res) => {
 
 //Analyze page
 
-app.get('/getUserName', requireAuth, async function (req, res) {
-  const docArray = await getUserNames();
+app.post('/getUserName', requireAuth, async function (req, res) {
+  const group = req.body.group;
+  // console.log(group);
+  var docArray = [];
+
+  if(group == "SKB"){
+   docArray = await getUserNames();
+  }else{
+   docArray = await getUserNamesSapphire();
+  }
+
   res.send(docArray);
 });
 
@@ -330,42 +339,70 @@ app.post("/analyzeData", requireAuth, async (req, res) => {
     const weekFrom = req.body.weekFrom;
     const weekTo = req.body.weekTo;
     const name = req.body.name;
+    const group = req.body.group;
 
-    const data = await getAnalyzeData('users', year, weekFrom, weekTo, name);
+
+    const data = await getAnalyzeData(year, weekFrom, weekTo, name, group);
     res.send(data);
   } catch (err) {
     res.send(err);
   }
 });
 
-async function getAnalyzeData(collection, year, weekFrom, weekTo, name) {
-
-  const snapshot = await db.collection(collection).doc(name.toString()).collection(year.toString()).listDocuments();
+async function getAnalyzeData(year, weekFrom, weekTo, name, group) {
   const docArray = [];
   const idArray = [];
 
-  let sl = 1;
-
-  for (let i = 1; i <= snapshot.length; i++) {
-    if (parseInt(snapshot[i - 1].id) >= parseInt(weekFrom) && parseInt(snapshot[i - 1].id) <= parseInt(weekTo)) {
-      idArray.push(parseInt(snapshot[i - 1].id));
+  if(group == "SKB"){
+    const snapshot = await db.collection("users").doc(name.toString()).collection(year.toString()).listDocuments();
+    let sl = 1;
+  
+    for (let i = 1; i <= snapshot.length; i++) {
+      if (parseInt(snapshot[i - 1].id) >= parseInt(weekFrom) && parseInt(snapshot[i - 1].id) <= parseInt(weekTo)) {
+        idArray.push(parseInt(snapshot[i - 1].id));
+      }
     }
-  }
+  
+    idArray.sort(function (a, b) { return a - b });
+  
+    for (let j = 0; j < idArray.length; j++) {
+      const snap = await db.collection("users").doc(name.toString()).collection(year.toString()).doc(idArray[j].toString()).get();
+  
+      const activity = new Activity(
+        sl, parseInt(idArray[j]), snap.data().list, snap.data().networkingDone, snap.data().networkingTarget, snap.data().infosDone, snap.data().infosTarget,
+        snap.data().reinfosDone, snap.data().reinfosTarget, snap.data().meetupsDone, snap.data().meetupsTarget,
+        snap.data().invisDone, snap.data().invisTarget, snap.data().plans, snap.data().pendingPlans, snap.data().remarks
+      );
+  
+      sl++;
+  
+      docArray.push(activity);
+    }
+  }else{
+    const snapshot = await db.collection("sapphire").doc(name.toString()).collection(year.toString()).listDocuments();
+    let sl = 1;
+  
+    for (let i = 1; i <= snapshot.length; i++) {
+      if (parseInt(snapshot[i - 1].id) >= parseInt(weekFrom) && parseInt(snapshot[i - 1].id) <= parseInt(weekTo)) {
+        idArray.push(parseInt(snapshot[i - 1].id));
+      }
+    }
+  
+    idArray.sort(function (a, b) { return a - b });
+  
+    for (let j = 0; j < idArray.length; j++) {
+      const snap = await db.collection("sapphire").doc(name.toString()).collection(year.toString()).doc(idArray[j].toString()).get();
 
-  idArray.sort(function (a, b) { return a - b });
-
-  for (let j = 0; j < idArray.length; j++) {
-    const snap = await db.collection(collection).doc(name.toString()).collection(year.toString()).doc(idArray[j].toString()).get();
-
-    const activity = new Activity(
-      sl, parseInt(idArray[j]), snap.data().list, snap.data().networkingDone, snap.data().networkingTarget, snap.data().infosDone, snap.data().infosTarget,
-      snap.data().reinfosDone, snap.data().reinfosTarget, snap.data().meetupsDone, snap.data().meetupsTarget,
-      snap.data().invisDone, snap.data().invisTarget, snap.data().plans, snap.data().pendingPlans, snap.data().remarks
-    );
-
-    sl++;
-
-    docArray.push(activity);
+      const sapphire = new Sapphire(
+        sl, parseInt(idArray[j]), snap.data().nodeCount, snap.data().networkingDone, snap.data().infosDone,
+        snap.data().reinfosDone, snap.data().meetupsDone,
+        snap.data().invisDone, snap.data().plans, snap.data().pendingPlans, snap.data().secondMeetings, snap.data().uv, snap.data().remarks
+      );
+  
+      sl++;
+  
+      docArray.push(sapphire);
+    }
   }
 
   return docArray;
@@ -571,5 +608,5 @@ app.get('/utilities', requireAuth, function (req, res) {
 //   res.render('404',{page : '404'});
 // });
 
-app.listen(port);
+app.listen(port,'0.0.0.0');
 console.log('Server started at http://localhost:' + port);
