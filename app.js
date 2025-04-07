@@ -570,8 +570,8 @@ app.get('/add', requireAuth, async function (req, res) {
   res.render('add', { userName: req.session.userId, page: 'add' });
 });
 
-app.get('/profile', requireAuth, function (req, res) {
-  res.render('profile', { userName: req.session.userId, page: 'profile' });
+app.get('/settings', requireAuth, function (req, res) {
+  res.render('settings', { userName: req.session.userId, page: 'settings' });
 });
 
 app.get('/analyze', requireAuth, async function (req, res) {
@@ -600,13 +600,13 @@ app.get('/utilities', requireAuth, function (req, res) {
 
 
 //The 404 Route (ALWAYS Keep this as the last route)
-// app.get('*',requireAuth, function(req, res){
-//   res.render('404',{page : '404'});
-// });
+app.get('*',requireAuth, function(req, res){
+  res.render('404',{userName: req.session.userId, page : '404'});
+});
 
-// app.post('*',requireAuth, function(req, res){
-//   res.render('404',{page : '404'});
-// });
+app.post('*',requireAuth, function(req, res){
+  res.render('404',{userName: req.session.userId, page : '404'});
+});
 
 app.listen(port,'0.0.0.0');
 console.log('Server started at http://localhost:' + port);

@@ -14,6 +14,8 @@
             <h4 class="mb-0 ms-3">Analyze Data</h4>
             <% } else if(page == 'utilities'){ %>
             <h4 class="mb-0 ms-3">Utilities</h4>
+            <% } else if(page == 'settings'){ %>
+            <h4 class="mb-0 ms-3">Settings</h4>
             <% } %>
         </div>
         <div class="ms-auto">
@@ -24,7 +26,7 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><a class="dropdown-item" href="#" disabled>Profile</a></li>
-                    <li><a class="dropdown-item" href="#" disabled>Settings</a></li>
+                    <li><a class="dropdown-item" href="/settings">Settings</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item link-danger" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</a></li>
                 </ul>
