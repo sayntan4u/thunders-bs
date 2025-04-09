@@ -338,7 +338,7 @@ select{
 }
 
 .hide{
-    display: none;
+    display: none !important;
 }
 
 .table-bordered td,.table-bordered th{

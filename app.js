@@ -548,6 +548,20 @@ app.post("/getSettings", requireAuth, async (req, res) => {
   }
 });
 
+app.post("/saveSettings", requireAuth, async (req, res) => {
+  const config = req.body.config;
+  try {
+    fs.writeFile('./settings.conf', JSON.stringify(config,null,2), function (err) {
+      if (err) throw err;
+      // console.log('Saved!');
+      res.send("Saved");
+    });
+    
+  } catch (err) {
+    res.send(err);
+  }
+});
+
 
 
 // Routes will go here

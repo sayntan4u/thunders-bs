@@ -27,7 +27,9 @@ function addField(fieldName = "") {
             header: fieldName,
             sub_heading: []
         });
-        console.log(settingsJson.SKB_table);
+        // console.log(settingsJson.SKB_table);
+        $("#settingsJsonText").val(JSON.stringify(settingsJson.SKB_table, null, 2));
+        generateSKBTable(settingsJson.SKB_table);
     }
     $("#table_header").append(`
         <li draggable="true" class="th">
@@ -43,7 +45,7 @@ function addField(fieldName = "") {
                                       <li><button class="btn dropdown-item" onclick="delete_heading(this)">Delete</button></li>
                                     </ul>
                                   </div>
-                                  <ul class="sub_heading sub_heading_` + fieldName + `">
+                                  <ul class="sub_heading sub_heading_` + fieldName.replaceAll(/\s/g,'') + `">
                                   </ul>
                                 </li>
         
@@ -64,7 +66,9 @@ function delete_heading(elem) {
             break;
         }
     }
-    console.log(settingsJson.SKB_table);
+    // console.log(settingsJson.SKB_table);
+    $("#settingsJsonText").val(JSON.stringify(settingsJson.SKB_table, null, 2));
+    generateSKBTable(settingsJson.SKB_table);
     elem.parentNode.parentNode.parentNode.parentNode.remove();
 }
 
@@ -103,7 +107,9 @@ function addSubField(sub_field_name = "", heading = "") {
                 break;
             }
         }
-        console.log(settingsJson.SKB_table);
+        // console.log(settingsJson.SKB_table);
+        $("#settingsJsonText").val(JSON.stringify(settingsJson.SKB_table, null, 2));
+        generateSKBTable(settingsJson.SKB_table);
         
         $('.add_li').parent().append(`
             <li>
@@ -113,7 +119,7 @@ function addSubField(sub_field_name = "", heading = "") {
             `);
         $('.add_li').remove();
     } else {
-        $('.sub_heading_' + heading).append(`
+        $('.sub_heading_' + heading.replaceAll(/\s/g,'')).append(`
             <li>
                                           <span class="badge rounded-pill bg-warning">` + sub_field_name + `</span>
                                           <button type="button" class="btn btn-sm" onclick="delete_sub_heading(this)"><i class="fa-solid fa-xmark text-danger"></i></button>
@@ -142,7 +148,9 @@ function delete_sub_heading(elem) {
             break;
         }
     }
-    console.log(settingsJson.SKB_table);
+    // console.log(settingsJson.SKB_table);
+    $("#settingsJsonText").val(JSON.stringify(settingsJson.SKB_table, null, 2));
+    generateSKBTable(settingsJson.SKB_table);
     $(elem).parent().remove();
 }
 
@@ -152,8 +160,9 @@ function loadSettings() {
     xhttp.onload = function () {
         const response = JSON.parse(this.responseText);
         settingsJson = response;
+        $("#settingsJsonText").val(JSON.stringify(settingsJson.SKB_table, null, 2));
         generateSKBTableTree(settingsJson.SKB_table);
-        // generateSKBTable(response.SKB_table);
+        generateSKBTable(settingsJson.SKB_table);
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send();
@@ -171,6 +180,18 @@ function generateSKBTableTree(SKB_table) {
 }
 
 function generateSKBTable(SKB_table) {
+
+    $(".skb_table").html("");
+    $(".skb_table").append(`
+        <thead class="thead-dark">
+            <tr class="header">
+
+            </tr>
+            <tr class="sub_heading">
+
+            </tr>
+        </thead>
+        `);
 
     var isSubHeading = false;
 
@@ -205,5 +226,17 @@ function generateSKBTable(SKB_table) {
         }
     }
 }
+
+$("#saveConfigSKB").click(function(){
+    const data = {config : settingsJson};
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/saveSettings");
+    xhttp.onload = function () {
+        console.log(this.responseText);
+        $(".alert_skb").toggleClass("hide");
+    }
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send(JSON.stringify(data));
+});
 
 loadSettings();
