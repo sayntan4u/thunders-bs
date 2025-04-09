@@ -1,3 +1,5 @@
+var settingsJson = {};
+
 $("#addFieldBtn").click(function () {
     $("#addFieldBtn").prop("disabled", true);
     $("#table_header").append(`
@@ -21,6 +23,11 @@ function cancelAddField() {
 function addField(fieldName = "") {
     if (fieldName == "") {
         fieldName = $("#textFieldName").val();
+        settingsJson.SKB_table.push({
+            header: fieldName,
+            sub_heading: []
+        });
+        console.log(settingsJson.SKB_table);
     }
     $("#table_header").append(`
         <li draggable="true" class="th">
@@ -36,7 +43,7 @@ function addField(fieldName = "") {
                                       <li><button class="btn dropdown-item" onclick="delete_heading(this)">Delete</button></li>
                                     </ul>
                                   </div>
-                                  <ul class="sub_heading_` + fieldName + `">
+                                  <ul class="sub_heading sub_heading_` + fieldName + `">
                                   </ul>
                                 </li>
         
@@ -44,9 +51,20 @@ function addField(fieldName = "") {
 
     $("#addFieldBtn").prop("disabled", false);
     $('#add_li').remove();
+
 }
 
 function delete_heading(elem) {
+    const heading_name = $(elem).parent().parent().parent().parent().children("span").html();
+    // console.log(heading_name);
+
+    for(let i = 0; i<settingsJson.SKB_table.length; i++){
+        if(settingsJson.SKB_table[i].header == heading_name){
+            settingsJson.SKB_table.splice(i,1);
+            break;
+        }
+    }
+    console.log(settingsJson.SKB_table);
     elem.parentNode.parentNode.parentNode.parentNode.remove();
 }
 
@@ -73,8 +91,20 @@ function cancelAddSubField() {
 
 function addSubField(sub_field_name = "", heading = "") {
 
-    if(heading == ""){
+    if (heading == "") {
         sub_field_name = $("#textSubFieldName").val();
+
+        const heading_name = $('.add_li').parent().parent().children("span").html();
+        // console.log(heading_name);
+
+        for(let i = 0; i<settingsJson.SKB_table.length; i++){
+            if(settingsJson.SKB_table[i].header == heading_name){
+                settingsJson.SKB_table[i].sub_heading.push(sub_field_name);
+                break;
+            }
+        }
+        console.log(settingsJson.SKB_table);
+        
         $('.add_li').parent().append(`
             <li>
                                           <span class="badge rounded-pill bg-warning">` + sub_field_name + `</span>
@@ -82,7 +112,7 @@ function addSubField(sub_field_name = "", heading = "") {
             </li>
             `);
         $('.add_li').remove();
-    }else{
+    } else {
         $('.sub_heading_' + heading).append(`
             <li>
                                           <span class="badge rounded-pill bg-warning">` + sub_field_name + `</span>
@@ -90,11 +120,29 @@ function addSubField(sub_field_name = "", heading = "") {
             </li>
             `);
     }
-   
+
 
 }
 
 function delete_sub_heading(elem) {
+    const heading_name = $(elem).parent().parent().parent().children("span").html();
+    const sub_heading_name = $(elem).parent().children("span").html();
+
+    // console.log(heading_name);
+    // console.log(sub_heading_name);
+
+    for(let i = 0; i<settingsJson.SKB_table.length; i++){
+        if(settingsJson.SKB_table[i].header == heading_name){
+           for(let j=0; j<settingsJson.SKB_table[i].sub_heading.length; j++){
+            if(settingsJson.SKB_table[i].sub_heading[j] == sub_heading_name){
+                settingsJson.SKB_table[i].sub_heading.splice(j,1);
+                break;
+            }
+           }
+            break;
+        }
+    }
+    console.log(settingsJson.SKB_table);
     $(elem).parent().remove();
 }
 
@@ -103,8 +151,9 @@ function loadSettings() {
     xhttp.open("POST", "/getSettings");
     xhttp.onload = function () {
         const response = JSON.parse(this.responseText);
-        console.log(response.SKB_table);
-        generateSKBTableTree(response.SKB_table);
+        settingsJson = response;
+        generateSKBTableTree(settingsJson.SKB_table);
+        // generateSKBTable(response.SKB_table);
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send();
@@ -113,10 +162,46 @@ function loadSettings() {
 function generateSKBTableTree(SKB_table) {
     for (let i = 0; i < SKB_table.length; i++) {
         addField(SKB_table[i].header);
-        if(SKB_table[i].sub_heading.length > 0){
-            for(let j = 0; j < SKB_table[i].sub_heading.length; j++){
+        if (SKB_table[i].sub_heading.length > 0) {
+            for (let j = 0; j < SKB_table[i].sub_heading.length; j++) {
                 addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
             }
+        }
+    }
+}
+
+function generateSKBTable(SKB_table) {
+
+    var isSubHeading = false;
+
+    for (let i = 0; i < SKB_table.length; i++) {
+
+        if (SKB_table[i].sub_heading.length > 0) {
+            isSubHeading = true;
+            $(".skb_table thead .header").append(`
+                <th scope="col" class="txt-align-center text-light bg-dark" colspan="` + SKB_table[i].sub_heading.length + `">` + SKB_table[i].header + `</th>
+                `);
+        } else {
+            $(".skb_table thead .header").append(`
+                <th scope="col" class="txt-align-center text-light bg-dark">` + SKB_table[i].header + `</th>
+                `);
+        }
+    }
+
+    if (isSubHeading) {
+        for (let i = 0; i < SKB_table.length; i++) {
+            if (SKB_table[i].sub_heading.length > 0) {
+                for (let j = 0; j < SKB_table[i].sub_heading.length; j++) {
+                    $(".skb_table thead .sub_heading").append(`
+                        <th scope="col" class="txt-align-center text-light bg-dark">` + SKB_table[i].sub_heading[j] + `</th>
+                        `);
+                }
+            } else {
+                $(".skb_table thead .sub_heading").append(`
+                    <th scope="col" class="txt-align-center text-light bg-dark"></th>
+                    `);
+            }
+
         }
     }
 }

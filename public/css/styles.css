@@ -345,4 +345,8 @@ select{
     border: 1px solid black !important;
 }
 
+.txt-align-center{
+    text-align: center !important;
+}
+
 
