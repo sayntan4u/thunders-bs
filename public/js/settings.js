@@ -13,6 +13,7 @@ $("#addFieldBtn").click(function () {
                               </div>
         </li>
         `);
+        document.getElementById("textFieldName").focus();
 });
 
 function cancelAddField() {
@@ -86,6 +87,7 @@ function add_sub_heading(elem) {
                              </div>
        </li>
        `);
+       document.getElementById("textSubFieldName").focus();
 
 }
 
@@ -232,8 +234,9 @@ $("#saveConfigSKB").click(function(){
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/saveSettings");
     xhttp.onload = function () {
-        console.log(this.responseText);
+        // console.log(this.responseText);
         $(".alert_skb").toggleClass("hide");
+        setTimeout(function () { $(".alert_skb").toggleClass("hide"); }, 6000);
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
