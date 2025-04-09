@@ -530,7 +530,23 @@ function createLegalDocumentAndDeclaration(
   return [outputPathLegal, outputPathDeclaration];
 }
 
+//Settings Page
 
+app.post("/getSettings", requireAuth, async (req, res) => {
+  try {
+    fs.readFile('./settings.conf', 'utf8', (err, data) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      const json = JSON.parse(data);
+      res.send(data);
+    });
+    
+  } catch (err) {
+    res.send(err);
+  }
+});
 
 
 

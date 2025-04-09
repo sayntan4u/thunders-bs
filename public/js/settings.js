@@ -1,5 +1,5 @@
 $("#addFieldBtn").click(function () {
-    $("#addFieldBtn").prop("disabled",true);
+    $("#addFieldBtn").prop("disabled", true);
     $("#table_header").append(`
         <li id="add_li">
         <div class="input-group">
@@ -13,14 +13,15 @@ $("#addFieldBtn").click(function () {
         `);
 });
 
-function cancelAddField(){
-    $("#addFieldBtn").prop("disabled",false);
+function cancelAddField() {
+    $("#addFieldBtn").prop("disabled", false);
     $('#add_li').remove();
 }
 
-function addField(){
-
-    const fieldName = $("#textFieldName").val();
+function addField(fieldName = "") {
+    if (fieldName == "") {
+        fieldName = $("#textFieldName").val();
+    }
     $("#table_header").append(`
         <li draggable="true" class="th">
                                   <span class="badge rounded-pill bg-secondary">` + fieldName + `</span>
@@ -35,21 +36,21 @@ function addField(){
                                       <li><button class="btn dropdown-item" onclick="delete_heading(this)">Delete</button></li>
                                     </ul>
                                   </div>
-                                  <ul class="sub_heading">
+                                  <ul class="sub_heading_` + fieldName + `">
                                   </ul>
                                 </li>
         
         `);
 
-    $("#addFieldBtn").prop("disabled",false);
+    $("#addFieldBtn").prop("disabled", false);
     $('#add_li').remove();
 }
 
-function delete_heading(elem){
+function delete_heading(elem) {
     elem.parentNode.parentNode.parentNode.parentNode.remove();
 }
 
-function add_sub_heading(elem){
+function add_sub_heading(elem) {
     // const sub_heading_ul = elem.parentNode.parentNode.parentNode.parentNode.children[2];
     // alert($(elem).parent().parent().parent().parent());
     $(elem).parent().parent().parent().parent().children(".sub_heading").append(`
@@ -66,23 +67,58 @@ function add_sub_heading(elem){
 
 }
 
-function cancelAddSubField(){
+function cancelAddSubField() {
     $('.add_li').remove();
 }
 
-function addSubField(){
+function addSubField(sub_field_name = "", heading = "") {
 
-    const sub_field_name = $("#textSubFieldName").val();
-    $('.add_li').parent().append(`
-        <li>
-                                      <span class="badge rounded-pill bg-warning">` + sub_field_name +`</span>
-                                      <button type="button" class="btn btn-sm" onclick="delete_sub_heading(this)"><i class="fa-solid fa-xmark text-danger"></i></button>
-        </li>
-        `);
-    $('.add_li').remove();
+    if(heading == ""){
+        sub_field_name = $("#textSubFieldName").val();
+        $('.add_li').parent().append(`
+            <li>
+                                          <span class="badge rounded-pill bg-warning">` + sub_field_name + `</span>
+                                          <button type="button" class="btn btn-sm" onclick="delete_sub_heading(this)"><i class="fa-solid fa-xmark text-danger"></i></button>
+            </li>
+            `);
+        $('.add_li').remove();
+    }else{
+        $('.sub_heading_' + heading).append(`
+            <li>
+                                          <span class="badge rounded-pill bg-warning">` + sub_field_name + `</span>
+                                          <button type="button" class="btn btn-sm" onclick="delete_sub_heading(this)"><i class="fa-solid fa-xmark text-danger"></i></button>
+            </li>
+            `);
+    }
+   
 
 }
 
-function delete_sub_heading(elem){
+function delete_sub_heading(elem) {
     $(elem).parent().remove();
 }
+
+function loadSettings() {
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/getSettings");
+    xhttp.onload = function () {
+        const response = JSON.parse(this.responseText);
+        console.log(response.SKB_table);
+        generateSKBTableTree(response.SKB_table);
+    }
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send();
+}
+
+function generateSKBTableTree(SKB_table) {
+    for (let i = 0; i < SKB_table.length; i++) {
+        addField(SKB_table[i].header);
+        if(SKB_table[i].sub_heading.length > 0){
+            for(let j = 0; j < SKB_table[i].sub_heading.length; j++){
+                addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
+            }
+        }
+    }
+}
+
+loadSettings();
