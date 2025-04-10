@@ -15,7 +15,7 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 const admin = require('firebase-admin');
-const credentials = require('./key.json');
+const credentials = require('./key1.json');
 
 class Activity {
   constructor(sl, name, list, networkingDone, networkingTarget, infosDone, infosTarget, reinfosDone, reinfosTarget, meetupsDone,
