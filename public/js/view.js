@@ -373,7 +373,7 @@ function getPrevWeekDataSapphire(wk, yr) {
 
         const response = JSON.parse(this.responseText);
 
-        $(".skbPrevData").html("");
+        $(".sapphirePrevData").html("");
 
         for (let i = 0; i < response.length; i++) {
             $(".sapphirePrevData").append(`<tr>
