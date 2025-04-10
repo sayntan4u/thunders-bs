@@ -13,7 +13,7 @@ $("#addFieldBtn").click(function () {
                               </div>
         </li>
         `);
-        document.getElementById("textFieldName").focus();
+    document.getElementById("textFieldName").focus();
 });
 
 function cancelAddField() {
@@ -33,7 +33,7 @@ function addField(fieldName = "") {
         generateSKBTable(settingsJson.SKB_table);
     }
     $("#table_header").append(`
-        <li draggable="true" class="th">
+        <li draggable="true" id="` + fieldName.replaceAll(/\s/g, '') + `" ondragstart="dragstartHandler(event)" ondrop="dropHandler(event)" ondragover="dragoverHandler(event)" class="th">
                                   <span class="badge rounded-pill bg-secondary">` + fieldName + `</span>
                                   <!-- Example single danger button -->
                                   <div class="btn-group">
@@ -46,7 +46,7 @@ function addField(fieldName = "") {
                                       <li><button class="btn dropdown-item" onclick="delete_heading(this)">Delete</button></li>
                                     </ul>
                                   </div>
-                                  <ul class="sub_heading sub_heading_` + fieldName.replaceAll(/\s/g,'') + `">
+                                  <ul class="sub_heading sub_heading_` + fieldName.replaceAll(/\s/g, '') + `">
                                   </ul>
                                 </li>
         
@@ -61,9 +61,9 @@ function delete_heading(elem) {
     const heading_name = $(elem).parent().parent().parent().parent().children("span").html();
     // console.log(heading_name);
 
-    for(let i = 0; i<settingsJson.SKB_table.length; i++){
-        if(settingsJson.SKB_table[i].header == heading_name){
-            settingsJson.SKB_table.splice(i,1);
+    for (let i = 0; i < settingsJson.SKB_table.length; i++) {
+        if (settingsJson.SKB_table[i].header == heading_name) {
+            settingsJson.SKB_table.splice(i, 1);
             break;
         }
     }
@@ -87,7 +87,7 @@ function add_sub_heading(elem) {
                              </div>
        </li>
        `);
-       document.getElementById("textSubFieldName").focus();
+    document.getElementById("textSubFieldName").focus();
 
 }
 
@@ -103,8 +103,8 @@ function addSubField(sub_field_name = "", heading = "") {
         const heading_name = $('.add_li').parent().parent().children("span").html();
         // console.log(heading_name);
 
-        for(let i = 0; i<settingsJson.SKB_table.length; i++){
-            if(settingsJson.SKB_table[i].header == heading_name){
+        for (let i = 0; i < settingsJson.SKB_table.length; i++) {
+            if (settingsJson.SKB_table[i].header == heading_name) {
                 settingsJson.SKB_table[i].sub_heading.push(sub_field_name);
                 break;
             }
@@ -112,7 +112,7 @@ function addSubField(sub_field_name = "", heading = "") {
         // console.log(settingsJson.SKB_table);
         $("#settingsJsonText").val(JSON.stringify(settingsJson.SKB_table, null, 2));
         generateSKBTable(settingsJson.SKB_table);
-        
+
         $('.add_li').parent().append(`
             <li>
                                           <span class="badge rounded-pill bg-warning">` + sub_field_name + `</span>
@@ -121,7 +121,7 @@ function addSubField(sub_field_name = "", heading = "") {
             `);
         $('.add_li').remove();
     } else {
-        $('.sub_heading_' + heading.replaceAll(/\s/g,'')).append(`
+        $('.sub_heading_' + heading.replaceAll(/\s/g, '')).append(`
             <li>
                                           <span class="badge rounded-pill bg-warning">` + sub_field_name + `</span>
                                           <button type="button" class="btn btn-sm" onclick="delete_sub_heading(this)"><i class="fa-solid fa-xmark text-danger"></i></button>
@@ -139,14 +139,14 @@ function delete_sub_heading(elem) {
     // console.log(heading_name);
     // console.log(sub_heading_name);
 
-    for(let i = 0; i<settingsJson.SKB_table.length; i++){
-        if(settingsJson.SKB_table[i].header == heading_name){
-           for(let j=0; j<settingsJson.SKB_table[i].sub_heading.length; j++){
-            if(settingsJson.SKB_table[i].sub_heading[j] == sub_heading_name){
-                settingsJson.SKB_table[i].sub_heading.splice(j,1);
-                break;
+    for (let i = 0; i < settingsJson.SKB_table.length; i++) {
+        if (settingsJson.SKB_table[i].header == heading_name) {
+            for (let j = 0; j < settingsJson.SKB_table[i].sub_heading.length; j++) {
+                if (settingsJson.SKB_table[i].sub_heading[j] == sub_heading_name) {
+                    settingsJson.SKB_table[i].sub_heading.splice(j, 1);
+                    break;
+                }
             }
-           }
             break;
         }
     }
@@ -171,6 +171,7 @@ function loadSettings() {
 }
 
 function generateSKBTableTree(SKB_table) {
+    $("#table_header").html("");
     for (let i = 0; i < SKB_table.length; i++) {
         addField(SKB_table[i].header);
         if (SKB_table[i].sub_heading.length > 0) {
@@ -229,8 +230,8 @@ function generateSKBTable(SKB_table) {
     }
 }
 
-$("#saveConfigSKB").click(function(){
-    const data = {config : settingsJson};
+$("#saveConfigSKB").click(function () {
+    const data = { config: settingsJson };
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/saveSettings");
     xhttp.onload = function () {
@@ -241,5 +242,44 @@ $("#saveConfigSKB").click(function(){
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
 });
+
+function dragstartHandler(ev) {
+    ev.dataTransfer.setData("text", $(ev.target).children("span").html());
+}
+
+function dropHandler(ev) {
+    ev.preventDefault();
+    const data = ev.dataTransfer.getData("text");
+    $("#drag_drop").html(data + " -> " + $(ev.target).html());
+
+    swapElements(data, $(ev.target).html(), settingsJson.SKB_table);
+
+    $("#settingsJsonText").val(JSON.stringify(settingsJson.SKB_table, null, 2));
+    generateSKBTableTree(settingsJson.SKB_table);
+    generateSKBTable(settingsJson.SKB_table);
+}
+
+function dragoverHandler(ev) {
+    ev.preventDefault();
+}
+
+function swapElements(itemA,itemB,jsonData){
+    var indexA = null;
+    var indexB = null;
+    for(let i=0; i< jsonData.length; i++){
+        if(jsonData[i].header == itemA){
+            indexA = i;
+        }
+        if(jsonData[i].header == itemB){
+            indexB = i;
+        }
+    }
+    if(indexA !=null && indexB != null){
+        var c = jsonData[indexA];
+        jsonData[indexA] = jsonData[indexB];
+        jsonData[indexB] = c;
+    }
+   
+}
 
 loadSettings();
