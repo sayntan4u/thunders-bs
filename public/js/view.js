@@ -122,6 +122,11 @@ function getData() {
     $("#dataTableSapphire").addClass("hide");
     $("#prevWeekAcordion").addClass("hide");
     $("#prevWeekAcordionSapphire").addClass("hide");
+
+    $(".accordion-button").addClass("collapsed");
+    $(".accordion-button").prop("aria-expanded", false);
+    $(".accordion-collapse").removeClass("show");
+
     $(".loading").removeClass("hide");
 
     var wk = document.getElementById("inputWeek").value;
