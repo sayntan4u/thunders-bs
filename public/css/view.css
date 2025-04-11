@@ -4,7 +4,12 @@ td, .middle{
 }
 
 .done_data{
+    
     background-color: #f8fad7 !important;
+}
+
+.bg-warning, .bg-success, .bg-info{
+    font-weight:bold;
 }
 
 .bg-plan{

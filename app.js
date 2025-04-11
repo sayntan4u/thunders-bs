@@ -127,8 +127,6 @@ app.post("/getData", requireAuth, async (req, res) => {
     } else {
       data = await getCollectionData('sapphire', year, week);
     }
-
-
     res.send(data);
   } catch (err) {
     res.send(err);
@@ -177,9 +175,9 @@ async function getCollectionData(collection, year, week) {
 
       const snap = await db.collection(collection).doc(snapshot[i].id).collection(year).doc(week).get();
 
-      console.log(i + 1);
-      console.log(snapshot[i].id);
-      console.log(snap.data());
+      // console.log(i + 1);
+      // console.log(snapshot[i].id);
+      // console.log(snap.data());
 
       var dataRow = "{";
       dataRow += ' "sl" : "' + (i+1) + '",';
@@ -196,8 +194,8 @@ async function getCollectionData(collection, year, week) {
       }
       dataRow += '}';
 
-      console.log("datarow");
-      console.log(JSON.parse(dataRow));
+      // console.log("datarow");
+      // console.log(JSON.parse(dataRow));
 
       // const activity = new Activity(
       //   i + 1, snapshot[i].id, snap.data().list, snap.data().networkingDone, snap.data().networkingTarget, snap.data().infosDone, snap.data().infosTarget,
@@ -224,8 +222,7 @@ async function getCollectionData(collection, year, week) {
     }
   }
 
-
-
+  console.log(docArray);
   return docArray;
 }
 
