@@ -3,6 +3,8 @@ $('#searchActivity').on('click', function () {
     getData();
 });
 
+var settingsJson = {};
+
 function sumData() {
 
     var list = document.getElementsByClassName("list");
@@ -143,6 +145,7 @@ function getData() {
         // alert(JSON.parse(this.responseText).length);
 
         const response = JSON.parse(this.responseText);
+        console.log(response);
 
         if (groupSearch == "SKB") {
             $(".skbData").html("");
@@ -212,7 +215,7 @@ function getData() {
             <td><input type="text" class="form-control bg-plan secondMeetings-Sapphire ${response[i].name + '-secondMeetings-Sapphire'}" value="${(response[i].secondMeetings > 0) ? response[i].secondMeetings : ''}" onchange="valueChanged('${response[i].name}', 'secondMeetings', 'Sapphire')"></td>
             <td><input type="text" class="form-control bg-plan uv-Sapphire ${response[i].name + '-uv-Sapphire'}" value="${(response[i].uv > 0) ? response[i].uv : ''}" onchange="valueChanged('${response[i].name}', 'uv', 'Sapphire')"></td>
             <td><input type="text" class="form-control remarks-Sapphire ${response[i].name + '-remarks-Sapphire'}" value="${response[i].remarks}" onchange="valueChanged('${response[i].name}', 'remarks', 'Sapphire')"></td>
-          </tr>`);
+            </tr>`);
             }
 
             $(".sapphireData").append(`
@@ -536,3 +539,53 @@ function sumPrevDataSapphire() {
     document.getElementsByClassName("ptotalSecondMeetings")[0].innerHTML = totalSecondMeetings;
     document.getElementsByClassName("ptotalUV")[0].innerHTML = totalUV;
 }
+
+function generateSKBTable(SKB_table) {
+
+    var isSubHeading = false;
+
+    for (let i = 0; i < SKB_table.length; i++) {
+
+        if (SKB_table[i].sub_heading.length > 0) {
+            isSubHeading = true;
+            $(".skb_dataTable thead .header").append(`
+                <th scope="col" class="txt-align-center text-light bg-dark" colspan="` + SKB_table[i].sub_heading.length + `">` + SKB_table[i].header + `</th>
+                `);
+        } else {
+            $(".skb_dataTable thead .header").append(`
+                <th scope="col" class="txt-align-center text-light bg-dark">` + SKB_table[i].header + `</th>
+                `);
+        }
+    }
+
+    if (isSubHeading) {
+        for (let i = 0; i < SKB_table.length; i++) {
+            if (SKB_table[i].sub_heading.length > 0) {
+                for (let j = 0; j < SKB_table[i].sub_heading.length; j++) {
+                    $(".skb_dataTable thead .sub_heading").append(`
+                        <th scope="col" class="txt-align-center text-light bg-dark">` + SKB_table[i].sub_heading[j] + `</th>
+                        `);
+                }
+            } else {
+                $(".skb_dataTable thead .sub_heading").append(`
+                    <th scope="col" class="txt-align-center text-light bg-dark"></th>
+                    `);
+            }
+
+        }
+    }
+}
+
+function loadSettings() {
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/getSettings");
+    xhttp.onload = function () {
+        const response = JSON.parse(this.responseText);
+        settingsJson = response;
+        generateSKBTable(settingsJson.initTableView.concat(settingsJson.SKB_table , settingsJson.endTable));
+    }
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send();
+}
+
+loadSettings();

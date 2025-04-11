@@ -58,6 +58,28 @@ class Sapphire {
   }
 }
 
+function getFields() {
+  const fields = [];
+  const data = fs.readFileSync('./settings.conf', 'utf8');
+  const SKB_table = JSON.parse(data).SKB_table;
+
+
+  for (let i = 0; i < SKB_table.length; i++) {
+    // addField(SKB_table[i].header);
+
+    if (SKB_table[i].sub_heading.length > 0) {
+      for (let j = 0; j < SKB_table[i].sub_heading.length; j++) {
+        // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
+        fields.push(camelize((SKB_table[i].header + SKB_table[i].sub_heading[j]).toString()));
+      }
+    } else {
+      fields.push(camelize(SKB_table[i].header));
+    }
+  }
+
+  return fields;
+}
+
 admin.initializeApp({
   credential: admin.credential.cert(credentials)
 });
@@ -157,17 +179,33 @@ async function getCollectionData(collection, year, week) {
 
       console.log(i + 1);
       console.log(snapshot[i].id);
-      console.log(snap.data()["list"]);
       console.log(snap.data());
 
+      var dataRow = "{";
+      dataRow += ' "sl" : "' + (i+1) + '",';
+      dataRow += ' "name" : "' + snapshot[i].id + '",';
+      var fields = getFields();
+      fields.push("remarks");
 
-      const activity = new Activity(
-        i + 1, snapshot[i].id, snap.data().list, snap.data().networkingDone, snap.data().networkingTarget, snap.data().infosDone, snap.data().infosTarget,
-        snap.data().reinfosDone, snap.data().reinfosTarget, snap.data().meetupsDone, snap.data().meetupsTarget,
-        snap.data().invisDone, snap.data().invisTarget, snap.data().plans, snap.data().pendingPlans, snap.data().remarks
-      );
+      for(let i=0; i<fields.length; i++){
+        dataRow += '"'+ fields[i] + '" : "' + snap.data()[fields[i]] + '"';
+        // dataRow.push(snap.data()[fields[i]]);
+        if(i != fields.length -1){
+          dataRow += ',';
+        }
+      }
+      dataRow += '}';
 
-      docArray.push(activity);
+      console.log("datarow");
+      console.log(JSON.parse(dataRow));
+
+      // const activity = new Activity(
+      //   i + 1, snapshot[i].id, snap.data().list, snap.data().networkingDone, snap.data().networkingTarget, snap.data().infosDone, snap.data().infosTarget,
+      //   snap.data().reinfosDone, snap.data().reinfosTarget, snap.data().meetupsDone, snap.data().meetupsTarget,
+      //   snap.data().invisDone, snap.data().invisTarget, snap.data().plans, snap.data().pendingPlans, snap.data().remarks
+      // );
+
+      docArray.push(JSON.parse(dataRow));
 
     }
   } else {
@@ -205,27 +243,36 @@ app.post("/addUser", requireAuth, async (req, res) => {
   const name = req.body.name;
   const group = req.body.group;
 
-  const data = fs.readFileSync('./settings.conf', 'utf8');
-  console.log(JSON.parse(data));
+  const fields = getFields();
+
+  var test = "{";
+  for (let i = 0; i < fields.length; i++) {
+    test += '"' + fields[i] + '" : 0,';
+  }
+  test = test + ' "remarks" : "" }';
+
+  // console.log(JSON.parse(test));
 
   if (group == "SKB") {
 
-    const userJson = {
-      list: 0,
-      networkingDone: 0,
-      networkingTarget: 0,
-      infosDone: 0,
-      infosTarget: 0,
-      reinfosDone: 0,
-      reinfosTarget: 0,
-      meetupsDone: 0,
-      meetupsTarget: 0,
-      invisDone: 0,
-      invisTarget: 0,
-      plans: 0,
-      pendingPlans: 0,
-      remarks: ""
-    };
+    // const userJson = {
+    //   list: 0,
+    //   networkingDone: 0,
+    //   networkingTarget: 0,
+    //   infosDone: 0,
+    //   infosTarget: 0,
+    //   reinfosDone: 0,
+    //   reinfosTarget: 0,
+    //   meetupsDone: 0,
+    //   meetupsTarget: 0,
+    //   invisDone: 0,
+    //   invisTarget: 0,
+    //   plans: 0,
+    //   pendingPlans: 0,
+    //   remarks: ""
+    // };
+
+    const userJson = JSON.parse(test);
 
     const d = new Date();
     let year = d.getFullYear();
