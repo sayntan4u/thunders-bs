@@ -46,9 +46,9 @@ class Sapphire {
       (this.name = name),
       (this.nodeCount = nodeCount),
       (this.networkingDone = networkingDone),
-      (this.infosDone = infosDone),  
-      (this.reinfosDone = reinfosDone),  
-      (this.meetupsDone = meetupsDone),    
+      (this.infosDone = infosDone),
+      (this.reinfosDone = reinfosDone),
+      (this.meetupsDone = meetupsDone),
       (this.invisDone = invisDone),
       (this.plans = plans),
       (this.pendingPlans = pendingPlans),
@@ -100,9 +100,9 @@ app.post("/getData", requireAuth, async (req, res) => {
 
     var data = [];
 
-    if(group == "SKB"){
+    if (group == "SKB") {
       data = await getCollectionData('users', year, week);
-    }else{
+    } else {
       data = await getCollectionData('sapphire', year, week);
     }
 
@@ -132,12 +132,12 @@ app.post("/updateUser", requireAuth, async (req, res) => {
     const obj = JSON.parse(userJson);
     // console.log(obj);
 
-    if(group == "SKB"){
+    if (group == "SKB") {
       db.collection("users").doc(name).collection(year).doc(week).update(obj);
-    }else{
+    } else {
       db.collection("sapphire").doc(name).collection(year).doc(week).update(obj);
     }
-    
+
     // const response = db.collection("users").doc(name).collection("2025").doc(week).set(userJson);
     res.send("success");
   } catch (err) {
@@ -150,46 +150,63 @@ async function getCollectionData(collection, year, week) {
   const snapshot = await db.collection(collection).listDocuments();
   const docArray = [];
 
-  if(collection == "users"){
+  if (collection == "users") {
     for (let i = 0; i < snapshot.length; i++) {
 
       const snap = await db.collection(collection).doc(snapshot[i].id).collection(year).doc(week).get();
-  
+
+      console.log(i + 1);
+      console.log(snapshot[i].id);
+      console.log(snap.data()["list"]);
+      console.log(snap.data());
+
+
       const activity = new Activity(
         i + 1, snapshot[i].id, snap.data().list, snap.data().networkingDone, snap.data().networkingTarget, snap.data().infosDone, snap.data().infosTarget,
         snap.data().reinfosDone, snap.data().reinfosTarget, snap.data().meetupsDone, snap.data().meetupsTarget,
-        snap.data().invisDone, snap.data().invisTarget, snap.data().plans, snap.data().pendingPlans,snap.data().remarks
+        snap.data().invisDone, snap.data().invisTarget, snap.data().plans, snap.data().pendingPlans, snap.data().remarks
       );
-  
+
       docArray.push(activity);
-  
+
     }
-  }else{
+  } else {
     for (let i = 0; i < snapshot.length; i++) {
 
       const snap = await db.collection(collection).doc(snapshot[i].id).collection(year).doc(week).get();
-  
+
       const sapphire = new Sapphire(
         i + 1, snapshot[i].id, snap.data().nodeCount, snap.data().networkingDone, snap.data().infosDone,
         snap.data().reinfosDone, snap.data().meetupsDone,
         snap.data().invisDone, snap.data().plans, snap.data().pendingPlans, snap.data().secondMeetings, snap.data().uv, snap.data().remarks
       );
-  
+
       docArray.push(sapphire);
-  
+
     }
   }
 
-  
+
 
   return docArray;
 }
 
 //Team page 
 
+function camelize(str) {
+  return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
+    return index === 0 ? word.toLowerCase() : word.toUpperCase();
+  }).replace(/\s+/g, '');
+}
+
+// console.log(camelize("Pending Plans"));
+
 app.post("/addUser", requireAuth, async (req, res) => {
   const name = req.body.name;
   const group = req.body.group;
+
+  const data = fs.readFileSync('./settings.conf', 'utf8');
+  console.log(JSON.parse(data));
 
   if (group == "SKB") {
 
@@ -215,10 +232,10 @@ app.post("/addUser", requireAuth, async (req, res) => {
     // console.log(year + 1);
 
     for (let i = 1; i <= 53; i++) {
-      db.collection("users").doc(name).collection(year.toString()).doc(i.toString()).set(userJson);
-      db.collection("users").doc(name).collection((year + 1).toString()).doc(i.toString()).set(userJson);
+      await db.collection("users").doc(name).collection(year.toString()).doc(i.toString()).set(userJson);
+      await db.collection("users").doc(name).collection((year + 1).toString()).doc(i.toString()).set(userJson);
     }
-    db.collection("users").doc(name).set({ namelist_link: "" });
+    await db.collection("users").doc(name).set({ namelist_link: "" });
   } else {
     const userJson = {
       nodeCount: 0,
@@ -238,8 +255,8 @@ app.post("/addUser", requireAuth, async (req, res) => {
     let year = d.getFullYear();
 
     for (let i = 1; i <= 53; i++) {
-      db.collection("sapphire").doc(name).collection(year.toString()).doc(i.toString()).set(userJson);
-      db.collection("sapphire").doc(name).collection((year + 1).toString()).doc(i.toString()).set(userJson);
+      await db.collection("sapphire").doc(name).collection(year.toString()).doc(i.toString()).set(userJson);
+      await db.collection("sapphire").doc(name).collection((year + 1).toString()).doc(i.toString()).set(userJson);
     }
     // db.collection("sapphire").doc(name).set({namelist_link : ""});
 
@@ -305,13 +322,13 @@ app.post("/delete", requireAuth, async (req, res) => {
   const name = req.body.name;
   const group = req.body.group;
 
-  if(group == "SKB"){
+  if (group == "SKB") {
     await db.recursiveDelete(db.collection("users").doc(name));
-  }else{
+  } else {
     await db.recursiveDelete(db.collection("sapphire").doc(name));
   }
   // console.log(name);
-  
+
   // console.log("done");
 
   // res.redirect('/add');
@@ -325,10 +342,10 @@ app.post('/getUserName', requireAuth, async function (req, res) {
   // console.log(group);
   var docArray = [];
 
-  if(group == "SKB"){
-   docArray = await getUserNames();
-  }else{
-   docArray = await getUserNamesSapphire();
+  if (group == "SKB") {
+    docArray = await getUserNames();
+  } else {
+    docArray = await getUserNamesSapphire();
   }
 
   res.send(docArray);
@@ -355,43 +372,43 @@ async function getAnalyzeData(year, weekFrom, weekTo, name, group) {
   const docArray = [];
   const idArray = [];
 
-  if(group == "SKB"){
+  if (group == "SKB") {
     const snapshot = await db.collection("users").doc(name.toString()).collection(year.toString()).listDocuments();
     let sl = 1;
-  
+
     for (let i = 1; i <= snapshot.length; i++) {
       if (parseInt(snapshot[i - 1].id) >= parseInt(weekFrom) && parseInt(snapshot[i - 1].id) <= parseInt(weekTo)) {
         idArray.push(parseInt(snapshot[i - 1].id));
       }
     }
-  
+
     idArray.sort(function (a, b) { return a - b });
-  
+
     for (let j = 0; j < idArray.length; j++) {
       const snap = await db.collection("users").doc(name.toString()).collection(year.toString()).doc(idArray[j].toString()).get();
-  
+
       const activity = new Activity(
         sl, parseInt(idArray[j]), snap.data().list, snap.data().networkingDone, snap.data().networkingTarget, snap.data().infosDone, snap.data().infosTarget,
         snap.data().reinfosDone, snap.data().reinfosTarget, snap.data().meetupsDone, snap.data().meetupsTarget,
         snap.data().invisDone, snap.data().invisTarget, snap.data().plans, snap.data().pendingPlans, snap.data().remarks
       );
-  
+
       sl++;
-  
+
       docArray.push(activity);
     }
-  }else{
+  } else {
     const snapshot = await db.collection("sapphire").doc(name.toString()).collection(year.toString()).listDocuments();
     let sl = 1;
-  
+
     for (let i = 1; i <= snapshot.length; i++) {
       if (parseInt(snapshot[i - 1].id) >= parseInt(weekFrom) && parseInt(snapshot[i - 1].id) <= parseInt(weekTo)) {
         idArray.push(parseInt(snapshot[i - 1].id));
       }
     }
-  
+
     idArray.sort(function (a, b) { return a - b });
-  
+
     for (let j = 0; j < idArray.length; j++) {
       const snap = await db.collection("sapphire").doc(name.toString()).collection(year.toString()).doc(idArray[j].toString()).get();
 
@@ -400,9 +417,9 @@ async function getAnalyzeData(year, weekFrom, weekTo, name, group) {
         snap.data().reinfosDone, snap.data().meetupsDone,
         snap.data().invisDone, snap.data().plans, snap.data().pendingPlans, snap.data().secondMeetings, snap.data().uv, snap.data().remarks
       );
-  
+
       sl++;
-  
+
       docArray.push(sapphire);
     }
   }
@@ -544,7 +561,7 @@ app.post("/getSettings", requireAuth, async (req, res) => {
       const json = JSON.parse(data);
       res.send(data);
     });
-    
+
   } catch (err) {
     res.send(err);
   }
@@ -553,12 +570,12 @@ app.post("/getSettings", requireAuth, async (req, res) => {
 app.post("/saveSettings", requireAuth, async (req, res) => {
   const config = req.body.config;
   try {
-    fs.writeFile('./settings.conf', JSON.stringify(config,null,2), function (err) {
+    fs.writeFile('./settings.conf', JSON.stringify(config, null, 2), function (err) {
       if (err) throw err;
       // console.log('Saved!');
       res.send("Saved");
     });
-    
+
   } catch (err) {
     res.send(err);
   }
@@ -576,10 +593,10 @@ app.get('/', requireAuth, function (req, res) {
 app.get('/Login', function (req, res) {
   if (req.session.userId) {
     res.redirect("/");
-  }else{
+  } else {
     res.render('login');
   }
-  
+
 });
 
 app.post('/Login', function (req, res) {
@@ -637,13 +654,13 @@ app.get('/utilities', requireAuth, function (req, res) {
 
 
 //The 404 Route (ALWAYS Keep this as the last route)
-app.get('*',requireAuth, function(req, res){
-  res.render('404',{userName: req.session.userId, page : '404'});
+app.get('*', requireAuth, function (req, res) {
+  res.render('404', { userName: req.session.userId, page: '404' });
 });
 
-app.post('*',requireAuth, function(req, res){
-  res.render('404',{userName: req.session.userId, page : '404'});
+app.post('*', requireAuth, function (req, res) {
+  res.render('404', { userName: req.session.userId, page: '404' });
 });
 
-app.listen(port,'0.0.0.0');
+app.listen(port, '0.0.0.0');
 console.log('Server started at http://localhost:' + port);
