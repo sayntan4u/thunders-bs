@@ -31,7 +31,15 @@ var settingsJson = {};
 var fields = [];
 
 function sumData() {
-    
+    for (let i = settingsJson.totalViewSKBColSpan; i < fields.length - 1; i++) {
+        var total = 0;
+        $(`.${fields[i]}`).each(function () {
+            if ($(this).val() != "") {
+                total += parseInt($(this).val());
+            }
+        });
+        $(".total" + fields[i]).html(total);
+    }
 }
 
 function sumSapphireData() {
@@ -85,19 +93,19 @@ function sumSapphireData() {
     document.getElementsByClassName("totalUV")[0].innerHTML = totalUV;
 }
 
-function getTDClass(field){
+function getTDClass(field) {
     var ret = "done-data";
-    if(field.toLowerCase().includes("target")){
+    if (field.toLowerCase().includes("target")) {
         ret = "bg-warning";
-    }else if(field.toLowerCase().includes("list")){
+    } else if (field.toLowerCase().includes("list")) {
         ret = "bg-info";
-    }else if(field == "plan"){
+    } else if (field == "plan") {
         ret = "bg-success";
-    }else if(field == "remarks"){
+    } else if (field == "remarks") {
         ret = "";
-    }else if(field.toLowerCase().includes("done")){
+    } else if (field.toLowerCase().includes("done")) {
         ret = "done_data";
-    }else if(field.toLowerCase().includes("pending")){
+    } else if (field.toLowerCase().includes("pending")) {
         ret = "bg-plan";
     }
 
@@ -130,7 +138,7 @@ function getData() {
         // alert(JSON.parse(this.responseText).length);
 
         const response = JSON.parse(this.responseText);
-        console.log(response);
+        // console.log(response);
 
         if (groupSearch == "SKB") {
             $(".skbData").html("");
@@ -150,16 +158,16 @@ function getData() {
             }
 
             var rowTable = `<tr><td colspan="${settingsJson.totalViewSKBColSpan}" class="txt-align-center"> <b>Total</b> </td>`;
-            for(let i=settingsJson.totalViewSKBColSpan; i<fields.length ; i++){
-                if(i == fields.length - 1){
+            for (let i = settingsJson.totalViewSKBColSpan; i < fields.length; i++) {
+                if (i == fields.length - 1) {
                     rowTable += `<th class="txt-align-center"></th>`;
-                }else{
+                } else {
                     rowTable += `<th class="txt-align-center ${getTDClass(fields[i])} total${fields[i]}"></th>`;
                 }
             }
             rowTable += '</tr>';
             $(".skbData").append(rowTable);
-            
+
 
             sumData();
 
@@ -290,44 +298,28 @@ function getPrevWeekData(wk, yr) {
         $(".skbPrevData").html("");
 
         for (let i = 0; i < response.length; i++) {
-            $(".skbPrevData").append(`<tr>
-            <th scope="row" class="middle">${response[i].sl}</th>
-            <td>${response[i].name}</td>
-            <td class="txt-align-center bg-info plist">${response[i].list}</td>
-            <td class="txt-align-center done_data pnetworkingDone">${response[i].networkingDone}</td>
-            <td class="txt-align-center bg-warning pnetworkingTarget">${response[i].networkingTarget}</td>
-            <td class="txt-align-center done_data pinfosDone">${response[i].infosDone}</td>
-            <td class="txt-align-center bg-warning pinfosTarget">${response[i].infosTarget}</td>
-            <td class="txt-align-center done_data preinfosDone">${response[i].reinfosDone}</td>
-            <td class="txt-align-center bg-warning preinfosTarget">${response[i].reinfosTarget}</td>
-            <td class="txt-align-center done_data pmeetupsDone">${response[i].meetupsDone}</td>
-            <td class="txt-align-center bg-warning pmeetupsTarget">${response[i].meetupsTarget}</td>
-            <td class="txt-align-center done_data pinvisDone">${response[i].invisDone}</td>
-            <td class="txt-align-center bg-warning pinvisTarget">${response[i].invisTarget}</td>
-            <td class="txt-align-center bg-success pplans">${response[i].plans}</td>
-            <td class="txt-align-center bg-plan ppendingPlans">${response[i].pendingPlans}</td>
-          </tr>`);
+            var rowTable = '<tr>';
+            for (let j = 0; j < fields.length - 1; j++) {
+                if (j == 0) {
+                    rowTable += '<th scope="row" class="middle">' + response[i].sl + '</th>';
+                } else if (j == 1) {
+                    rowTable += '<td>' + response[i][fields[j]] + '</td>';
+                } else {
+                    rowTable += `<td class="txt-align-center ${getTDClass(fields[j])} p${fields[j]}">${response[i][fields[j]]}</td>`;
+                }
+            }
+            rowTable += '</tr>';
+            $(".skbPrevData").append(rowTable);
         }
 
-        $(".skbPrevData").append(`
-        <tr class="">
-                
-                <td colspan="3" class="txt-align-center"> <b>Total</b> </td>
-                
-                <th class="txt-align-center done_data ptotalNetworkingDone"></th>
-                <th class="txt-align-center bg-warning  ptotalNetworkingTarget"></th>
-                <th class="txt-align-center done_data ptotalInfosDone"></th>
-                <th class="txt-align-center bg-warning  ptotalInfosTarget"></th>
-                <th class="txt-align-center done_data ptotalReinfosDone"></th>
-                <th class="txt-align-center bg-warning  ptotalReinfosTarget"></th>
-                <th class="txt-align-center done_data ptotalMeetupDone"></th>
-                <th class="txt-align-center bg-warning  ptotalMeetupTarget"></th>
-                <th class="txt-align-center done_data ptotalInviDone"></th>
-                <th class="txt-align-center bg-warning  ptotalInviTarget"></th>
-                <th class="txt-align-center bg-success ptotalPlanDone"></th>
-                <th class="txt-align-center bg-plan ptotalPendingPlans"></th>
-              </tr>
-        `);
+        var rowTable = `<tr><td colspan="${settingsJson.totalViewSKBColSpan}" class="txt-align-center"> <b>Total</b> </td>`;
+        for (let i = settingsJson.totalViewSKBColSpan; i < fields.length - 1; i++) {
+            rowTable += `<th class="txt-align-center ${getTDClass(fields[i])} ptotal${fields[i]}"></th>`;
+        }
+        rowTable += '</tr>';
+        $(".skbPrevData").append(rowTable);
+
+
         sumPrevData();
 
         $("#prevWeekTable").removeClass("hide");
@@ -397,66 +389,15 @@ function getPrevWeekDataSapphire(wk, yr) {
 }
 
 function sumPrevData() {
-
-    var list = document.getElementsByClassName("plist");
-    var networkingDone = document.getElementsByClassName("pnetworkingDone");
-    var networkingTarget = document.getElementsByClassName("pnetworkingTarget");
-    var infosDone = document.getElementsByClassName("pinfosDone");
-    var infosTarget = document.getElementsByClassName("pinfosTarget");
-    var reinfosDone = document.getElementsByClassName("preinfosDone");
-    var reinfosTarget = document.getElementsByClassName("preinfosTarget");
-    var meetupsDone = document.getElementsByClassName("pmeetupsDone");
-    var meetupsTarget = document.getElementsByClassName("pmeetupsTarget");
-    var inviDone = document.getElementsByClassName("pinvisDone");
-    var inviTarget = document.getElementsByClassName("pinvisTarget");
-    var plans = document.getElementsByClassName("pplans");
-    var pendingPlans = document.getElementsByClassName("ppendingPlans");
-
-
-
-    var totalList = 0;
-    var totalNetworkingDone = 0;
-    var totalNetworkingTarget = 0;
-    var totalInfosDone = 0;
-    var totalInfosTarget = 0;
-    var totalReinfosDone = 0;
-    var totalReinfosTarget = 0;
-    var totalMeetupDone = 0;
-    var totalMeetupTarget = 0;
-    var totalInviDone = 0;
-    var totalInviTarget = 0;
-    var totalPlanDone = 0;
-    var totalPendingPlans = 0;
-
-    for (let index = 0; index < list.length; index++) {
-        totalList = totalList + Number(list[index].innerHTML);
-        totalNetworkingDone = totalNetworkingDone + Number(networkingDone[index].innerHTML);
-        totalNetworkingTarget = totalNetworkingTarget + Number(networkingTarget[index].innerHTML);
-        totalInfosDone = totalInfosDone + Number(infosDone[index].innerHTML);
-        totalInfosTarget = totalInfosTarget + Number(infosTarget[index].innerHTML);
-        totalReinfosDone = totalReinfosDone + Number(reinfosDone[index].innerHTML);
-        totalReinfosTarget = totalReinfosTarget + Number(reinfosTarget[index].innerHTML);
-        totalMeetupDone = totalMeetupDone + Number(meetupsDone[index].innerHTML);
-        totalMeetupTarget = totalMeetupTarget + Number(meetupsTarget[index].innerHTML);
-        totalInviDone = totalInviDone + Number(inviDone[index].innerHTML);
-        totalInviTarget = totalInviTarget + Number(inviTarget[index].innerHTML);
-        totalPlanDone = totalPlanDone + Number(plans[index].innerHTML);
-        totalPendingPlans = totalPendingPlans + Number(pendingPlans[index].innerHTML);
+    for (let i = settingsJson.totalViewSKBColSpan; i < fields.length - 1; i++) {
+        var total = 0;
+        $(`.p${fields[i]}`).each(function () {
+            if ($(this).html() != "") {
+                total += parseInt($(this).html());
+            }
+        });
+        $(".ptotal" + fields[i]).html(total);
     }
-
-    // document.getElementsByClassName("totalList")[0].innerHTML = totalList;
-    document.getElementsByClassName("ptotalNetworkingDone")[0].innerHTML = totalNetworkingDone;
-    document.getElementsByClassName("ptotalNetworkingTarget")[0].innerHTML = totalNetworkingTarget;
-    document.getElementsByClassName("ptotalInfosDone")[0].innerHTML = totalInfosDone;
-    document.getElementsByClassName("ptotalInfosTarget")[0].innerHTML = totalInfosTarget;
-    document.getElementsByClassName("ptotalReinfosDone")[0].innerHTML = totalReinfosDone;
-    document.getElementsByClassName("ptotalReinfosTarget")[0].innerHTML = totalReinfosTarget;
-    document.getElementsByClassName("ptotalMeetupDone")[0].innerHTML = totalMeetupDone;
-    document.getElementsByClassName("ptotalMeetupTarget")[0].innerHTML = totalMeetupTarget;
-    document.getElementsByClassName("ptotalInviDone")[0].innerHTML = totalInviDone;
-    document.getElementsByClassName("ptotalInviTarget")[0].innerHTML = totalInviTarget;
-    document.getElementsByClassName("ptotalPlanDone")[0].innerHTML = totalPlanDone;
-    document.getElementsByClassName("ptotalPendingPlans")[0].innerHTML = totalPendingPlans;
 }
 
 function sumPrevDataSapphire() {
@@ -546,6 +487,42 @@ function generateSKBTable(SKB_table) {
     }
 }
 
+function generatePrevSKBTable(SKB_table) {
+
+    var isSubHeading = false;
+
+    for (let i = 0; i < SKB_table.length - 1; i++) {
+
+        if (SKB_table[i].sub_heading.length > 0) {
+            isSubHeading = true;
+            $("#prevWeekTable thead .header").append(`
+                <th scope="col" class="txt-align-center text-light bg-dark" colspan="` + SKB_table[i].sub_heading.length + `">` + SKB_table[i].header + `</th>
+                `);
+        } else {
+            $("#prevWeekTable thead .header").append(`
+                <th scope="col" class="txt-align-center text-light bg-dark">` + SKB_table[i].header + `</th>
+                `);
+        }
+    }
+
+    if (isSubHeading) {
+        for (let i = 0; i < SKB_table.length - 1; i++) {
+            if (SKB_table[i].sub_heading.length > 0) {
+                for (let j = 0; j < SKB_table[i].sub_heading.length; j++) {
+                    $("#prevWeekTable thead .sub_heading").append(`
+                        <th scope="col" class="txt-align-center text-light bg-dark">` + SKB_table[i].sub_heading[j] + `</th>
+                        `);
+                }
+            } else {
+                $("#prevWeekTable thead .sub_heading").append(`
+                    <th scope="col" class="txt-align-center text-light bg-dark"></th>
+                    `);
+            }
+
+        }
+    }
+}
+
 function loadSettings() {
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/getSettings");
@@ -553,6 +530,7 @@ function loadSettings() {
         const response = JSON.parse(this.responseText);
         settingsJson = response;
         generateSKBTable(settingsJson.initTableView.concat(settingsJson.SKB_table, settingsJson.endTable));
+        generatePrevSKBTable(settingsJson.initTableView.concat(settingsJson.SKB_table, settingsJson.endTable));
         const headerData = settingsJson.initTableView.concat(settingsJson.SKB_table, settingsJson.endTable);
         fields = getFields(headerData);
     }
