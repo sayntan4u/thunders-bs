@@ -245,6 +245,8 @@ app.post("/addUser", requireAuth, async (req, res) => {
 
   }
 
+  res.send("success");
+
 });
 
 
@@ -572,7 +574,12 @@ app.get('/', requireAuth, function (req, res) {
 });
 
 app.get('/Login', function (req, res) {
-  res.render('login');
+  if (req.session.userId) {
+    res.redirect("/");
+  }else{
+    res.render('login');
+  }
+  
 });
 
 app.post('/Login', function (req, res) {

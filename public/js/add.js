@@ -10,34 +10,42 @@ function addPerson() {
     const nm = $('#memberName').val();
     const grp = $("#memberGroup").val();
 
-    const data = { name: nm , group : grp};
+    const data = { name: nm, group: grp };
 
     const xhttp = new XMLHttpRequest();
+    xhttp.onload = function () {
+
+        const response = this.responseText;
+        if(response == "success"){
+            
+            // loadNames();
+            addName(nm);
+            $("#newPersonName").html(nm);
+            $('#memberName').val("");
+            $('.add_alert').removeClass("hide").addClass("show");
+            setTimeout(function () { $('.add_alert').removeClass("show").addClass("hide"); }, 6000);
+        }
+    }
     xhttp.open("POST", "/addUser");
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
     $(".names").html("");
     $(".loading").removeClass("hide");
-    // loadNames();
-    addName(nm);
-    $("#newPersonName").html(nm);
-    $('#memberName').val("");
-    $('.add_alert').removeClass("hide").addClass("show");
-    setTimeout(function () { $('.add_alert').removeClass("show").addClass("hide"); }, 6000);
+
 }
 
 function addName(name) {
-    if($("#memberGroup").val() == "SKB"){
+    if ($("#memberGroup").val() == "SKB") {
         // userJson.push({ name: name, namelist: ""});
         // generateNamesTable(userJson);
         $("#groupSelect").val("SKB").change();
     }
-    else{
+    else {
         // sapphireJson.push({ name: name});
         // generateNamesTable(sapphireJson, "Sapphire");
         $("#groupSelect").val("Sapphire").change();
     }
-    
+
 }
 
 function loadNames() {
@@ -47,12 +55,12 @@ function loadNames() {
 
         const response = JSON.parse(this.responseText);
         userJson = response;
-        if(userJson.length > 0){
+        if (userJson.length > 0) {
             generateNamesTable(response);
-        }else{
+        } else {
             $(".loading").addClass("hide");
         }
-        
+
 
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
@@ -65,34 +73,34 @@ function loadSapphire() {
     xhttp.onload = function () {
         const response = JSON.parse(this.responseText);
         sapphireJson = response;
-        if(sapphireJson.length > 0){
+        if (sapphireJson.length > 0) {
             generateNamesTable(response, "Sapphire");
-        }else{
+        } else {
             $(".loading").addClass("hide");
         }
-        
+
 
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send();
 }
 
-function changeGroup(){
+function changeGroup() {
     const grp = $("#groupSelect").val();
     $(".loading").removeClass("hide");
     $(".names").html("");
-    if(grp == "SKB"){
+    if (grp == "SKB") {
         loadNames();
-    }else{
+    } else {
         loadSapphire();
     }
 }
 
-function generateNamesTable(response, group="SKB") {
+function generateNamesTable(response, group = "SKB") {
     $(".names").html("");
     for (let i = 0; i < response.length; i++) {
 
-        if(group == "SKB"){
+        if (group == "SKB") {
             $(".names").append(`
                 <tr>
                     <th scope="row">${i + 1}</th>
@@ -118,7 +126,7 @@ function generateNamesTable(response, group="SKB") {
                     </td>
                 </tr>
                     `);
-        }else{
+        } else {
             $(".names").append(`
                 <tr>
                     <th scope="row">${i + 1}</th>
@@ -132,7 +140,7 @@ function generateNamesTable(response, group="SKB") {
                 </tr>
                     `);
         }
-       
+
 
         $(".loading").addClass("hide");
     }
@@ -202,7 +210,7 @@ function deleteUser() {
     const nm = $("#userName").html();
     const group = $("#groupDeleteModal").html();
 
-    const data = { name: nm , group : group};
+    const data = { name: nm, group: group };
     // alert(name);
     // location.href = "/delete?name=" + name;
 
@@ -211,7 +219,7 @@ function deleteUser() {
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
 
-    if(group == "SKB"){
+    if (group == "SKB") {
         for (let i = 0; i < userJson.length; i++) {
             if (userJson[i].name == nm) {
                 // delete userJson[i];
@@ -220,7 +228,7 @@ function deleteUser() {
             }
         }
         generateNamesTable(userJson);
-    }else{
+    } else {
         for (let i = 0; i < sapphireJson.length; i++) {
             if (sapphireJson[i].name == nm) {
                 // delete userJson[i];
@@ -228,7 +236,7 @@ function deleteUser() {
                 break;
             }
         }
-        generateNamesTable(sapphireJson,"Sapphire");
+        generateNamesTable(sapphireJson, "Sapphire");
     }
 
     $("#deletePersonName").html(nm);
@@ -242,7 +250,7 @@ function search() {
 
     resultJson = [];
 
-    if(grp == "SKB"){
+    if (grp == "SKB") {
         if (searchStr != "") {
             for (let i = 0; i < userJson.length; i++) {
                 if (userJson[i].name.toLowerCase().match(searchStr.toLowerCase())) {
@@ -252,8 +260,8 @@ function search() {
         } else {
             resultJson = userJson;
         }
-       
-    }else{
+
+    } else {
         if (searchStr != "") {
             for (let i = 0; i < sapphireJson.length; i++) {
                 if (sapphireJson[i].name.toLowerCase().match(searchStr.toLowerCase())) {
@@ -263,12 +271,12 @@ function search() {
         } else {
             resultJson = sapphireJson;
         }
-        
+
     }
 
     generateNamesTable(resultJson, grp);
 
-    
+
 }
 
 loadNames();
