@@ -17,66 +17,41 @@ const port = process.env.PORT || 8080;
 const admin = require('firebase-admin');
 const credentials = require('./key1.json');
 
-class Activity {
-  constructor(sl, name, list, networkingDone, networkingTarget, infosDone, infosTarget, reinfosDone, reinfosTarget, meetupsDone,
-    meetupsTarget, invisDone, invisTarget, plans, pendingPlans, remarks) {
-    (this.sl = sl),
-      (this.name = name),
-      (this.list = list),
-      (this.networkingDone = networkingDone),
-      (this.networkingTarget = networkingTarget),
-      (this.infosDone = infosDone),
-      (this.infosTarget = infosTarget),
-      (this.reinfosDone = reinfosDone),
-      (this.reinfosTarget = reinfosTarget),
-      (this.meetupsDone = meetupsDone),
-      (this.meetupsTarget = meetupsTarget),
-      (this.invisDone = invisDone),
-      (this.invisTarget = invisTarget),
-      (this.plans = plans),
-      (this.pendingPlans = pendingPlans),
-      (this.remarks = remarks);
-  }
-}
 
-class Sapphire {
-  constructor(sl, name, nodeCount, networkingDone, infosDone, reinfosDone, meetupsDone,
-    invisDone, plans, pendingPlans, second_meeting, uv, remarks) {
-    (this.sl = sl),
-      (this.name = name),
-      (this.nodeCount = nodeCount),
-      (this.networkingDone = networkingDone),
-      (this.infosDone = infosDone),
-      (this.reinfosDone = reinfosDone),
-      (this.meetupsDone = meetupsDone),
-      (this.invisDone = invisDone),
-      (this.plans = plans),
-      (this.pendingPlans = pendingPlans),
-      (this.secondMeetings = second_meeting),
-      (this.uv = uv),
-      (this.remarks = remarks);
-  }
-}
-
-function getFields() {
+function getFields(group) {
   const fields = [];
   const data = fs.readFileSync('./settings.conf', 'utf8');
-  const SKB_table = JSON.parse(data).SKB_table;
 
-
-  for (let i = 0; i < SKB_table.length; i++) {
-    // addField(SKB_table[i].header);
-
-    if (SKB_table[i].sub_heading.length > 0) {
-      for (let j = 0; j < SKB_table[i].sub_heading.length; j++) {
-        // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
-        fields.push(camelize((SKB_table[i].header + SKB_table[i].sub_heading[j]).toString()));
+  if(group == "SKB"){
+    const SKB_table = JSON.parse(data).SKB_table;
+    for (let i = 0; i < SKB_table.length; i++) {
+      // addField(SKB_table[i].header);
+  
+      if (SKB_table[i].sub_heading.length > 0) {
+        for (let j = 0; j < SKB_table[i].sub_heading.length; j++) {
+          // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
+          fields.push(camelize((SKB_table[i].header + SKB_table[i].sub_heading[j]).toString()));
+        }
+      } else {
+        fields.push(camelize(SKB_table[i].header));
       }
-    } else {
-      fields.push(camelize(SKB_table[i].header));
+    }
+  } else if(group == "Sapphire"){
+    const Sapphire_table = JSON.parse(data).Sapphire_table;
+    for (let i = 0; i < Sapphire_table.length; i++) {
+      // addField(SKB_table[i].header);
+  
+      if (Sapphire_table[i].sub_heading.length > 0) {
+        for (let j = 0; j < Sapphire_table[i].sub_heading.length; j++) {
+          // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
+          fields.push(camelize((Sapphire_table[i].header + Sapphire_table[i].sub_heading[j]).toString()));
+        }
+      } else {
+        fields.push(camelize(Sapphire_table[i].header));
+      }
     }
   }
-
+  
   return fields;
 }
 
@@ -122,11 +97,9 @@ app.post("/getData", requireAuth, async (req, res) => {
 
     var data = [];
 
-    if (group == "SKB") {
-      data = await getCollectionData('users', year, week);
-    } else {
-      data = await getCollectionData('sapphire', year, week);
-    }
+    data = await getCollectionData(group, year, week);
+
+   
     res.send(data);
   } catch (err) {
     res.send(err);
@@ -165,64 +138,43 @@ app.post("/updateUser", requireAuth, async (req, res) => {
   }
 });
 
-async function getCollectionData(collection, year, week) {
+async function getCollectionData(group, year, week) {
+
+  var collection = "";
+
+  if (group == "SKB") {
+      collection = "users";
+  } else {
+      collection = "sapphire";
+  }
 
   const snapshot = await db.collection(collection).listDocuments();
   const docArray = [];
 
-  if (collection == "users") {
-    for (let i = 0; i < snapshot.length; i++) {
+  for (let i = 0; i < snapshot.length; i++) {
 
-      const snap = await db.collection(collection).doc(snapshot[i].id).collection(year).doc(week).get();
+    const snap = await db.collection(collection).doc(snapshot[i].id).collection(year).doc(week).get();
 
-      // console.log(i + 1);
-      // console.log(snapshot[i].id);
-      // console.log(snap.data());
+    var dataRow = "{";
+    dataRow += ' "sl" : "' + (i+1) + '",';
+    dataRow += ' "name" : "' + snapshot[i].id + '",';
+    var fields = getFields(group);
+    fields.push("remarks");
 
-      var dataRow = "{";
-      dataRow += ' "sl" : "' + (i+1) + '",';
-      dataRow += ' "name" : "' + snapshot[i].id + '",';
-      var fields = getFields();
-      fields.push("remarks");
-
-      for(let i=0; i<fields.length; i++){
-        dataRow += '"'+ fields[i] + '" : "' + snap.data()[fields[i]] + '"';
-        // dataRow.push(snap.data()[fields[i]]);
-        if(i != fields.length -1){
-          dataRow += ',';
-        }
+    for(let i=0; i<fields.length; i++){
+      dataRow += '"'+ fields[i] + '" : "' + snap.data()[fields[i]] + '"';
+      // dataRow.push(snap.data()[fields[i]]);
+      if(i != fields.length -1){
+        dataRow += ',';
       }
-      dataRow += '}';
-
-      // console.log("datarow");
-      // console.log(JSON.parse(dataRow));
-
-      // const activity = new Activity(
-      //   i + 1, snapshot[i].id, snap.data().list, snap.data().networkingDone, snap.data().networkingTarget, snap.data().infosDone, snap.data().infosTarget,
-      //   snap.data().reinfosDone, snap.data().reinfosTarget, snap.data().meetupsDone, snap.data().meetupsTarget,
-      //   snap.data().invisDone, snap.data().invisTarget, snap.data().plans, snap.data().pendingPlans, snap.data().remarks
-      // );
-
-      docArray.push(JSON.parse(dataRow));
-
     }
-  } else {
-    for (let i = 0; i < snapshot.length; i++) {
+    dataRow += '}';
 
-      const snap = await db.collection(collection).doc(snapshot[i].id).collection(year).doc(week).get();
+    docArray.push(JSON.parse(dataRow));
 
-      const sapphire = new Sapphire(
-        i + 1, snapshot[i].id, snap.data().nodeCount, snap.data().networkingDone, snap.data().infosDone,
-        snap.data().reinfosDone, snap.data().meetupsDone,
-        snap.data().invisDone, snap.data().plans, snap.data().pendingPlans, snap.data().secondMeetings, snap.data().uv, snap.data().remarks
-      );
-
-      docArray.push(sapphire);
-
-    }
   }
 
-  console.log(docArray);
+  // console.log(docArray);
   return docArray;
 }
 
@@ -240,7 +192,7 @@ app.post("/addUser", requireAuth, async (req, res) => {
   const name = req.body.name;
   const group = req.body.group;
 
-  const fields = getFields();
+  const fields = getFields(group);
 
   var test = "{";
   for (let i = 0; i < fields.length; i++) {
@@ -281,19 +233,7 @@ app.post("/addUser", requireAuth, async (req, res) => {
     }
     await db.collection("users").doc(name).set({ namelist_link: "" });
   } else {
-    const userJson = {
-      nodeCount: 0,
-      networkingDone: 0,
-      infosDone: 0,
-      reinfosDone: 0,
-      meetupsDone: 0,
-      invisDone: 0,
-      plans: 0,
-      pendingPlans: 0,
-      secondMeetings: 0,
-      uv: 0,
-      remarks: ""
-    };
+    const userJson = JSON.parse(test);
 
     const d = new Date();
     let year = d.getFullYear();

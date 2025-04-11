@@ -9,18 +9,18 @@ function camelize(str) {
     }).replace(/\s+/g, '');
 }
 
-function getFields(SKB_table) {
+function getFields(table) {
     const fields = [];
-    for (let i = 0; i < SKB_table.length; i++) {
+    for (let i = 0; i < table.length; i++) {
         // addField(SKB_table[i].header);
 
-        if (SKB_table[i].sub_heading.length > 0) {
-            for (let j = 0; j < SKB_table[i].sub_heading.length; j++) {
+        if (table[i].sub_heading.length > 0) {
+            for (let j = 0; j < table[i].sub_heading.length; j++) {
                 // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
-                fields.push(camelize((SKB_table[i].header + SKB_table[i].sub_heading[j]).toString()));
+                fields.push(camelize((table[i].header + table[i].sub_heading[j]).toString()));
             }
         } else {
-            fields.push(camelize(SKB_table[i].header));
+            fields.push(camelize(table[i].header));
         }
     }
 
