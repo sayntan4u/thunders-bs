@@ -80,7 +80,7 @@ function getTDClassSapphire(field) {
     if (field.toLowerCase().includes("meeting")) {
         ret = "bg-warning";
     } else if (field.toLowerCase().includes("uv")) {
-        ret = "bg-plan";
+        ret = "bg-danger";
     } else if (field.toLowerCase().includes("node")) {
         ret = "bg-info";
     } else if (field == "plan") {

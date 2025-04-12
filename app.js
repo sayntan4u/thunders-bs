@@ -371,15 +371,23 @@ async function getAnalyzeData(year, weekFrom, weekTo, name, group) {
     for (let j = 0; j < idArray.length; j++) {
       const snap = await db.collection("users").doc(name.toString()).collection(year.toString()).doc(idArray[j].toString()).get();
 
-      const activity = new Activity(
-        sl, parseInt(idArray[j]), snap.data().list, snap.data().networkingDone, snap.data().networkingTarget, snap.data().infosDone, snap.data().infosTarget,
-        snap.data().reinfosDone, snap.data().reinfosTarget, snap.data().meetupsDone, snap.data().meetupsTarget,
-        snap.data().invisDone, snap.data().invisTarget, snap.data().plans, snap.data().pendingPlans, snap.data().remarks
-      );
+      var dataRow = "{";
+      dataRow += ' "sl" : "' + sl + '",';
+      dataRow += ' "week" : "Week ' + parseInt(idArray[j]) + '",';
+      var fields = getFields(group);
+  
+      for(let i=0; i<fields.length; i++){
+        dataRow += '"'+ fields[i] + '" : "' + snap.data()[fields[i]] + '"';
+        // dataRow.push(snap.data()[fields[i]]);
+        if(i != fields.length -1){
+          dataRow += ',';
+        }
+      }
+      dataRow += '}';
 
       sl++;
 
-      docArray.push(activity);
+      docArray.push(JSON.parse(dataRow));
     }
   } else {
     const snapshot = await db.collection("sapphire").doc(name.toString()).collection(year.toString()).listDocuments();
@@ -396,18 +404,27 @@ async function getAnalyzeData(year, weekFrom, weekTo, name, group) {
     for (let j = 0; j < idArray.length; j++) {
       const snap = await db.collection("sapphire").doc(name.toString()).collection(year.toString()).doc(idArray[j].toString()).get();
 
-      const sapphire = new Sapphire(
-        sl, parseInt(idArray[j]), snap.data().nodeCount, snap.data().networkingDone, snap.data().infosDone,
-        snap.data().reinfosDone, snap.data().meetupsDone,
-        snap.data().invisDone, snap.data().plans, snap.data().pendingPlans, snap.data().secondMeetings, snap.data().uv, snap.data().remarks
-      );
+      var dataRow = "{";
+      dataRow += ' "sl" : "' + sl + '",';
+      dataRow += ' "week" : "Week ' + parseInt(idArray[j]) + '",';
+      var fields = getFields(group);
+  
+      for(let i=0; i<fields.length; i++){
+        dataRow += '"'+ fields[i] + '" : "' + snap.data()[fields[i]] + '"';
+        // dataRow.push(snap.data()[fields[i]]);
+        if(i != fields.length -1){
+          dataRow += ',';
+        }
+      }
+      dataRow += '}';
 
       sl++;
-
-      docArray.push(sapphire);
+      
+      docArray.push(JSON.parse(dataRow));
     }
   }
 
+  // console.log(docArray);
   return docArray;
 }
 
