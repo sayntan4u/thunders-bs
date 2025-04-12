@@ -417,6 +417,5 @@ function loadSettings() {
 
 loadSettings();
 
-// sumData();
 generateWeekTwo(1);
 generateNameDropDown();

@@ -529,10 +529,13 @@ function loadSettings() {
         const response = JSON.parse(this.responseText);
         settingsJson = response;
 
-        // console.log(settingsJson);
+        console.log(settingsJson.totalViewSKBColSpan);
+        console.log(settingsJson.totalAnalyzeSKBColSpan);
 
         //Load SKB Settings
         $("#settingsJsonTextSKB").val(JSON.stringify(settingsJson.SKB_table, null, 2));
+        $("#viewColSpanSKB").val(settingsJson.totalViewSKBColSpan);
+        $("#analyzeColSpanSKB").val(settingsJson.totalAnalyzeSKBColSpan);
         generateSKBTableTree(settingsJson.SKB_table);
         generateSKBTable(settingsJson.SKB_table);
 
