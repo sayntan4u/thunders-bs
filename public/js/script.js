@@ -3,6 +3,8 @@ $(document).ready(function () {
     const sidebarState = localStorage.getItem('sidebarState');
     if (sidebarState === 'collapsed') {
         $('#sidebar').addClass('active');
+    }else{
+        $('#sidebar').removeClass('active');
     }
 
     // Sidebar toggle
