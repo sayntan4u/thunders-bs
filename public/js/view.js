@@ -29,6 +29,7 @@ function getFields(table) {
 
 var settingsJson = {};
 var fields = [];
+var fieldsSapphire = [];
 
 function sumData() {
     for (let i = settingsJson.totalViewSKBColSpan; i < fields.length - 1; i++) {
@@ -43,54 +44,15 @@ function sumData() {
 }
 
 function sumSapphireData() {
-
-    var nodeCount = document.getElementsByClassName("nodeCount-Sapphire");
-    var networkingDone = document.getElementsByClassName("networkingDone-Sapphire");
-    var infosDone = document.getElementsByClassName("infosDone-Sapphire");
-    var reinfosDone = document.getElementsByClassName("reinfosDone-Sapphire");
-    var meetupsDone = document.getElementsByClassName("meetupsDone-Sapphire");
-    var inviDone = document.getElementsByClassName("invisDone-Sapphire");
-    var plans = document.getElementsByClassName("plans-Sapphire");
-    var pendingPlans = document.getElementsByClassName("pendingPlans-Sapphire");
-    var secondMeetings = document.getElementsByClassName("secondMeetings-Sapphire");
-    var uv = document.getElementsByClassName("uv-Sapphire");
-
-
-
-    var totalNodeCount = 0;
-    var totalNetworkingDone = 0;
-    var totalInfosDone = 0;
-    var totalReinfosDone = 0;
-    var totalMeetupDone = 0;
-    var totalInviDone = 0;
-    var totalPlanDone = 0;
-    var totalPendingPlans = 0;
-    var totalSecondMeetings = 0;
-    var totalUV = 0;
-
-    for (let index = 0; index < nodeCount.length; index++) {
-        totalNodeCount = totalNodeCount + Number(nodeCount[index].value);
-        totalNetworkingDone = totalNetworkingDone + Number(networkingDone[index].value);
-        totalInfosDone = totalInfosDone + Number(infosDone[index].value);
-        totalReinfosDone = totalReinfosDone + Number(reinfosDone[index].value);
-        totalMeetupDone = totalMeetupDone + Number(meetupsDone[index].value);
-        totalInviDone = totalInviDone + Number(inviDone[index].value);
-        totalPlanDone = totalPlanDone + Number(plans[index].value);
-        totalPendingPlans = totalPendingPlans + Number(pendingPlans[index].value);
-        totalSecondMeetings = totalSecondMeetings + Number(secondMeetings[index].value);
-        totalUV = totalUV + Number(uv[index].value);
+    for (let i = settingsJson.totalViewSapphireColSpan; i < fieldsSapphire.length - 1; i++) {
+        var total = 0;
+        $(`.${fieldsSapphire[i]}-Sapphire`).each(function () {
+            if ($(this).val() != "") {
+                total += parseInt($(this).val());
+            }
+        });
+        $(".total" + fieldsSapphire[i] + "-Sapphire").html(total);
     }
-
-    document.getElementsByClassName("totalNodeCount")[0].innerHTML = totalNodeCount;
-    document.getElementsByClassName("totalNetworkingDone-Sapphire")[0].innerHTML = totalNetworkingDone;
-    document.getElementsByClassName("totalInfosDone-Sapphire")[0].innerHTML = totalInfosDone;
-    document.getElementsByClassName("totalReinfosDone-Sapphire")[0].innerHTML = totalReinfosDone;
-    document.getElementsByClassName("totalMeetupDone-Sapphire")[0].innerHTML = totalMeetupDone;
-    document.getElementsByClassName("totalInviDone-Sapphire")[0].innerHTML = totalInviDone;
-    document.getElementsByClassName("totalPlanDone-Sapphire")[0].innerHTML = totalPlanDone;
-    document.getElementsByClassName("totalPendingPlans-Sapphire")[0].innerHTML = totalPendingPlans;
-    document.getElementsByClassName("totalSecondMeetings")[0].innerHTML = totalSecondMeetings;
-    document.getElementsByClassName("totalUV")[0].innerHTML = totalUV;
 }
 
 function getTDClass(field) {
@@ -105,6 +67,26 @@ function getTDClass(field) {
         ret = "";
     } else if (field.toLowerCase().includes("done")) {
         ret = "done_data";
+    } else if (field.toLowerCase().includes("pending")) {
+        ret = "bg-plan";
+    }
+
+    return ret
+}
+
+function getTDClassSapphire(field) {
+    var ret = "done_data";
+
+    if (field.toLowerCase().includes("meeting")) {
+        ret = "bg-warning";
+    } else if (field.toLowerCase().includes("uv")) {
+        ret = "bg-plan";
+    } else if (field.toLowerCase().includes("node")) {
+        ret = "bg-info";
+    } else if (field == "plan") {
+        ret = "bg-success";
+    } else if (field == "remarks") {
+        ret = "";
     } else if (field.toLowerCase().includes("pending")) {
         ret = "bg-plan";
     }
@@ -149,6 +131,8 @@ function getData() {
                         rowTable += '<th scope="row" class="middle">' + response[i].sl + '</th>';
                     } else if (j == 1) {
                         rowTable += '<td>' + response[i][fields[j]] + '</td>';
+                    } else if (j == fields.length - 1) {
+                        rowTable += `<td><input type="text" class="form-control ${getTDClass(fields[j])} ${fields[j]} ${response[i].name + '-' + fields[j]}" value="${response[i][fields[j]]}" onchange="valueChanged('${response[i].name}', '${fields[j]}')"></td>`;
                     } else {
                         rowTable += `<td><input type="text" class="form-control ${getTDClass(fields[j])} ${fields[j]} ${response[i].name + '-' + fields[j]}" value="${(response[i][fields[j]] > 0) ? response[i][fields[j]] : ''}" onchange="valueChanged('${response[i].name}', '${fields[j]}')"></td>`;
                     }
@@ -179,40 +163,33 @@ function getData() {
             $(".sapphireData").html("");
 
             for (let i = 0; i < response.length; i++) {
-                $(".sapphireData").append(`<tr>
-            <th scope="row" class="middle">${response[i].sl}</th>
-            <td>${response[i].name}</td>
-            <td><input type="text" class="form-control bg-info nodeCount-Sapphire ${response[i].name + '-nodeCount-Sapphire'}" value="${(response[i].nodeCount > 0) ? response[i].nodeCount : ''}" onchange="valueChanged('${response[i].name}', 'nodeCount', 'Sapphire')"></td>
-            <td><input type="text" class="form-control done_data networkingDone-Sapphire ${response[i].name + '-networkingDone-Sapphire'}" value="${(response[i].networkingDone > 0) ? response[i].networkingDone : ''}" onchange="valueChanged('${response[i].name}', 'networkingDone', 'Sapphire')"></td>
-            <td><input type="text" class="form-control done_data infosDone-Sapphire ${response[i].name + '-infosDone-Sapphire'}" value="${(response[i].infosDone > 0) ? response[i].infosDone : ''}" onchange="valueChanged('${response[i].name}', 'infosDone', 'Sapphire')"></td>
-            <td><input type="text" class="form-control done_data reinfosDone-Sapphire ${response[i].name + '-reinfosDone-Sapphire'}" value="${(response[i].reinfosDone > 0) ? response[i].reinfosDone : ''}" onchange="valueChanged('${response[i].name}', 'reinfosDone', 'Sapphire')"></td>
-            <td><input type="text" class="form-control done_data meetupsDone-Sapphire ${response[i].name + '-meetupsDone-Sapphire'}" value="${(response[i].meetupsDone > 0) ? response[i].meetupsDone : ''}" onchange="valueChanged('${response[i].name}', 'meetupsDone', 'Sapphire')"></td>
-            <td><input type="text" class="form-control done_data invisDone-Sapphire ${response[i].name + '-invisDone-Sapphire'}" value="${(response[i].invisDone > 0) ? response[i].invisDone : ''}" onchange="valueChanged('${response[i].name}', 'invisDone', 'Sapphire')"></td>
-            <td><input type="text" class="form-control bg-success plans-Sapphire ${response[i].name + '-plans-Sapphire'}" value="${(response[i].plans > 0) ? response[i].plans : ''}" onchange="valueChanged('${response[i].name}', 'plans', 'Sapphire')"></td>
-            <td><input type="text" class="form-control done_data  pendingPlans-Sapphire ${response[i].name + '-pendingPlans-Sapphire'}" value="${(response[i].pendingPlans > 0) ? response[i].pendingPlans : ''}" onchange="valueChanged('${response[i].name}', 'pendingPlans', 'Sapphire')"></td>
-            <td><input type="text" class="form-control bg-plan secondMeetings-Sapphire ${response[i].name + '-secondMeetings-Sapphire'}" value="${(response[i].secondMeetings > 0) ? response[i].secondMeetings : ''}" onchange="valueChanged('${response[i].name}', 'secondMeetings', 'Sapphire')"></td>
-            <td><input type="text" class="form-control bg-plan uv-Sapphire ${response[i].name + '-uv-Sapphire'}" value="${(response[i].uv > 0) ? response[i].uv : ''}" onchange="valueChanged('${response[i].name}', 'uv', 'Sapphire')"></td>
-            <td><input type="text" class="form-control remarks-Sapphire ${response[i].name + '-remarks-Sapphire'}" value="${response[i].remarks}" onchange="valueChanged('${response[i].name}', 'remarks', 'Sapphire')"></td>
-            </tr>`);
+                var rowTable = '<tr>';
+                for (let j = 0; j < fieldsSapphire.length; j++) {
+                    if (j == 0) {
+                        rowTable += '<th scope="row" class="middle">' + response[i].sl + '</th>';
+                    } else if (j == 1) {
+                        rowTable += '<td>' + response[i][fieldsSapphire[j]] + '</td>';
+                    }else if (j == fieldsSapphire.length - 1) {
+                        rowTable += `<td><input type="text" class="form-control ${getTDClassSapphire(fieldsSapphire[j])} ${fieldsSapphire[j]}-Sapphire ${response[i].name + '-' + fieldsSapphire[j]}-Sapphire" value="${response[i][fieldsSapphire[j]]}" onchange="valueChanged('${response[i].name}', '${fieldsSapphire[j]}', 'Sapphire')"></td>`;
+                    } else {
+                        rowTable += `<td><input type="text" class="form-control ${getTDClassSapphire(fieldsSapphire[j])} ${fieldsSapphire[j]}-Sapphire ${response[i].name + '-' + fieldsSapphire[j]}-Sapphire" value="${(response[i][fieldsSapphire[j]] > 0) ? response[i][fieldsSapphire[j]] : ''}" onchange="valueChanged('${response[i].name}', '${fieldsSapphire[j]}', 'Sapphire')"></td>`;
+                    }
+                }
+                rowTable += '</tr>';
+                $(".sapphireData").append(rowTable);
             }
 
-            $(".sapphireData").append(`
-        <tr class="">
-                
-                <td colspan="2" class="txt-align-center"> <b>Total</b> </td>
-                <th class="txt-align-center bg-info totalNodeCount"></th>
-                <th class="txt-align-center done_data totalNetworkingDone-Sapphire"></th>
-                <th class="txt-align-center done_data totalInfosDone-Sapphire"></th>
-                <th class="txt-align-center done_data totalReinfosDone-Sapphire"></th>
-                <th class="txt-align-center done_data totalMeetupDone-Sapphire"></th>
-                <th class="txt-align-center done_data totalInviDone-Sapphire"></th>
-                <th class="txt-align-center bg-success totalPlanDone-Sapphire"></th>
-                <th class="txt-align-center done_data  totalPendingPlans-Sapphire"></th>
-                <th class="txt-align-center bg-plan totalSecondMeetings"></th>
-                <th class="txt-align-center bg-plan totalUV"></th>
-                <th class="txt-align-center"></th>
-        </tr>
-        `);
+            var rowTable = `<tr><td colspan="${settingsJson.totalViewSapphireColSpan}" class="txt-align-center"> <b>Total</b> </td>`;
+            for (let i = settingsJson.totalViewSapphireColSpan; i < fieldsSapphire.length; i++) {
+                if (i == fieldsSapphire.length - 1) {
+                    rowTable += `<th class="txt-align-center"></th>`;
+                } else {
+                    rowTable += `<th class="txt-align-center ${getTDClassSapphire(fieldsSapphire[i])} total${fieldsSapphire[i]}-Sapphire"></th>`;
+                }
+            }
+            rowTable += '</tr>';
+            $(".sapphireData").append(rowTable);
+
             // sumData();
             sumSapphireData();
 
@@ -244,6 +221,8 @@ function valueChanged(docName, triggeredFrom, group = "SKB") {
     // console.log(docName);
     // console.log(triggeredFrom);
     // console.log($("." + docName + "-" + triggeredFrom).val());
+    // console.log($("." + docName + "-" + triggeredFrom + "-Sapphire").val());
+
     var wk = document.getElementById("inputWeek").value;
     var yr = document.getElementById("inputYear").value;
 
@@ -266,7 +245,7 @@ function valueChanged(docName, triggeredFrom, group = "SKB") {
         var value_input = $("." + docName + "-" + triggeredFrom + "-Sapphire").val();
 
 
-        if (value_input == '' && triggeredFrom != "remarks-Sapphire") {
+        if (value_input == '' && triggeredFrom != "remarks") {
             value_input = 0;
         }
 
@@ -346,38 +325,27 @@ function getPrevWeekDataSapphire(wk, yr) {
         $(".sapphirePrevData").html("");
 
         for (let i = 0; i < response.length; i++) {
-            $(".sapphirePrevData").append(`<tr>
-            <th scope="row" class="middle">${response[i].sl}</th>
-                    <td>${response[i].name}</td>
-                    <td class="txt-align-center bg-info pnodeCount-Sapphire">${response[i].nodeCount}</td>
-                    <td class="txt-align-center done_data pnetworkingDone-Sapphire">${response[i].networkingDone}</td>
-                    <td class="txt-align-center done_data pinfosDone-Sapphire">${response[i].infosDone}</td>
-                    <td class="txt-align-center done_data preinfosDone-Sapphire">${response[i].reinfosDone}</td>
-                    <td class="txt-align-center done_data pmeetupsDone-Sapphire">${response[i].meetupsDone}</td>
-                    <td class="txt-align-center done_data pinvisDone-Sapphire">${response[i].invisDone}</td>
-                    <td class="txt-align-center bg-success pplans-Sapphire">${response[i].plans}</td>
-                    <td class="txt-align-center done_data ppendingPlans-Sapphire">${response[i].pendingPlans}</td>
-                    <td class="txt-align-center bg-plan psecondMeetings-Sapphire">${response[i].secondMeetings}</td>
-                    <td class="txt-align-center bg-plan puv-Sapphire">${response[i].uv}</td>
-          </tr>`);
+            var rowTable = '<tr>';
+            for (let j = 0; j < fieldsSapphire.length - 1; j++) {
+                if (j == 0) {
+                    rowTable += '<th scope="row" class="middle">' + response[i].sl + '</th>';
+                } else if (j == 1) {
+                    rowTable += '<td>' + response[i][fieldsSapphire[j]] + '</td>';
+                } else {
+                    rowTable += `<td class="txt-align-center ${getTDClassSapphire(fieldsSapphire[j])} p${fieldsSapphire[j]}-Sapphire">${response[i][fieldsSapphire[j]]}</td>`;
+                }
+            }
+            rowTable += '</tr>';
+            $(".sapphirePrevData").append(rowTable);
         }
 
-        $(".sapphirePrevData").append(`
-        <tr class="">
-                
-                 <td colspan="2" class="txt-align-center"> <b>Total</b> </td>
-                        <th class="txt-align-center bg-info ptotalNodeCount"></th>
-                        <th class="txt-align-center done_data ptotalNetworkingDone-Sapphire"></th>
-                        <th class="txt-align-center done_data ptotalInfosDone-Sapphire"></th>
-                        <th class="txt-align-center done_data ptotalReinfosDone-Sapphire"></th>
-                        <th class="txt-align-center done_data ptotalMeetupDone-Sapphire"></th>
-                        <th class="txt-align-center done_data ptotalInviDone-Sapphire"></th>
-                        <th class="txt-align-center bg-success ptotalPlanDone-Sapphire"></th>
-                        <th class="txt-align-center done_data ptotalPendingPlans-Sapphire"></th>
-                        <th class="txt-align-center bg-plan ptotalSecondMeetings"></th>
-                        <th class="txt-align-center bg-plan ptotalUV"></th>
-              </tr>
-        `);
+        var rowTable = `<tr><td colspan="${settingsJson.totalViewSapphireColSpan}" class="txt-align-center"> <b>Total</b> </td>`;
+        for (let i = settingsJson.totalViewSapphireColSpan; i < fieldsSapphire.length - 1; i++) {
+            rowTable += `<th class="txt-align-center ${getTDClassSapphire(fieldsSapphire[i])} ptotal${fieldsSapphire[i]}-Sapphire"></th>`;
+        }
+        rowTable += '</tr>';
+        $(".sapphirePrevData").append(rowTable);
+
         sumPrevDataSapphire();
 
         $("#prevWeekTableSapphire").removeClass("hide");
@@ -401,54 +369,15 @@ function sumPrevData() {
 }
 
 function sumPrevDataSapphire() {
-
-    var nodeCount = document.getElementsByClassName("pnodeCount-Sapphire");
-    var networkingDone = document.getElementsByClassName("pnetworkingDone-Sapphire");
-    var infosDone = document.getElementsByClassName("pinfosDone-Sapphire");
-    var reinfosDone = document.getElementsByClassName("preinfosDone-Sapphire");
-    var meetupsDone = document.getElementsByClassName("pmeetupsDone-Sapphire");
-    var inviDone = document.getElementsByClassName("pinvisDone-Sapphire");
-    var plans = document.getElementsByClassName("pplans-Sapphire");
-    var pendingPlans = document.getElementsByClassName("ppendingPlans-Sapphire");
-    var secondMeetings = document.getElementsByClassName("psecondMeetings-Sapphire");
-    var uv = document.getElementsByClassName("puv-Sapphire");
-
-
-
-    var totalNodeCount = 0;
-    var totalNetworkingDone = 0;
-    var totalInfosDone = 0;
-    var totalReinfosDone = 0;
-    var totalMeetupDone = 0;
-    var totalInviDone = 0;
-    var totalPlanDone = 0;
-    var totalPendingPlans = 0;
-    var totalSecondMeetings = 0;
-    var totalUV = 0;
-
-    for (let index = 0; index < nodeCount.length; index++) {
-        totalNodeCount = totalNodeCount + Number(nodeCount[index].innerHTML);
-        totalNetworkingDone = totalNetworkingDone + Number(networkingDone[index].innerHTML);
-        totalInfosDone = totalInfosDone + Number(infosDone[index].innerHTML);
-        totalReinfosDone = totalReinfosDone + Number(reinfosDone[index].innerHTML);
-        totalMeetupDone = totalMeetupDone + Number(meetupsDone[index].innerHTML);
-        totalInviDone = totalInviDone + Number(inviDone[index].innerHTML);
-        totalPlanDone = totalPlanDone + Number(plans[index].innerHTML);
-        totalPendingPlans = totalPendingPlans + Number(pendingPlans[index].innerHTML);
-        totalSecondMeetings = totalSecondMeetings + Number(secondMeetings[index].innerHTML);
-        totalUV = totalUV + Number(uv[index].innerHTML);
+    for (let i = settingsJson.totalViewSapphireColSpan; i < fieldsSapphire.length - 1; i++) {
+        var total = 0;
+        $(`.p${fieldsSapphire[i]}-Sapphire`).each(function () {
+            if ($(this).html() != "") {
+                total += parseInt($(this).html());
+            }
+        });
+        $(".ptotal" + fieldsSapphire[i] + "-Sapphire").html(total);
     }
-
-    document.getElementsByClassName("ptotalNodeCount")[0].innerHTML = totalNodeCount;
-    document.getElementsByClassName("ptotalNetworkingDone-Sapphire")[0].innerHTML = totalNetworkingDone;
-    document.getElementsByClassName("ptotalInfosDone-Sapphire")[0].innerHTML = totalInfosDone;
-    document.getElementsByClassName("ptotalReinfosDone-Sapphire")[0].innerHTML = totalReinfosDone;
-    document.getElementsByClassName("ptotalMeetupDone-Sapphire")[0].innerHTML = totalMeetupDone;
-    document.getElementsByClassName("ptotalInviDone-Sapphire")[0].innerHTML = totalInviDone;
-    document.getElementsByClassName("ptotalPlanDone-Sapphire")[0].innerHTML = totalPlanDone;
-    document.getElementsByClassName("ptotalPendingPlans-Sapphire")[0].innerHTML = totalPendingPlans;
-    document.getElementsByClassName("ptotalSecondMeetings")[0].innerHTML = totalSecondMeetings;
-    document.getElementsByClassName("ptotalUV")[0].innerHTML = totalUV;
 }
 
 function generateSKBTable(SKB_table) {
@@ -523,6 +452,78 @@ function generatePrevSKBTable(SKB_table) {
     }
 }
 
+function generateSapphireTable(Sapphire_table) {
+
+    var isSubHeading = false;
+
+    for (let i = 0; i < Sapphire_table.length; i++) {
+
+        if (Sapphire_table[i].sub_heading.length > 0) {
+            isSubHeading = true;
+            $(".Sapphire_table thead .header").append(`
+                <th scope="col" class="txt-align-center text-light bg-dark" colspan="` + Sapphire_table[i].sub_heading.length + `">` + Sapphire_table[i].header + `</th>
+                `);
+        } else {
+            $(".Sapphire_table thead .header").append(`
+                <th scope="col" class="txt-align-center text-light bg-dark">` + Sapphire_table[i].header + `</th>
+                `);
+        }
+    }
+
+    if (isSubHeading) {
+        for (let i = 0; i < Sapphire_table.length; i++) {
+            if (Sapphire_table[i].sub_heading.length > 0) {
+                for (let j = 0; j < Sapphire_table[i].sub_heading.length; j++) {
+                    $(".skb_dataTable thead .sub_heading").append(`
+                        <th scope="col" class="txt-align-center text-light bg-dark">` + Sapphire_table[i].sub_heading[j] + `</th>
+                        `);
+                }
+            } else {
+                $(".skb_dataTable thead .sub_heading").append(`
+                    <th scope="col" class="txt-align-center text-light bg-dark"></th>
+                    `);
+            }
+
+        }
+    }
+}
+
+function generatePrevSapphireTable(Sapphire_table) {
+
+    var isSubHeading = false;
+
+    for (let i = 0; i < Sapphire_table.length - 1; i++) {
+
+        if (Sapphire_table[i].sub_heading.length > 0) {
+            isSubHeading = true;
+            $("#prevWeekTableSapphire thead .header").append(`
+                <th scope="col" class="txt-align-center text-light bg-dark" colspan="` + Sapphire_table[i].sub_heading.length + `">` + Sapphire_table[i].header + `</th>
+                `);
+        } else {
+            $("#prevWeekTableSapphire thead .header").append(`
+                <th scope="col" class="txt-align-center text-light bg-dark">` + Sapphire_table[i].header + `</th>
+                `);
+        }
+    }
+
+    if (isSubHeading) {
+        for (let i = 0; i < Sapphire_table.length - 1; i++) {
+            if (Sapphire_table[i].sub_heading.length > 0) {
+                for (let j = 0; j < Sapphire_table[i].sub_heading.length; j++) {
+                    $("#prevWeekTableSapphire thead .sub_heading").append(`
+                        <th scope="col" class="txt-align-center text-light bg-dark">` + Sapphire_table[i].sub_heading[j] + `</th>
+                        `);
+                }
+            } else {
+                $("#prevWeekTableSapphire thead .sub_heading").append(`
+                    <th scope="col" class="txt-align-center text-light bg-dark"></th>
+                    `);
+            }
+
+        }
+    }
+}
+
 function loadSettings() {
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/getSettings");
@@ -533,6 +534,11 @@ function loadSettings() {
         generatePrevSKBTable(settingsJson.initTableView.concat(settingsJson.SKB_table, settingsJson.endTable));
         const headerData = settingsJson.initTableView.concat(settingsJson.SKB_table, settingsJson.endTable);
         fields = getFields(headerData);
+
+        generateSapphireTable(settingsJson.initTableView.concat(settingsJson.Sapphire_table, settingsJson.endTable));
+        generatePrevSapphireTable(settingsJson.initTableView.concat(settingsJson.Sapphire_table, settingsJson.endTable));
+        const headerDataSapphire = settingsJson.initTableView.concat(settingsJson.Sapphire_table, settingsJson.endTable);
+        fieldsSapphire = getFields(headerDataSapphire);
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send();
