@@ -61,14 +61,23 @@
                                 <div class="input-group mb-3">
                                   <span class="input-group-text" ><b>View page col span</b></span>
                                   <input type="text" id="viewColSpanSKB" class="form-control" style="width: 100px;  font-weight: bold;" disabled>
-                                  <button type="button" class="btn"><i class="fa-solid fa-pen"></i></button>
+                                  <button type="button" class="btn" onclick="editColSpan(this)"><i class="fa-solid fa-pen"></i></button>
+                                  <div class="btn_controls hide">
+                                    <button type="button" class="btn" onclick="cancelColSpan(this)"><i class="fa-solid fa-xmark"></i></button>
+                                    <button type="button" class="btn" onclick="saveColSpan(this, 'View', 'SKB')"><i class="fa-solid fa-floppy-disk"></i></button>
+                                  </div>
+                                 
                                 </div>
                               </div>
                               <div class="col-auto">
                                 <div class="input-group mb-3">
                                   <span class="input-group-text" ><b>Analyze page col span</b></span>
                                   <input type="text" id="analyzeColSpanSKB" class="form-control" style="width: 100px; font-weight: bold;" disabled>
-                                  <button type="button" class="btn"><i class="fa-solid fa-pen"></i></button>
+                                  <button type="button" class="btn" onclick="editColSpan(this)"><i class="fa-solid fa-pen"></i></button>
+                                  <div class="btn_controls hide">
+                                    <button type="button" class="btn" onclick="cancelColSpan(this)"><i class="fa-solid fa-xmark"></i></button>
+                                    <button type="button" class="btn" onclick="saveColSpan(this, 'Analyze', 'SKB')"><i class="fa-solid fa-floppy-disk"></i></button>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -127,6 +136,32 @@
                               <textarea class="form-control" placeholder="Leave a comment here" id="settingsJsonTextSapphire"
                                 style="height: 300px" disabled></textarea>
                               <label for="floatingTextarea2">settingsJson.Sapphire_table</label>
+                            </div>
+                            <br>
+                            <div class="row g-3 align-items-center">
+                              <div class="col-auto">
+                                <div class="input-group mb-3">
+                                  <span class="input-group-text" ><b>View page col span</b></span>
+                                  <input type="text" id="viewColSpanSapphire" class="form-control" style="width: 100px;  font-weight: bold;" disabled>
+                                  <button type="button" class="btn" onclick="editColSpan(this)"><i class="fa-solid fa-pen"></i></button>
+                                  <div class="btn_controls hide">
+                                    <button type="button" class="btn" onclick="cancelColSpan(this)"><i class="fa-solid fa-xmark"></i></button>
+                                    <button type="button" class="btn" onclick="saveColSpan(this, 'View', 'Sapphire')"><i class="fa-solid fa-floppy-disk"></i></button>
+                                  </div>
+                                 
+                                </div>
+                              </div>
+                              <div class="col-auto">
+                                <div class="input-group mb-3">
+                                  <span class="input-group-text" ><b>Analyze page col span</b></span>
+                                  <input type="text" id="analyzeColSpanSapphire" class="form-control" style="width: 100px; font-weight: bold;" disabled>
+                                  <button type="button" class="btn" onclick="editColSpan(this)"><i class="fa-solid fa-pen"></i></button>
+                                  <div class="btn_controls hide">
+                                    <button type="button" class="btn" onclick="cancelColSpan(this)"><i class="fa-solid fa-xmark"></i></button>
+                                    <button type="button" class="btn" onclick="saveColSpan(this, 'Analyze', 'Sapphire')"><i class="fa-solid fa-floppy-disk"></i></button>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
 
 

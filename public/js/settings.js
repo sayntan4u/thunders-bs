@@ -502,6 +502,33 @@ function dragoverHandlerSapphire(ev) {
     ev.preventDefault();
 }
 
+//Common Methods
+
+function editColSpan(elem){
+    $(elem).toggleClass("hide");
+    $(elem).parent().children(".btn_controls").toggleClass("hide");
+    $(elem).parent().children("input").prop("disabled", false);
+    
+}
+
+function cancelColSpan(elem){
+    $(elem).parent().toggleClass("hide");
+    $(elem).parent().parent().children("button").toggleClass("hide");
+    $(elem).parent().parent().children("input").prop("disabled", true);
+}
+
+function saveColSpan(elem, page, group){
+    $(elem).parent().toggleClass("hide");
+    $(elem).parent().parent().children("button").toggleClass("hide");
+    $(elem).parent().parent().children("input").prop("disabled", true);
+
+    settingsJson["total" + page + group + "ColSpan"] = parseInt($(elem).parent().parent().children("input").val());
+
+    console.log(settingsJson);
+
+
+}
+
 //Helper
 function swapElements(itemA, itemB, jsonData) {
     var indexA = null;
@@ -529,13 +556,14 @@ function loadSettings() {
         const response = JSON.parse(this.responseText);
         settingsJson = response;
 
-        console.log(settingsJson.totalViewSKBColSpan);
-        console.log(settingsJson.totalAnalyzeSKBColSpan);
-
         //Load SKB Settings
         $("#settingsJsonTextSKB").val(JSON.stringify(settingsJson.SKB_table, null, 2));
+
         $("#viewColSpanSKB").val(settingsJson.totalViewSKBColSpan);
         $("#analyzeColSpanSKB").val(settingsJson.totalAnalyzeSKBColSpan);
+        $("#viewColSpanSapphire").val(settingsJson.totalViewSapphireColSpan);
+        $("#analyzeColSpanSapphire").val(settingsJson.totalAnalyzeSapphireColSpan);
+        
         generateSKBTableTree(settingsJson.SKB_table);
         generateSKBTable(settingsJson.SKB_table);
 
