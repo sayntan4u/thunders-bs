@@ -69,6 +69,7 @@ function edit_heading(elem){
     $(elem).parent().parent().parent().parent().children(".edit_heading").toggleClass("hide");
     $(elem).parent().parent().parent().parent().children("span").toggleClass("hide");
     $(elem).parent().parent().parent().parent().children(".btn-group").toggleClass("hide");
+    $(elem).parent().parent().parent().parent().prop("draggable",false);
 
     const headingVal = $(elem).parent().parent().parent().parent().children("span").html();
 
@@ -79,6 +80,7 @@ function cancelEditField(elem){
     $(elem).parent().toggleClass("hide");
     $(elem).parent().parent().children("span").toggleClass("hide");
     $(elem).parent().parent().children(".btn-group").toggleClass("hide");
+    $(elem).parent().parent().prop("draggable",true);
 }
 
 function updateField(elem){
@@ -102,6 +104,7 @@ function updateField(elem){
     $(elem).parent().toggleClass("hide");
     $(elem).parent().parent().children("span").toggleClass("hide");
     $(elem).parent().parent().children(".btn-group").toggleClass("hide");
+    $(elem).parent().parent().prop("draggable",true);
 }
 
 function delete_heading(elem) {
@@ -331,7 +334,7 @@ function addFieldSapphire(fieldName = "") {
         generateSapphireTable(settingsJson.Sapphire_table);
     }
     $("#table_header_sapphire").append(`
-        <li draggable="true" id="` + fieldName.replaceAll(/\s/g, '') + `_Sapphire" ondragstart="dragstartHandlerSKB(event)" ondrop="dropHandlerSKB(event)" ondragover="dragoverHandlerSKB(event)" class="th">
+        <li draggable="true" id="` + fieldName.replaceAll(/\s/g, '') + `_Sapphire" ondragstart="dragstartHandlerSapphire(event)" ondrop="dropHandlerSapphire(event)" ondragover="dragoverHandlerSapphire(event)" class="th">
                                   <span class="badge rounded-pill bg-secondary">` + fieldName + `</span>
                                    <div class="edit_heading input-group hide">
                                         <input type="text" class="form-control" placeholder="Add Field Name">
@@ -366,6 +369,7 @@ function edit_heading_sapphire(elem){
     $(elem).parent().parent().parent().parent().children(".edit_heading").toggleClass("hide");
     $(elem).parent().parent().parent().parent().children("span").toggleClass("hide");
     $(elem).parent().parent().parent().parent().children(".btn-group").toggleClass("hide");
+    $(elem).parent().parent().parent().parent().prop("draggable",false);
 
     const headingVal = $(elem).parent().parent().parent().parent().children("span").html();
 
@@ -376,6 +380,7 @@ function cancelEditFieldSapphire(elem){
     $(elem).parent().toggleClass("hide");
     $(elem).parent().parent().children("span").toggleClass("hide");
     $(elem).parent().parent().children(".btn-group").toggleClass("hide");
+    $(elem).parent().parent().prop("draggable",true);
 }
 
 function updateFieldSapphire(elem){
@@ -399,6 +404,7 @@ function updateFieldSapphire(elem){
     $(elem).parent().toggleClass("hide");
     $(elem).parent().parent().children("span").toggleClass("hide");
     $(elem).parent().parent().children(".btn-group").toggleClass("hide");
+    $(elem).parent().parent().prop("draggable",true);
 }
 
 function delete_heading_sapphire(elem) {
@@ -574,11 +580,11 @@ $("#saveConfigSapphire").click(function () {
     xhttp.send(JSON.stringify(data));
 });
 
-function dragstartHandlerSKB(ev) {
+function dragstartHandlerSapphire(ev) {
     ev.dataTransfer.setData("textSapphire", $(ev.target).children("span").html());
 }
 
-function dropHandlerSKB(ev) {
+function dropHandlerSapphire(ev) {
     ev.preventDefault();
     const data = ev.dataTransfer.getData("textSapphire");
     $("#drag_drop_sapphire").html(data + " -> " + $(ev.target).html());
