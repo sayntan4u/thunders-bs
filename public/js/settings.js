@@ -36,7 +36,13 @@ function addField(fieldName = "") {
     $("#table_header").append(`
         <li draggable="true" id="` + fieldName.replaceAll(/\s/g, '') + `" ondragstart="dragstartHandlerSKB(event)" ondrop="dropHandlerSKB(event)" ondragover="dragoverHandlerSKB(event)" class="th">
                                   <span class="badge rounded-pill bg-secondary">` + fieldName + `</span>
-                                  <!-- Example single danger button -->
+                                    <div class="edit_heading input-group hide">
+                                        <input type="text" class="form-control" placeholder="Add Field Name">
+                                
+                                        <button type="button" class="btn btn-danger" onclick="cancelEditField(this)"><i class="fa-solid fa-xmark"></i></button>
+                                        &nbsp;
+                                        <button type="button" class="btn btn-success" onclick="updateField(this)"><i class="fa-solid fa-check"></i></button>
+                                    </div>
                                   <div class="btn-group">
                                     <button type="button" class="btn dropdown-toggle btn-sm"
                                       data-bs-toggle="dropdown" aria-expanded="false">
@@ -44,6 +50,7 @@ function addField(fieldName = "") {
                                     </button>
                                     <ul class="dropdown-menu">
                                       <li><button class="btn dropdown-item" onclick="add_sub_heading(this)" >Add Sub-heading</button></li>
+                                      <li><button class="btn dropdown-item" onclick="edit_heading(this)" >Edit</button></li>
                                       <li><button class="btn dropdown-item" onclick="delete_heading(this)">Delete</button></li>
                                     </ul>
                                   </div>
@@ -56,6 +63,45 @@ function addField(fieldName = "") {
     $("#addFieldBtn").prop("disabled", false);
     $('#add_li').remove();
 
+}
+
+function edit_heading(elem){
+    $(elem).parent().parent().parent().parent().children(".edit_heading").toggleClass("hide");
+    $(elem).parent().parent().parent().parent().children("span").toggleClass("hide");
+    $(elem).parent().parent().parent().parent().children(".btn-group").toggleClass("hide");
+
+    const headingVal = $(elem).parent().parent().parent().parent().children("span").html();
+
+    $(elem).parent().parent().parent().parent().children(".edit_heading").children("input").val(headingVal);
+}
+
+function cancelEditField(elem){
+    $(elem).parent().toggleClass("hide");
+    $(elem).parent().parent().children("span").toggleClass("hide");
+    $(elem).parent().parent().children(".btn-group").toggleClass("hide");
+}
+
+function updateField(elem){
+    const newVal = $(elem).parent().children("input").val();
+    const oldVal =  $(elem).parent().parent().children("span").html();
+
+    //update UI
+    $(elem).parent().parent().children("span").html(newVal);
+
+    //Update JSON
+    for (let i = 0; i < settingsJson.SKB_table.length; i++) {
+        if (settingsJson.SKB_table[i].header == oldVal) {
+            settingsJson.SKB_table[i].header = newVal;
+        }
+    }
+
+    $("#settingsJsonTextSKB").val(JSON.stringify(settingsJson.SKB_table, null, 2));
+    generateSKBTable(settingsJson.SKB_table);
+
+
+    $(elem).parent().toggleClass("hide");
+    $(elem).parent().parent().children("span").toggleClass("hide");
+    $(elem).parent().parent().children(".btn-group").toggleClass("hide");
 }
 
 function delete_heading(elem) {
@@ -287,7 +333,13 @@ function addFieldSapphire(fieldName = "") {
     $("#table_header_sapphire").append(`
         <li draggable="true" id="` + fieldName.replaceAll(/\s/g, '') + `_Sapphire" ondragstart="dragstartHandlerSKB(event)" ondrop="dropHandlerSKB(event)" ondragover="dragoverHandlerSKB(event)" class="th">
                                   <span class="badge rounded-pill bg-secondary">` + fieldName + `</span>
-                                  <!-- Example single danger button -->
+                                   <div class="edit_heading input-group hide">
+                                        <input type="text" class="form-control" placeholder="Add Field Name">
+                                
+                                        <button type="button" class="btn btn-danger" onclick="cancelEditFieldSapphire(this)"><i class="fa-solid fa-xmark"></i></button>
+                                        &nbsp;
+                                        <button type="button" class="btn btn-success" onclick="updateFieldSapphire(this)"><i class="fa-solid fa-check"></i></button>
+                                    </div>
                                   <div class="btn-group">
                                     <button type="button" class="btn dropdown-toggle btn-sm"
                                       data-bs-toggle="dropdown" aria-expanded="false">
@@ -295,6 +347,7 @@ function addFieldSapphire(fieldName = "") {
                                     </button>
                                     <ul class="dropdown-menu">
                                       <li><button class="btn dropdown-item" onclick="add_sub_heading_sapphire(this)" >Add Sub-heading</button></li>
+                                      <li><button class="btn dropdown-item" onclick="edit_heading_sapphire(this)" >Edit</button></li>
                                       <li><button class="btn dropdown-item" onclick="delete_heading_sapphire(this)">Delete</button></li>
                                     </ul>
                                   </div>
@@ -307,6 +360,45 @@ function addFieldSapphire(fieldName = "") {
     $("#addFieldBtnSapphire").prop("disabled", false);
     $('#add_li_sapphire').remove();
 
+}
+
+function edit_heading_sapphire(elem){
+    $(elem).parent().parent().parent().parent().children(".edit_heading").toggleClass("hide");
+    $(elem).parent().parent().parent().parent().children("span").toggleClass("hide");
+    $(elem).parent().parent().parent().parent().children(".btn-group").toggleClass("hide");
+
+    const headingVal = $(elem).parent().parent().parent().parent().children("span").html();
+
+    $(elem).parent().parent().parent().parent().children(".edit_heading").children("input").val(headingVal);
+}
+
+function cancelEditFieldSapphire(elem){
+    $(elem).parent().toggleClass("hide");
+    $(elem).parent().parent().children("span").toggleClass("hide");
+    $(elem).parent().parent().children(".btn-group").toggleClass("hide");
+}
+
+function updateFieldSapphire(elem){
+    const newVal = $(elem).parent().children("input").val();
+    const oldVal =  $(elem).parent().parent().children("span").html();
+
+    //update UI
+    $(elem).parent().parent().children("span").html(newVal);
+
+    //Update JSON
+    for (let i = 0; i < settingsJson.Sapphire_table.length; i++) {
+        if (settingsJson.Sapphire_table[i].header == oldVal) {
+            settingsJson.Sapphire_table[i].header = newVal;
+        }
+    }
+
+    $("#settingsJsonTextSapphire").val(JSON.stringify(settingsJson.Sapphire_table, null, 2));
+    generateSapphireTable(settingsJson.Sapphire_table);
+
+
+    $(elem).parent().toggleClass("hide");
+    $(elem).parent().parent().children("span").toggleClass("hide");
+    $(elem).parent().parent().children(".btn-group").toggleClass("hide");
 }
 
 function delete_heading_sapphire(elem) {
