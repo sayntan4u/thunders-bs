@@ -23,11 +23,11 @@ function getFields(group) {
   const fields = [];
   const data = fs.readFileSync('./settings.conf', 'utf8');
 
-  if(group == "SKB"){
+  if (group == "SKB") {
     const SKB_table = JSON.parse(data).SKB_table;
     for (let i = 0; i < SKB_table.length; i++) {
       // addField(SKB_table[i].header);
-  
+
       if (SKB_table[i].sub_heading.length > 0) {
         for (let j = 0; j < SKB_table[i].sub_heading.length; j++) {
           // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
@@ -37,11 +37,11 @@ function getFields(group) {
         fields.push(camelize(SKB_table[i].header));
       }
     }
-  } else if(group == "Sapphire"){
+  } else if (group == "Sapphire") {
     const Sapphire_table = JSON.parse(data).Sapphire_table;
     for (let i = 0; i < Sapphire_table.length; i++) {
       // addField(SKB_table[i].header);
-  
+
       if (Sapphire_table[i].sub_heading.length > 0) {
         for (let j = 0; j < Sapphire_table[i].sub_heading.length; j++) {
           // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
@@ -52,7 +52,7 @@ function getFields(group) {
       }
     }
   }
-  
+
   return fields;
 }
 
@@ -100,7 +100,7 @@ app.post("/getData", requireAuth, async (req, res) => {
 
     data = await getCollectionData(group, year, week);
 
-   
+
     res.send(data);
   } catch (err) {
     res.send(err);
@@ -144,9 +144,9 @@ async function getCollectionData(group, year, week) {
   var collection = "";
 
   if (group == "SKB") {
-      collection = "users";
+    collection = "users";
   } else {
-      collection = "sapphire";
+    collection = "sapphire";
   }
 
   const snapshot = await db.collection(collection).listDocuments();
@@ -157,15 +157,15 @@ async function getCollectionData(group, year, week) {
     const snap = await db.collection(collection).doc(snapshot[i].id).collection(year).doc(week).get();
 
     var dataRow = "{";
-    dataRow += ' "sl" : "' + (i+1) + '",';
+    dataRow += ' "sl" : "' + (i + 1) + '",';
     dataRow += ' "name" : "' + snapshot[i].id + '",';
     var fields = getFields(group);
     fields.push("remarks");
 
-    for(let i=0; i<fields.length; i++){
-      dataRow += '"'+ fields[i] + '" : "' + snap.data()[fields[i]] + '"';
+    for (let i = 0; i < fields.length; i++) {
+      dataRow += '"' + fields[i] + '" : "' + snap.data()[fields[i]] + '"';
       // dataRow.push(snap.data()[fields[i]]);
-      if(i != fields.length -1){
+      if (i != fields.length - 1) {
         dataRow += ',';
       }
     }
@@ -204,23 +204,6 @@ app.post("/addUser", requireAuth, async (req, res) => {
   // console.log(JSON.parse(test));
 
   if (group == "SKB") {
-
-    // const userJson = {
-    //   list: 0,
-    //   networkingDone: 0,
-    //   networkingTarget: 0,
-    //   infosDone: 0,
-    //   infosTarget: 0,
-    //   reinfosDone: 0,
-    //   reinfosTarget: 0,
-    //   meetupsDone: 0,
-    //   meetupsTarget: 0,
-    //   invisDone: 0,
-    //   invisTarget: 0,
-    //   plans: 0,
-    //   pendingPlans: 0,
-    //   remarks: ""
-    // };
 
     const userJson = JSON.parse(test);
 
@@ -376,11 +359,11 @@ async function getAnalyzeData(year, weekFrom, weekTo, name, group) {
       dataRow += ' "sl" : "' + sl + '",';
       dataRow += ' "week" : "Week ' + parseInt(idArray[j]) + '",';
       var fields = getFields(group);
-  
-      for(let i=0; i<fields.length; i++){
-        dataRow += '"'+ fields[i] + '" : "' + snap.data()[fields[i]] + '"';
+
+      for (let i = 0; i < fields.length; i++) {
+        dataRow += '"' + fields[i] + '" : "' + snap.data()[fields[i]] + '"';
         // dataRow.push(snap.data()[fields[i]]);
-        if(i != fields.length -1){
+        if (i != fields.length - 1) {
           dataRow += ',';
         }
       }
@@ -409,18 +392,18 @@ async function getAnalyzeData(year, weekFrom, weekTo, name, group) {
       dataRow += ' "sl" : "' + sl + '",';
       dataRow += ' "week" : "Week ' + parseInt(idArray[j]) + '",';
       var fields = getFields(group);
-  
-      for(let i=0; i<fields.length; i++){
-        dataRow += '"'+ fields[i] + '" : "' + snap.data()[fields[i]] + '"';
+
+      for (let i = 0; i < fields.length; i++) {
+        dataRow += '"' + fields[i] + '" : "' + snap.data()[fields[i]] + '"';
         // dataRow.push(snap.data()[fields[i]]);
-        if(i != fields.length -1){
+        if (i != fields.length - 1) {
           dataRow += ',';
         }
       }
       dataRow += '}';
 
       sl++;
-      
+
       docArray.push(JSON.parse(dataRow));
     }
   }
@@ -574,23 +557,161 @@ app.post("/saveSettings", requireAuth, async (req, res) => {
 
   const data = fs.readFileSync('./settings.conf', 'utf8');
 
-  const jsonSettings = JSON.parse(data);
+  const settingsJson = JSON.parse(data);
 
-  console.log(_.isEqual(config, jsonSettings)); 
+  console.log("save settings clicked");
 
-  // try {
-  //   fs.writeFile('./settings.conf', JSON.stringify(config, null, 2), function (err) {
-  //     if (err) throw err;
-  //     // console.log('Saved!');
-  //     res.send("Saved");
-  //   });
+  // await addField("helloWorld", "SKB");
+  // await deleteField("helloWorld", "SKB");
 
-  // } catch (err) {
-  //   res.send(err);
-  // }
+  if (!_.isEqual(config, settingsJson)) {
+    const addDelField = new Map();
+
+    //Check new SKB Table ADD / Edit
+
+    for (let i = 0; i < config.SKB_table.length; i++) {
+      if (config.SKB_table[i].isAdded) {
+        //Newly added field
+        // 
+        // await addField(camelize(config.SKB_table[i].header), "SKB");
+        if (config.SKB_table[i].sub_heading.length > 0) {
+          for (let j = 0; j < config.SKB_table[i].sub_heading.length; j++) {
+            // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
+            addDelField.set(camelize((config.SKB_table[i].header + config.SKB_table[i].sub_heading[j]).toString()), 0);
+            // config.SKB_table[i].isAdded = false;
+          }
+        } else {
+          addDelField.set(camelize(config.SKB_table[i].header), 0);
+
+        }
+        config.SKB_table[i].isAdded = false;
+      } else {
+        if (config.SKB_table[i].isEdited) {
+          //Edited field..change in DB
+
+          if (config.SKB_table[i].sub_heading.length > 0) {
+            for (let j = 0; j < config.SKB_table[i].sub_heading.length; j++) {
+              // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
+              await renameField(camelize((config.SKB_table[i].header + config.SKB_table[i].sub_heading[j]).toString()), camelize((config.SKB_table[i].prev + config.SKB_table[i].sub_heading[j]).toString()), "SKB");
+
+            }
+          } else {
+            await renameField(camelize(config.SKB_table[i].header), camelize(config.SKB_table[i].prev), "SKB");
+          }
+
+          config.SKB_table[i].prev = "";
+          config.SKB_table[i].isEdited = false;
+        }
+      }
+    }
+
+    //Check for Delete
+    for (let i = 0; i < settingsJson.SKB_table.length; i++) {
+      var notFound = true;
+
+      for (let j = 0; j < config.SKB_table.length; j++) {
+        if (settingsJson.SKB_table[i].header == config.SKB_table[j].header) {
+          notFound = false;
+          break;
+        }
+      }
+      if (notFound) {
+        //Add delete field
+        if (settingsJson.SKB_table[i].sub_heading.length > 0) {
+          for (let j = 0; j < settingsJson.SKB_table[i].sub_heading.length; j++) {
+            // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
+            addDelField.set(camelize((settingsJson.SKB_table[i].header + settingsJson.SKB_table[i].sub_heading[j]).toString()), admin.firestore.FieldValue.delete());
+          }
+        } else {
+          addDelField.set(camelize(settingsJson.SKB_table[i].header), admin.firestore.FieldValue.delete());
+        }
+      }
+    }
+
+    const obj = Object.fromEntries(addDelField);
+
+    console.log(obj);
+
+    await updateFields(obj, "SKB");
+  }
+
+  try {
+    fs.writeFile('./settings.conf', JSON.stringify(config, null, 2), function (err) {
+      if (err) throw err;
+      // console.log('Saved!');
+      res.send("Saved");
+    });
+
+  } catch (err) {
+    res.send(err);
+  }
 });
 
+async function renameField(newFieldName, oldFieldName, group) {
+  var collection = "";
 
+  if (group == "SKB") {
+    collection = "users";
+  } else {
+    collection = "sapphire";
+  }
+
+  const year = 2025;
+
+  const snapshot = await db.collection(collection).listDocuments();
+
+  for (let i = 0; i < snapshot.length; i++) {
+    for (let j = 1; j <= 53; j++) {
+      
+      var snap = await db.collection(collection).doc(snapshot[i].id).collection(year.toString()).doc(j.toString()).get();
+      
+      var addDelField = new Map();
+      var prevData = snap.data()[oldFieldName];
+      addDelField.set(newFieldName, prevData);
+      // addDelField.set(oldFieldName, admin.firestore.FieldValue.delete());
+
+      var obj = Object.fromEntries(addDelField);
+      await db.collection(collection).doc(snapshot[i].id).collection(year.toString()).doc(j.toString()).update(obj);
+
+      snap = await db.collection(collection).doc(snapshot[i].id).collection((year + 1).toString()).doc(j.toString()).get();
+      
+      addDelField = new Map();
+      prevData = snap.data()[oldFieldName];
+      addDelField.set(newFieldName, prevData);
+      // addDelField.set(oldFieldName, admin.firestore.FieldValue.delete());
+
+      obj = Object.fromEntries(addDelField);
+      await db.collection(collection).doc(snapshot[i].id).collection((year + 1).toString()).doc(j.toString()).update(obj);
+    }
+
+  }
+
+  // console.log("Renamed Fields !");
+
+}
+
+async function updateFields(fieldObj, group) {
+  var collection = "";
+  if (group == "SKB") {
+    collection = "users";
+  } else {
+    collection = "sapphire";
+  }
+
+  const year = 2025;
+
+  const snapshot = await db.collection(collection).listDocuments();
+
+  for (let i = 0; i < snapshot.length; i++) {
+    for (let j = 1; j <= 53; j++) {
+      await db.collection(collection).doc(snapshot[i].id).collection(year.toString()).doc(j.toString()).update(fieldObj);//{ helloWorld : admin.firestore.FieldValue.delete()});
+      await db.collection(collection).doc(snapshot[i].id).collection((year + 1).toString()).doc(j.toString()).update(fieldObj); //{ helloWorld : admin.firestore.FieldValue.delete()});
+    }
+
+  }
+
+  console.log("Updated !");
+}
 
 // Routes will go here
 

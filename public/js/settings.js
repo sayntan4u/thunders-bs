@@ -27,7 +27,10 @@ function addField(fieldName = "") {
         fieldName = $("#textFieldName").val();
         settingsJson.SKB_table.push({
             header: fieldName,
-            sub_heading: []
+            sub_heading: [],
+            isEdited: false,
+            prev: "" ,
+            isAdded: true
         });
         // console.log(settingsJson.SKB_table);
         $("#settingsJsonTextSKB").val(JSON.stringify(settingsJson.SKB_table, null, 2));
@@ -93,6 +96,8 @@ function updateField(elem){
     //Update JSON
     for (let i = 0; i < settingsJson.SKB_table.length; i++) {
         if (settingsJson.SKB_table[i].header == oldVal) {
+            settingsJson.SKB_table[i].isEdited = true;
+            settingsJson.SKB_table[i].prev = oldVal;
             settingsJson.SKB_table[i].header = newVal;
         }
     }
@@ -327,7 +332,10 @@ function addFieldSapphire(fieldName = "") {
         fieldName = $("#textFieldNameSapphire").val();
         settingsJson.Sapphire_table.push({
             header: fieldName,
-            sub_heading: []
+            sub_heading: [],
+            isEdited: false,
+            prev: "" ,
+            isAdded: true
         });
         // console.log(settingsJson.SKB_table);
         $("#settingsJsonTextSapphire").val(JSON.stringify(settingsJson.Sapphire_table, null, 2));
@@ -393,6 +401,9 @@ function updateFieldSapphire(elem){
     //Update JSON
     for (let i = 0; i < settingsJson.Sapphire_table.length; i++) {
         if (settingsJson.Sapphire_table[i].header == oldVal) {
+
+            settingsJson.Sapphire_table[i].isEdited = true;
+            settingsJson.Sapphire_table[i].prev = oldVal;
             settingsJson.Sapphire_table[i].header = newVal;
         }
     }
