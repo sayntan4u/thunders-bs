@@ -8,6 +8,7 @@ const Docxtemplater = require("docxtemplater");
 // Load PizZip library to load the docx/pptx/xlsx file in memory
 const PizZip = require("pizzip");
 const fs = require("fs");
+var _ = require('lodash');
 
 
 
@@ -570,16 +571,23 @@ app.post("/getSettings", requireAuth, async (req, res) => {
 
 app.post("/saveSettings", requireAuth, async (req, res) => {
   const config = req.body.config;
-  try {
-    fs.writeFile('./settings.conf', JSON.stringify(config, null, 2), function (err) {
-      if (err) throw err;
-      // console.log('Saved!');
-      res.send("Saved");
-    });
 
-  } catch (err) {
-    res.send(err);
-  }
+  const data = fs.readFileSync('./settings.conf', 'utf8');
+
+  const jsonSettings = JSON.parse(data);
+
+  console.log(_.isEqual(config, jsonSettings)); 
+
+  // try {
+  //   fs.writeFile('./settings.conf', JSON.stringify(config, null, 2), function (err) {
+  //     if (err) throw err;
+  //     // console.log('Saved!');
+  //     res.send("Saved");
+  //   });
+
+  // } catch (err) {
+  //   res.send(err);
+  // }
 });
 
 
