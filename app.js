@@ -565,7 +565,7 @@ app.post("/saveSettings", requireAuth, async (req, res) => {
   // await deleteField("helloWorld", "SKB");
 
   if (!_.isEqual(config, settingsJson)) {
-    const addDelField = new Map();
+    var addDelField = new Map();
 
     //Check new SKB Table ADD / Edit
 
@@ -630,9 +630,77 @@ app.post("/saveSettings", requireAuth, async (req, res) => {
 
     if(addDelField.size > 0){
       const obj = Object.fromEntries(addDelField);
-      console.log(obj != null);
       await updateFields(obj, "SKB");
     }
+
+    //Check new Sapphire Table ADD / Edit
+
+    addDelField = new Map();
+
+    for (let i = 0; i < config.Sapphire_table.length; i++) {
+      if (config.Sapphire_table[i].isAdded) {
+        //Newly added field
+        // 
+        // await addField(camelize(config.SKB_table[i].header), "SKB");
+        if (config.Sapphire_table[i].sub_heading.length > 0) {
+          for (let j = 0; j < config.Sapphire_table[i].sub_heading.length; j++) {
+            // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
+            addDelField.set(camelize((config.Sapphire_table[i].header + config.Sapphire_table[i].sub_heading[j]).toString()), 0);
+            // config.SKB_table[i].isAdded = false;
+          }
+        } else {
+          addDelField.set(camelize(config.Sapphire_table[i].header), 0);
+
+        }
+        config.Sapphire_table[i].isAdded = false;
+      } else {
+        if (config.Sapphire_table[i].isEdited) {
+          //Edited field..change in DB
+
+          if (config.Sapphire_table[i].sub_heading.length > 0) {
+            for (let j = 0; j < config.Sapphire_table[i].sub_heading.length; j++) {
+              // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
+              await renameField(camelize((config.Sapphire_table[i].header + config.Sapphire_table[i].sub_heading[j]).toString()), camelize((config.Sapphire_table[i].prev + config.Sapphire_table[i].sub_heading[j]).toString()), "Sapphire");
+
+            }
+          } else {
+            await renameField(camelize(config.Sapphire_table[i].header), camelize(config.Sapphire_table[i].prev), "Sapphire");
+          }
+
+          config.Sapphire_table[i].prev = "";
+          config.Sapphire_table[i].isEdited = false;
+        }
+      }
+    }
+
+    //Check for Delete
+    for (let i = 0; i < settingsJson.Sapphire_table.length; i++) {
+      var notFound = true;
+
+      for (let j = 0; j < config.Sapphire_table.length; j++) {
+        if (settingsJson.Sapphire_table[i].header == config.Sapphire_table[j].header) {
+          notFound = false;
+          break;
+        }
+      }
+      if (notFound) {
+        //Add delete field
+        if (settingsJson.Sapphire_table[i].sub_heading.length > 0) {
+          for (let j = 0; j < settingsJson.Sapphire_table[i].sub_heading.length; j++) {
+            // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
+            addDelField.set(camelize((settingsJson.Sapphire_table[i].header + settingsJson.Sapphire_table[i].sub_heading[j]).toString()), admin.firestore.FieldValue.delete());
+          }
+        } else {
+          addDelField.set(camelize(settingsJson.Sapphire_table[i].header), admin.firestore.FieldValue.delete());
+        }
+      }
+    }
+
+    if(addDelField.size > 0){
+      const obj = Object.fromEntries(addDelField);
+      await updateFields(obj, "Sapphire");
+    }
+
   }
 
   try {
@@ -699,7 +767,8 @@ async function updateFields(fieldObj, group) {
     collection = "sapphire";
   }
 
-  const year = 2025;
+  const d = new Date();
+  let year = d.getFullYear();
 
   const snapshot = await db.collection(collection).listDocuments();
 
