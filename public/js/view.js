@@ -61,7 +61,7 @@ function getTDClass(field) {
         ret = "bg-warning";
     } else if (field.toLowerCase().includes("list")) {
         ret = "bg-info";
-    } else if (field == "plan") {
+    } else if (field == "plans") {
         ret = "bg-success";
     } else if (field == "remarks") {
         ret = "";
@@ -83,7 +83,7 @@ function getTDClassSapphire(field) {
         ret = "bg-danger";
     } else if (field.toLowerCase().includes("node")) {
         ret = "bg-info";
-    } else if (field == "plan") {
+    } else if (field == "plans") {
         ret = "bg-success";
     } else if (field == "remarks") {
         ret = "";
