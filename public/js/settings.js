@@ -29,7 +29,7 @@ function addField(fieldName = "") {
             header: fieldName,
             sub_heading: [],
             isEdited: false,
-            prev: "" ,
+            prev: "",
             isAdded: true
         });
         // console.log(settingsJson.SKB_table);
@@ -68,27 +68,27 @@ function addField(fieldName = "") {
 
 }
 
-function edit_heading(elem){
+function edit_heading(elem) {
     $(elem).parent().parent().parent().parent().children(".edit_heading").toggleClass("hide");
     $(elem).parent().parent().parent().parent().children("span").toggleClass("hide");
     $(elem).parent().parent().parent().parent().children(".btn-group").toggleClass("hide");
-    $(elem).parent().parent().parent().parent().prop("draggable",false);
+    $(elem).parent().parent().parent().parent().prop("draggable", false);
 
     const headingVal = $(elem).parent().parent().parent().parent().children("span").html();
 
     $(elem).parent().parent().parent().parent().children(".edit_heading").children("input").val(headingVal);
 }
 
-function cancelEditField(elem){
+function cancelEditField(elem) {
     $(elem).parent().toggleClass("hide");
     $(elem).parent().parent().children("span").toggleClass("hide");
     $(elem).parent().parent().children(".btn-group").toggleClass("hide");
-    $(elem).parent().parent().prop("draggable",true);
+    $(elem).parent().parent().prop("draggable", true);
 }
 
-function updateField(elem){
+function updateField(elem) {
     const newVal = $(elem).parent().children("input").val();
-    const oldVal =  $(elem).parent().parent().children("span").html();
+    const oldVal = $(elem).parent().parent().children("span").html();
 
     //update UI
     $(elem).parent().parent().children("span").html(newVal);
@@ -109,7 +109,7 @@ function updateField(elem){
     $(elem).parent().toggleClass("hide");
     $(elem).parent().parent().children("span").toggleClass("hide");
     $(elem).parent().parent().children(".btn-group").toggleClass("hide");
-    $(elem).parent().parent().prop("draggable",true);
+    $(elem).parent().parent().prop("draggable", true);
 }
 
 function delete_heading(elem) {
@@ -273,13 +273,19 @@ function generateSKBTable(SKB_table) {
 }
 
 $("#saveConfigSKB").click(function () {
+    $("#saveConfigSKB").prop("disabled", true);
+    $(".loading").removeClass("hide");
+
+
     const data = { config: settingsJson };
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/saveSettings");
     xhttp.onload = function () {
-        // console.log(this.responseText);
+        loadSettings();
+        $("#saveConfigSKB").prop("disabled", false);
+        $(".loading").addClass("hide");
         $(".alert_skb").toggleClass("hide");
-        setTimeout(function () { $(".alert_skb").toggleClass("hide"); }, 6000);
+        setTimeout(function () { $(".alert_skb").toggleClass("hide"); }, 10000);
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
@@ -334,7 +340,7 @@ function addFieldSapphire(fieldName = "") {
             header: fieldName,
             sub_heading: [],
             isEdited: false,
-            prev: "" ,
+            prev: "",
             isAdded: true
         });
         // console.log(settingsJson.SKB_table);
@@ -373,27 +379,27 @@ function addFieldSapphire(fieldName = "") {
 
 }
 
-function edit_heading_sapphire(elem){
+function edit_heading_sapphire(elem) {
     $(elem).parent().parent().parent().parent().children(".edit_heading").toggleClass("hide");
     $(elem).parent().parent().parent().parent().children("span").toggleClass("hide");
     $(elem).parent().parent().parent().parent().children(".btn-group").toggleClass("hide");
-    $(elem).parent().parent().parent().parent().prop("draggable",false);
+    $(elem).parent().parent().parent().parent().prop("draggable", false);
 
     const headingVal = $(elem).parent().parent().parent().parent().children("span").html();
 
     $(elem).parent().parent().parent().parent().children(".edit_heading").children("input").val(headingVal);
 }
 
-function cancelEditFieldSapphire(elem){
+function cancelEditFieldSapphire(elem) {
     $(elem).parent().toggleClass("hide");
     $(elem).parent().parent().children("span").toggleClass("hide");
     $(elem).parent().parent().children(".btn-group").toggleClass("hide");
-    $(elem).parent().parent().prop("draggable",true);
+    $(elem).parent().parent().prop("draggable", true);
 }
 
-function updateFieldSapphire(elem){
+function updateFieldSapphire(elem) {
     const newVal = $(elem).parent().children("input").val();
-    const oldVal =  $(elem).parent().parent().children("span").html();
+    const oldVal = $(elem).parent().parent().children("span").html();
 
     //update UI
     $(elem).parent().parent().children("span").html(newVal);
@@ -415,7 +421,7 @@ function updateFieldSapphire(elem){
     $(elem).parent().toggleClass("hide");
     $(elem).parent().parent().children("span").toggleClass("hide");
     $(elem).parent().parent().children(".btn-group").toggleClass("hide");
-    $(elem).parent().parent().prop("draggable",true);
+    $(elem).parent().parent().prop("draggable", true);
 }
 
 function delete_heading_sapphire(elem) {
@@ -579,13 +585,21 @@ function generateSapphireTable(Sapphire_table) {
 }
 
 $("#saveConfigSapphire").click(function () {
+    $("#saveConfigSapphire").prop("disabled", true);
+    $(".loading_sapphire").removeClass("hide");
+
     const data = { config: settingsJson };
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/saveSettings");
     xhttp.onload = function () {
-        // console.log(this.responseText);
+
+        loadSettings();
+
+        $("#saveConfigSapphire").prop("disabled", false);
+        $(".loading_sapphire").addClass("hide");
+
         $(".alert_sapphire").toggleClass("hide");
-        setTimeout(function () { $(".alert_sapphire").toggleClass("hide"); }, 6000);
+        setTimeout(function () { $(".alert_sapphire").toggleClass("hide"); }, 10000);
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
@@ -613,20 +627,20 @@ function dragoverHandlerSapphire(ev) {
 
 //Common Methods
 
-function editColSpan(elem){
+function editColSpan(elem) {
     $(elem).toggleClass("hide");
     $(elem).parent().children(".btn_controls").toggleClass("hide");
     $(elem).parent().children("input").prop("disabled", false);
-    
+
 }
 
-function cancelColSpan(elem){
+function cancelColSpan(elem) {
     $(elem).parent().toggleClass("hide");
     $(elem).parent().parent().children("button").toggleClass("hide");
     $(elem).parent().parent().children("input").prop("disabled", true);
 }
 
-function saveColSpan(elem, page, group){
+function saveColSpan(elem, page, group) {
     $(elem).parent().toggleClass("hide");
     $(elem).parent().parent().children("button").toggleClass("hide");
     $(elem).parent().parent().children("input").prop("disabled", true);
@@ -672,7 +686,7 @@ function loadSettings() {
         $("#analyzeColSpanSKB").val(settingsJson.totalAnalyzeSKBColSpan);
         $("#viewColSpanSapphire").val(settingsJson.totalViewSapphireColSpan);
         $("#analyzeColSpanSapphire").val(settingsJson.totalAnalyzeSapphireColSpan);
-        
+
         generateSKBTableTree(settingsJson.SKB_table);
         generateSKBTable(settingsJson.SKB_table);
 

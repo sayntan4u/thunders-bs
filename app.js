@@ -16,7 +16,7 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 const admin = require('firebase-admin');
-const credentials = require('./key1.json');
+const credentials = require('./key.json');
 
 
 function getFields(group) {
@@ -543,7 +543,7 @@ app.post("/getSettings", requireAuth, async (req, res) => {
         console.error(err);
         return;
       }
-      const json = JSON.parse(data);
+      // const json = JSON.parse(data);
       res.send(data);
     });
 
