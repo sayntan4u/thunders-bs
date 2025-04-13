@@ -656,15 +656,16 @@ async function renameField(newFieldName, oldFieldName, group) {
     collection = "sapphire";
   }
 
-  const year = 2025;
+  const d = new Date();
+  let year = d.getFullYear();
 
   const snapshot = await db.collection(collection).listDocuments();
 
   for (let i = 0; i < snapshot.length; i++) {
     for (let j = 1; j <= 53; j++) {
-      
+
       var snap = await db.collection(collection).doc(snapshot[i].id).collection(year.toString()).doc(j.toString()).get();
-      
+
       var addDelField = new Map();
       var prevData = snap.data()[oldFieldName];
       addDelField.set(newFieldName, prevData);
@@ -674,7 +675,7 @@ async function renameField(newFieldName, oldFieldName, group) {
       await db.collection(collection).doc(snapshot[i].id).collection(year.toString()).doc(j.toString()).update(obj);
 
       snap = await db.collection(collection).doc(snapshot[i].id).collection((year + 1).toString()).doc(j.toString()).get();
-      
+
       addDelField = new Map();
       prevData = snap.data()[oldFieldName];
       addDelField.set(newFieldName, prevData);
