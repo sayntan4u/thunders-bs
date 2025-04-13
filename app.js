@@ -628,11 +628,11 @@ app.post("/saveSettings", requireAuth, async (req, res) => {
       }
     }
 
-    const obj = Object.fromEntries(addDelField);
-
-    console.log(obj);
-
-    await updateFields(obj, "SKB");
+    if(addDelField.size > 0){
+      const obj = Object.fromEntries(addDelField);
+      console.log(obj != null);
+      await updateFields(obj, "SKB");
+    }
   }
 
   try {
