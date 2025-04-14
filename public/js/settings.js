@@ -273,23 +273,36 @@ function generateSKBTable(SKB_table) {
 }
 
 $("#saveConfigSKB").click(function () {
+    var idInterval = null;
     $("#saveConfigSKB").prop("disabled", true);
     $(".loading").removeClass("hide");
-
-
     const data = { config: settingsJson };
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/saveSettings");
     xhttp.onload = function () {
+        clearInterval(idInterval);
         loadSettings();
         $("#saveConfigSKB").prop("disabled", false);
         $(".loading").addClass("hide");
         $(".alert_skb").toggleClass("hide");
         setTimeout(function () { $(".alert_skb").toggleClass("hide"); }, 10000);
+
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
+    idInterval = setInterval(getStatus, 6000);
 });
+
+function getStatus(){
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "/getStatus");
+    xhttp.onload = function () {
+       const response = this.responseText;
+       console.log(response);
+    }
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send();
+}
 
 function dragstartHandlerSKB(ev) {
     ev.dataTransfer.setData("text", $(ev.target).children("span").html());
@@ -592,7 +605,8 @@ $("#saveConfigSapphire").click(function () {
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/saveSettings");
     xhttp.onload = function () {
-
+        clearInterval(idInterval);
+        
         loadSettings();
 
         $("#saveConfigSapphire").prop("disabled", false);
@@ -603,6 +617,7 @@ $("#saveConfigSapphire").click(function () {
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
+    idInterval = setInterval(getStatus, 6000);
 });
 
 function dragstartHandlerSapphire(ev) {

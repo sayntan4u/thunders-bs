@@ -16,7 +16,7 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 const admin = require('firebase-admin');
-const credentials = require('./key.json');
+const credentials = require('./key1.json');
 
 
 function getFields(group) {
@@ -593,6 +593,17 @@ app.post('/deleteClosing', requireAuth, async function (req, res) {
 
 //Settings Page
 
+var statusJson = {
+  procName : "",
+  docName : "",
+  status : "",
+  progress : 0
+};
+
+app.get("/getStatus", requireAuth, async (req, res) => {
+ res.send(statusJson);
+});
+
 app.post("/getSettings", requireAuth, async (req, res) => {
   try {
     fs.readFile('./settings.conf', 'utf8', (err, data) => {
@@ -786,9 +797,12 @@ async function renameField(newFieldName, oldFieldName, group) {
 
   const snapshot = await db.collection(collection).listDocuments();
 
+  statusJson.procName = "Rename :";
   for (let i = 0; i < snapshot.length; i++) {
+    statusJson.docName = snapshot[i].id;
     for (let j = 1; j <= 53; j++) {
 
+      statusJson.status = "adding field : " + newFieldName + " to Week " + j.toString() + "," + year.toString();
       var snap = await db.collection(collection).doc(snapshot[i].id).collection(year.toString()).doc(j.toString()).get();
 
       var addDelField = new Map();
@@ -799,6 +813,9 @@ async function renameField(newFieldName, oldFieldName, group) {
       var obj = Object.fromEntries(addDelField);
       await db.collection(collection).doc(snapshot[i].id).collection(year.toString()).doc(j.toString()).update(obj);
 
+      statusJson.status = "added field : " + newFieldName + " to Week " + j.toString() + "," + year.toString();
+
+      statusJson.status = "adding field : " + newFieldName + " to Week " + j.toString() + "," + (year + 1).toString();
       snap = await db.collection(collection).doc(snapshot[i].id).collection((year + 1).toString()).doc(j.toString()).get();
 
       addDelField = new Map();
@@ -808,10 +825,12 @@ async function renameField(newFieldName, oldFieldName, group) {
 
       obj = Object.fromEntries(addDelField);
       await db.collection(collection).doc(snapshot[i].id).collection((year + 1).toString()).doc(j.toString()).update(obj);
+      statusJson.status = "added field : " + newFieldName + " to Week " + j.toString() + "," + (year + 1).toString();
     }
 
   }
 
+  statusJson.status = "Rename done";
   // console.log("Renamed Fields !");
 
 }
@@ -829,15 +848,18 @@ async function updateFields(fieldObj, group) {
 
   const snapshot = await db.collection(collection).listDocuments();
 
+  statusJson.procName = "Update :";
   for (let i = 0; i < snapshot.length; i++) {
+    statusJson.docName = snapshot[i].id;
     for (let j = 1; j <= 53; j++) {
-      await db.collection(collection).doc(snapshot[i].id).collection(year.toString()).doc(j.toString()).update(fieldObj);//{ helloWorld : admin.firestore.FieldValue.delete()});
-      await db.collection(collection).doc(snapshot[i].id).collection((year + 1).toString()).doc(j.toString()).update(fieldObj); //{ helloWorld : admin.firestore.FieldValue.delete()});
+      await db.collection(collection).doc(snapshot[i].id).collection(year.toString()).doc(j.toString()).update(fieldObj);
+      await db.collection(collection).doc(snapshot[i].id).collection((year + 1).toString()).doc(j.toString()).update(fieldObj); 
+      statusJson.status = `Updated week ${j.toString()}`;
     }
-
   }
 
   console.log("Updated !");
+  statusJson.status = "done";
 }
 
 // Routes will go here
