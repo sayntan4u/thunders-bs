@@ -600,6 +600,10 @@ var statusJson = {
   progress : 0
 };
 
+var processedWeek = 0;
+
+var isRename = false;
+
 app.get("/getStatus", requireAuth, async (req, res) => {
  res.send(statusJson);
 });
@@ -621,6 +625,10 @@ app.post("/getSettings", requireAuth, async (req, res) => {
 });
 
 app.post("/saveSettings", requireAuth, async (req, res) => {
+
+  processedWeek = 0;
+  isRename = false;
+
   const config = req.body.config;
 
   const data = fs.readFileSync('./settings.conf', 'utf8');
@@ -656,6 +664,7 @@ app.post("/saveSettings", requireAuth, async (req, res) => {
       } else {
         if (config.SKB_table[i].isEdited) {
           //Edited field..change in DB
+          isRename = true;
 
           if (config.SKB_table[i].sub_heading.length > 0) {
             for (let j = 0; j < config.SKB_table[i].sub_heading.length; j++) {
@@ -798,11 +807,10 @@ async function renameField(newFieldName, oldFieldName, group) {
   const snapshot = await db.collection(collection).listDocuments();
 
   statusJson.procName = "Rename :";
+
   for (let i = 0; i < snapshot.length; i++) {
     statusJson.docName = snapshot[i].id;
     for (let j = 1; j <= 53; j++) {
-
-      statusJson.status = "adding field : " + newFieldName + " to Week " + j.toString() + "," + year.toString();
       var snap = await db.collection(collection).doc(snapshot[i].id).collection(year.toString()).doc(j.toString()).get();
 
       var addDelField = new Map();
@@ -813,9 +821,7 @@ async function renameField(newFieldName, oldFieldName, group) {
       var obj = Object.fromEntries(addDelField);
       await db.collection(collection).doc(snapshot[i].id).collection(year.toString()).doc(j.toString()).update(obj);
 
-      statusJson.status = "added field : " + newFieldName + " to Week " + j.toString() + "," + year.toString();
 
-      statusJson.status = "adding field : " + newFieldName + " to Week " + j.toString() + "," + (year + 1).toString();
       snap = await db.collection(collection).doc(snapshot[i].id).collection((year + 1).toString()).doc(j.toString()).get();
 
       addDelField = new Map();
@@ -825,7 +831,13 @@ async function renameField(newFieldName, oldFieldName, group) {
 
       obj = Object.fromEntries(addDelField);
       await db.collection(collection).doc(snapshot[i].id).collection((year + 1).toString()).doc(j.toString()).update(obj);
-      statusJson.status = "added field : " + newFieldName + " to Week " + j.toString() + "," + (year + 1).toString();
+      statusJson.status = "added field : " + newFieldName + " to Week " + j.toString();
+      processedWeek++;
+      if(isRename){
+        statusJson.progress = parseFloat(processedWeek/(2*snapshot.length*53))*100;
+      }else{
+        statusJson.progress = parseFloat(processedWeek/(snapshot.length*53))*100;
+      }
     }
 
   }
@@ -855,6 +867,13 @@ async function updateFields(fieldObj, group) {
       await db.collection(collection).doc(snapshot[i].id).collection(year.toString()).doc(j.toString()).update(fieldObj);
       await db.collection(collection).doc(snapshot[i].id).collection((year + 1).toString()).doc(j.toString()).update(fieldObj); 
       statusJson.status = `Updated week ${j.toString()}`;
+      processedWeek++;
+      if(isRename){
+        statusJson.progress = parseFloat(processedWeek/(2*snapshot.length*53))*100;
+      }else{
+        statusJson.progress = parseFloat(processedWeek/(snapshot.length*53))*100;
+      }
+      
     }
   }
 
