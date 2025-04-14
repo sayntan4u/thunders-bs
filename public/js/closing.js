@@ -19,11 +19,11 @@ function addClosing() {
     console.log(node)
 
     var data = {
-        irName : irName,
-        prosName : prosName,
-        uv : uv,
-        status : status,
-        node : node
+        irName: irName,
+        prosName: prosName,
+        uv: uv,
+        status: status,
+        node: node
     };
 
     const xhttp = new XMLHttpRequest();
@@ -47,10 +47,12 @@ function numberWithCommas(x) {
 
 function generateClosingTable(response) {
     $(".closings").html("");
+
+
     for (let i = 0; i < response.length; i++) {
 
-        const uv = parseInt(response[i].uv);
-        const chq = parseInt(uv/3);
+        const uv = parseFloat(response[i].uv);
+        const chq = parseInt(uv / 3);
         const money = chq * 15000;
 
         $(".closings").append(`
@@ -59,7 +61,7 @@ function generateClosingTable(response) {
                     <td class="align-middle">${response[i].irName}</td>
                     <td class="align-middle">${response[i].prosName}</td>
                     <td class="align-middle">
-                     <select class="form-select" onchange="closingUVChanged('${response[i].id}', this)">
+                     <select class="form-select uv" onchange="closingUVChanged('${response[i].id}', this)">
                                     <option ${(response[i].uv == "1 UV") ? "selected" : ""}>1 UV</option>
                                     <option ${(response[i].uv == "1.5 UV") ? "selected" : ""}>1.5 UV</option>
                                     <option ${(response[i].uv == "2 UV") ? "selected" : ""}>2 UV</option>
@@ -95,27 +97,39 @@ function generateClosingTable(response) {
                                   </select>
                     
                     </td>
-                                        <td class="align-middle">
+                    <td class="align-middle">
+                    
                     ${response[i].node}
+                    
                     </td>
-                    <td class="text-success align-middle"><b>+ <i class="material-icons" style="font-size:20px">currency_rupee</i>${numberWithCommas(money)}</b></td>
+                    <td class="text-success align-middle profit_td">
+                    <b>
+                    +
+                    <i class="material-icons" style="font-size:20px">currency_rupee</i>
+                    <span class="profit">
+                    ${numberWithCommas(money)}
+                    </span>
+                    </b>
+                    </td>
                     <td>
                         <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteClosingModal" data-bs-id='${response[i].id}'><i class="fa-solid fa-xmark"></i></button>
                     </td>
                 </tr>
                     `);
 
-
         $(".loading").addClass("hide");
     }
+
+    addTotalRow();
+
 }
 
-function closingStatusChanged(id, elem){
+function closingStatusChanged(id, elem) {
 
     const statusValue = $(elem).val();
     var data = {
-        id : id,
-        status : statusValue
+        id: id,
+        status: statusValue
     };
 
     const xhttp = new XMLHttpRequest();
@@ -133,12 +147,20 @@ function closingStatusChanged(id, elem){
     xhttp.send(JSON.stringify(data));
 }
 
-function closingUVChanged(id, elem){
+function closingUVChanged(id, elem) {
 
     const uv = $(elem).val();
+    const chq = parseInt(parseFloat(uv) / 3);
+    const money = chq * 15000;
+
+    console.log(money);
+
+    $(elem).parent().siblings(".profit_td").children("b").children(".profit").html(numberWithCommas(money));
+    updateTotal();
+
     var data = {
-        id : id,
-        uv : uv
+        id: id,
+        uv: uv
     };
 
     const xhttp = new XMLHttpRequest();
@@ -178,34 +200,77 @@ function generateNodeDropDown() {
     xhttp.send(JSON.stringify(data));
 }
 
-function generateUVDropDown(){
+function generateUVDropDown() {
     for (let i = 1; i <= 10; i = i + 0.5) {
-        if(i==6){
+        if (i == 6) {
             $("#uvAdd").append("<option selected>" + i + " UV</option>");
-        }else{
+        } else {
             $("#uvAdd").append("<option>" + i + " UV</option>");
         }
-       
+
     }
 }
 
-function deleteClosing(){
+function deleteClosing() {
     $(".loading").toggleClass("hide");
 
     const id = $("#userName").html();
 
     var data = {
-        id : id
+        id: id
     };
 
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/deleteClosing");
     xhttp.onload = function () {
         loadClosings();
-        
+
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
+}
+
+function addTotalRow() {
+    $(".closings").append(`
+        <tr>
+            <th class="align-middle" scope="row"></th>
+            <td class="align-middle"></td>
+            <td class="align-middle"></td>
+            <td class="align-middle ">
+            <b>
+            <span class="total_uv"></span>
+            </b>
+            </td>
+            <td class="align-middle"></td>
+            <td class="align-middle"></td>
+            <td class="align-middle text-success-emphasis">
+            <b>
+            <i class="material-icons" style="font-size:20px">currency_rupee</i>
+                <span class="total_profit">    
+                </span>
+            </b>
+            </td>
+            <td class="align-middle"></td>
+        </tr>
+            `);
+
+    updateTotal();
+}
+
+function updateTotal() {
+    var totalUV = 0;
+    var totalProfit = 0;
+
+    $(".uv").each(function () {
+        totalUV += parseFloat($(this).val());
+    });
+
+    $(".total_uv").html(totalUV + " UV");
+
+    const chq = parseInt(totalUV/3);
+    totalProfit = chq * 15000;
+
+    $(".total_profit").html(numberWithCommas(totalProfit));
 }
 
 var deleteModal = document.getElementById('deleteClosingModal');
