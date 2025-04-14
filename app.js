@@ -269,8 +269,6 @@ async function getUserNamesSapphire() {
   return docArray;
 }
 
-
-
 app.post("/updateNamelist", requireAuth, async (req, res) => {
   const name = req.body.name;
   const link = req.body.link;
@@ -534,6 +532,65 @@ function createLegalDocumentAndDeclaration(
   return [outputPathLegal, outputPathDeclaration];
 }
 
+//Closings Page
+
+app.post('/getClosings', requireAuth, async function (req, res) {
+  var docArray = [];
+  docArray = await getClosings();
+  // console.log(docArray);
+  res.send(docArray);
+});
+
+async function getClosings() {
+  const snapshot = await db.collection("closings").listDocuments();
+
+  const docArray = [];
+  for (let i = 0; i < snapshot.length; i++) {
+
+    const snap = await db.collection("closings").doc(snapshot[i].id).get();
+    
+    docArray.push({ 
+      id: snapshot[i].id, 
+      irName : snap.data().irName,
+      prosName : snap.data().prosName,
+      uv : snap.data().uv,
+      node : snap.data().node,
+      status : snap.data().status
+    });
+  }
+  return docArray;
+}
+
+app.post('/addClosing', requireAuth, async function (req, res) {
+  await db.collection("closings").doc().set(req.body);
+  res.send("added closing");
+});
+
+app.post('/updateClosingStatus', requireAuth, async function (req, res) {
+  const id = req.body.id;
+  const status = req.body.status;
+
+  await db.collection("closings").doc(id).update({status : status});
+
+  // console.log("updated");
+});
+
+app.post('/updateClosingUV', requireAuth, async function (req, res) {
+  const id = req.body.id;
+  const uv = req.body.uv;
+
+  await db.collection("closings").doc(id).update({uv : uv});
+
+  // console.log("updated");
+});
+
+app.post('/deleteClosing', requireAuth, async function (req, res) {
+  const id = req.body.id;
+  await db.recursiveDelete(db.collection("closings").doc(id));
+  res.send("deleted !");
+});
+
+
 //Settings Page
 
 app.post("/getSettings", requireAuth, async (req, res) => {
@@ -628,7 +685,7 @@ app.post("/saveSettings", requireAuth, async (req, res) => {
       }
     }
 
-    if(addDelField.size > 0){
+    if (addDelField.size > 0) {
       const obj = Object.fromEntries(addDelField);
       await updateFields(obj, "SKB");
     }
@@ -696,7 +753,7 @@ app.post("/saveSettings", requireAuth, async (req, res) => {
       }
     }
 
-    if(addDelField.size > 0){
+    if (addDelField.size > 0) {
       const obj = Object.fromEntries(addDelField);
       await updateFields(obj, "Sapphire");
     }
