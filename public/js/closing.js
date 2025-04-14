@@ -59,7 +59,7 @@ function generateClosingTable(response) {
                     <td class="align-middle">${response[i].irName}</td>
                     <td class="align-middle">${response[i].prosName}</td>
                     <td class="align-middle">
-                     <select class="form-select" style="font-weight:bold" onchange="closingUVChanged('${response[i].id}', this)">
+                     <select class="form-select" onchange="closingUVChanged('${response[i].id}', this)">
                                     <option ${(response[i].uv == "1 UV") ? "selected" : ""}>1 UV</option>
                                     <option ${(response[i].uv == "1.5 UV") ? "selected" : ""}>1.5 UV</option>
                                     <option ${(response[i].uv == "2 UV") ? "selected" : ""}>2 UV</option>
@@ -83,7 +83,7 @@ function generateClosingTable(response) {
                                   </select>
                     </td>
                     <td class="align-middle">
-                    <select class="form-select" style="font-weight:bold" onchange="closingStatusChanged('${response[i].id}', this)">
+                    <select class="form-select" onchange="closingStatusChanged('${response[i].id}', this)">
                                     <option ${(response[i].status == "CIP") ? "selected" : ""}>CIP</option>
                                     <option ${(response[i].status == "LA") ? "selected" : ""}>LA</option>
                                     <option ${(response[i].status == "LA2") ? "selected" : ""}>LA2</option>
