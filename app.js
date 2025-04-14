@@ -843,13 +843,12 @@ async function getUserNames() {
   return docArray;
 }
 
-
-
-
-
 app.get('/utilities', requireAuth, function (req, res) {
-
   res.render('utilities', { userName: req.session.userId, page: 'utilities' });
+});
+
+app.get('/closing', requireAuth, function (req, res) {
+  res.render('closing', { userName: req.session.userId, page: 'closing' });
 });
 
 
