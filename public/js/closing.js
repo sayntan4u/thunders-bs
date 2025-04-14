@@ -232,18 +232,18 @@ function deleteClosing() {
 
 function addTotalRow() {
     $(".closings").append(`
-        <tr>
+        <tr class="table-warning">
             <th class="align-middle" scope="row"></th>
             <td class="align-middle"></td>
-            <td class="align-middle"></td>
+            <td class="align-middle txt-align-center">Total UV :</td>
             <td class="align-middle ">
             <b>
             <span class="total_uv"></span>
             </b>
             </td>
             <td class="align-middle"></td>
-            <td class="align-middle"></td>
-            <td class="align-middle text-success-emphasis">
+            <td class="align-middle txt-align-center"> Total Profit :</td>
+            <td class="align-middle">
             <b>
             <i class="material-icons" style="font-size:20px">currency_rupee</i>
                 <span class="total_profit">    
