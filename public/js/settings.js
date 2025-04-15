@@ -276,6 +276,7 @@ $("#saveConfigSKB").click(function () {
     var idInterval = null;
     $("#saveConfigSKB").prop("disabled", true);
     $(".loading").removeClass("hide");
+    $(".alert_skb").addClass("hide");
 
     $(".status").html("");
     $(".progress-bar").css("width","0%");
@@ -288,8 +289,9 @@ $("#saveConfigSKB").click(function () {
         loadSettings();
         $("#saveConfigSKB").prop("disabled", false);
         $(".loading").addClass("hide");
-        $(".alert_skb").toggleClass("hide");
-        setTimeout(function () { $(".alert_skb").toggleClass("hide"); }, 10000);
+        
+        $(".alert_skb").removeClass("hide");
+        setTimeout(function () { $(".alert_skb").addClass("hide"); }, 10000);
 
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
@@ -596,6 +598,7 @@ $("#saveConfigSapphire").click(function () {
     var idInterval = null;
     $("#saveConfigSapphire").prop("disabled", true);
     $(".loading_sapphire").removeClass("hide");
+    $(".alert_sapphire").addClass("hide");
 
     $(".status").html("");
     $(".progress-bar").css("width","0%");
@@ -611,8 +614,8 @@ $("#saveConfigSapphire").click(function () {
         $("#saveConfigSapphire").prop("disabled", false);
         $(".loading_sapphire").addClass("hide");
 
-        $(".alert_sapphire").toggleClass("hide");
-        setTimeout(function () { $(".alert_sapphire").toggleClass("hide"); }, 10000);
+        $(".alert_sapphire").removeClass("hide");
+        setTimeout(function () { $(".alert_sapphire").addClass("hide"); }, 10000);
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));

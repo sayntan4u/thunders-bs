@@ -16,7 +16,7 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 const admin = require('firebase-admin');
-const credentials = require('./key1.json');
+const credentials = require('./key.json');
 
 
 function getFields(group) {
@@ -736,7 +736,7 @@ app.post("/saveSettings", requireAuth, async (req, res) => {
         if (config.Sapphire_table[i].isEdited) {
           //Edited field..change in DB
           isRename = true;
-          
+
           if (config.Sapphire_table[i].sub_heading.length > 0) {
             for (let j = 0; j < config.Sapphire_table[i].sub_heading.length; j++) {
               // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
