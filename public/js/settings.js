@@ -276,6 +276,10 @@ $("#saveConfigSKB").click(function () {
     var idInterval = null;
     $("#saveConfigSKB").prop("disabled", true);
     $(".loading").removeClass("hide");
+
+    $(".status").html("");
+    $(".progress-bar").css("width","0%");
+
     const data = { config: settingsJson };
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/saveSettings");
@@ -290,19 +294,10 @@ $("#saveConfigSKB").click(function () {
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
-    idInterval = setInterval(getStatus, 6000);
+    idInterval = setInterval(getStatus, 3000);
 });
 
-function getStatus(){
-    const xhttp = new XMLHttpRequest();
-    xhttp.open("GET", "/getStatus");
-    xhttp.onload = function () {
-       const response = this.responseText;
-       console.log(response);
-    }
-    xhttp.setRequestHeader('Content-Type', 'application/json');
-    xhttp.send();
-}
+
 
 function dragstartHandlerSKB(ev) {
     ev.dataTransfer.setData("text", $(ev.target).children("span").html());
@@ -598,8 +593,12 @@ function generateSapphireTable(Sapphire_table) {
 }
 
 $("#saveConfigSapphire").click(function () {
+    var idInterval = null;
     $("#saveConfigSapphire").prop("disabled", true);
     $(".loading_sapphire").removeClass("hide");
+
+    $(".status").html("");
+    $(".progress-bar").css("width","0%");
 
     const data = { config: settingsJson };
     const xhttp = new XMLHttpRequest();
@@ -617,7 +616,7 @@ $("#saveConfigSapphire").click(function () {
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
-    idInterval = setInterval(getStatus, 6000);
+    idInterval = setInterval(getStatus, 3000);
 });
 
 function dragstartHandlerSapphire(ev) {
@@ -709,6 +708,19 @@ function loadSettings() {
         $("#settingsJsonTextSapphire").val(JSON.stringify(settingsJson.Sapphire_table, null, 2));
         generateSapphireTableTree(settingsJson.Sapphire_table);
         generateSapphireTable(settingsJson.Sapphire_table);
+    }
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send();
+}
+
+function getStatus(){
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "/getStatus");
+    xhttp.onload = function () {
+       const response = JSON.parse(this.responseText);
+       console.log(response);
+       $(".status").html(response.procName  + " => " + response.status);
+       $(".progress-bar").css("width",parseInt(response.progress).toString() + "%");
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send();
