@@ -669,6 +669,19 @@ function saveColSpan(elem, page, group) {
 
 }
 
+//Import/Export methods
+
+function importExportDropDownOnChanged(elem){
+    const dropDownVal = $(elem).val();
+    if(dropDownVal == "Import Data"){
+        $(elem).parent().siblings(".browse_container").removeClass("hide");
+        $(elem).parent().siblings(".selectCollection_container").addClass("hide");
+    }else{
+        $(elem).parent().siblings(".browse_container").addClass("hide");
+        $(elem).parent().siblings(".selectCollection_container").removeClass("hide");
+    }
+}
+
 //Helper
 function swapElements(itemA, itemB, jsonData) {
     var indexA = null;
@@ -722,7 +735,7 @@ function getStatus(){
     xhttp.onload = function () {
        const response = JSON.parse(this.responseText);
        console.log(response);
-       $(".status").html(response.procName  + " => " + response.status);
+       $(".status").html(response.procName  + " <b>" + response.docName + "</b> => " + response.status);
        $(".progress-bar").css("width",parseInt(response.progress).toString() + "%");
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');

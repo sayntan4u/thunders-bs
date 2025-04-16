@@ -241,13 +241,38 @@
                     <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse" data-bs-parent="#settingsMenu"
                       aria-labelledby="panelsStayOpen-headingThree">
                       <div class="accordion-body">
-                        <strong>This is the third item's accordion body.</strong> It is hidden by default, until the
-                        collapse plugin adds the appropriate classes that we use to style each element. These classes
-                        control the overall appearance, as well as the showing and hiding via CSS transitions. You can
-                        modify any of this with custom CSS or overriding our default variables. It's also worth noting
-                        that just about any HTML can go within the <code>.accordion-body</code>, though the transition
-                        does limit overflow.
+                        <div class="row">
+                          <div class="col-auto">
+                            <div class="row">
+                              <div class="col-auto">
+                              
+                                <select class="form-select" onchange="importExportDropDownOnChanged(this)">
+                                  <option>Export Data</option>
+                                  <option>Import Data</option>
+                                </select>
+                              </div>
+                              <div class="col-auto browse_container hide">
+                                <button type="button" class="btn btn-primary">Browse</button>
+                              </div>
+                              <div class="col-auto selectCollection_container">
+                                
+                                <select class="form-select" id="selectCollection">
+                                  <option>SKB</option>
+                                  <option>Sapphire</option>
+                                </select>
+                              </div>
+                            </div>
+                            
+                          </div>
+                         
+                          <div class="col-auto">
+                            <button type="button" class="btn btn-primary">Process</button>
+                          </div>
+                        </div>
                       </div>
+                      
+                      
+
                     </div>
                   </div>
                 </div>
