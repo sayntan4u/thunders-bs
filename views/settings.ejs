@@ -255,11 +255,19 @@
                                 <button type="button" class="btn btn-primary">Browse</button>
                               </div>
                               <div class="col-auto selectCollection_container">
-                                
-                                <select class="form-select" id="selectCollection">
-                                  <option>SKB</option>
-                                  <option>Sapphire</option>
-                                </select>
+                                <div class="row">
+                                  <div class="col-auto">
+                                    <select class="form-select" id="selectCollection" onchange="generateNameDropDown()">
+                                      <option>SKB</option>
+                                      <option>Sapphire</option>
+                                    </select>
+                                  </div>
+                                  <div class="col-auto">
+                                    <select class="form-select" id="name">
+                                      
+                                    </select>
+                                  </div>
+                                </div>
                               </div>
                             </div>
                             

@@ -5,3 +5,7 @@
 .th{
     margin-bottom: 10px;
 }
+
+.selectCollection_container .text-success{
+    font-weight: bold;
+}

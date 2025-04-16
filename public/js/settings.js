@@ -682,6 +682,43 @@ function importExportDropDownOnChanged(elem){
     }
 }
 
+function generateNameDropDown() {
+    $("#selectCollection").prop('disabled', true);
+    $("#name").html("");
+    $("#name").addClass("text-success");
+    $("#name").append("<option > Loading ... </option>");
+    const group = $("#selectCollection").val();
+
+    // console.log(group);
+    var data = {};
+
+    const xhttp = new XMLHttpRequest();
+    xhttp.onload = function () {
+        // alert(JSON.parse(this.responseText).length);
+
+        const response = JSON.parse(this.responseText);
+        $("#name").html("");
+        $("#name").removeClass("text-success");
+        $("#name").append("<option>All</option>");
+
+        for (let i = 0; i < response.length; i++) {
+            $("#name").append("<option>" + response[i].name + "</option>");
+        }
+        $("#selectCollection").prop('disabled', false);
+
+
+    }
+    xhttp.open("POST", "getUserName");
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    if (group == "SKB") {
+        data = { group: "SKB" };
+    }
+    else {
+        data = { group: "Sapphire" }
+    }
+    xhttp.send(JSON.stringify(data));
+}
+
 //Helper
 function swapElements(itemA, itemB, jsonData) {
     var indexA = null;
@@ -743,3 +780,4 @@ function getStatus(){
 }
 
 loadSettings();
+generateNameDropDown();
