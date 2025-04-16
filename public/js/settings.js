@@ -749,7 +749,7 @@ function processRequest() {
         }
         xhttp.setRequestHeader('Content-Type', 'application/json');
         xhttp.send(JSON.stringify(data));
-        idInterval = setInterval(getStatusImportExport, 1000);
+        idInterval = setInterval(getStatusImportExport, 2000);
 
     } else {
 
