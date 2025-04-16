@@ -719,6 +719,28 @@ function generateNameDropDown() {
     xhttp.send(JSON.stringify(data));
 }
 
+function processRequest(){
+    $("#processBtn").prop("disabled", true);
+    const reqType = $("#reqType").val();
+    const group = $("#selectCollection").val();
+    const field = $("#name").val();
+
+    if(reqType == "Export Data"){
+        const data = {group : group, field : field};
+        const xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "/export");
+        xhttp.onload = function () {
+            const response = JSON.parse(this.responseText);
+            console.log(response);
+            
+        }
+        xhttp.setRequestHeader('Content-Type', 'application/json');
+        xhttp.send(JSON.stringify(data));
+    }else{
+
+    }
+}
+
 //Helper
 function swapElements(itemA, itemB, jsonData) {
     var indexA = null;

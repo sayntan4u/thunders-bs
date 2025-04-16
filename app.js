@@ -16,7 +16,7 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 const admin = require('firebase-admin');
-const credentials = require('./key.json');
+const credentials = require('./key1.json');
 
 
 function getFields(group) {
@@ -601,7 +601,6 @@ var statusJson = {
 };
 
 var processedWeek = 0;
-
 var isRename = false;
 
 app.get("/getStatus", requireAuth, async (req, res) => {
@@ -642,8 +641,25 @@ app.post("/saveSettings", requireAuth, async (req, res) => {
 
   if (!_.isEqual(config, settingsJson)) {
     var addDelField = new Map();
+    var renameFieldCount = 0;
 
     //Check new SKB Table ADD / Edit
+
+    //Count edited fields
+    for (let i = 0; i < config.SKB_table.length; i++) {
+      if (config.SKB_table[i].isAdded) {
+        //Newly added field
+        // 
+       
+      } else {
+        if (config.SKB_table[i].isEdited) {
+          //Edited field..change in DB
+          renameFieldCount++;
+
+        }
+      }
+    }
+    console.log(renameFieldCount);
 
     for (let i = 0; i < config.SKB_table.length; i++) {
       if (config.SKB_table[i].isAdded) {
@@ -669,11 +685,11 @@ app.post("/saveSettings", requireAuth, async (req, res) => {
           if (config.SKB_table[i].sub_heading.length > 0) {
             for (let j = 0; j < config.SKB_table[i].sub_heading.length; j++) {
               // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
-              await renameField(camelize((config.SKB_table[i].header + config.SKB_table[i].sub_heading[j]).toString()), camelize((config.SKB_table[i].prev + config.SKB_table[i].sub_heading[j]).toString()), "SKB");
+              await renameField(camelize((config.SKB_table[i].header + config.SKB_table[i].sub_heading[j]).toString()), camelize((config.SKB_table[i].prev + config.SKB_table[i].sub_heading[j]).toString()), "SKB", renameFieldCount);
 
             }
           } else {
-            await renameField(camelize(config.SKB_table[i].header), camelize(config.SKB_table[i].prev), "SKB");
+            await renameField(camelize(config.SKB_table[i].header), camelize(config.SKB_table[i].prev), "SKB", renameFieldCount);
           }
 
           config.SKB_table[i].prev = "";
@@ -707,14 +723,30 @@ app.post("/saveSettings", requireAuth, async (req, res) => {
 
     if (addDelField.size > 0) {
       const obj = Object.fromEntries(addDelField);
-      await updateFields(obj, "SKB");
+      await updateFields(obj, "SKB", renameFieldCount);
     }
 
     //Check new Sapphire Table ADD / Edit
 
     isRename = false;
-
+    renameFieldCount = 0;
     addDelField = new Map();
+
+    //Count edited fields
+    for (let i = 0; i < config.Sapphire_table.length; i++) {
+      if (config.Sapphire_table[i].isAdded) {
+        //Newly added field
+        // 
+       
+      } else {
+        if (config.Sapphire_table[i].isEdited) {
+          //Edited field..change in DB
+          renameFieldCount++;
+
+        }
+      }
+    }
+    console.log(renameFieldCount);
 
     for (let i = 0; i < config.Sapphire_table.length; i++) {
       if (config.Sapphire_table[i].isAdded) {
@@ -740,11 +772,11 @@ app.post("/saveSettings", requireAuth, async (req, res) => {
           if (config.Sapphire_table[i].sub_heading.length > 0) {
             for (let j = 0; j < config.Sapphire_table[i].sub_heading.length; j++) {
               // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
-              await renameField(camelize((config.Sapphire_table[i].header + config.Sapphire_table[i].sub_heading[j]).toString()), camelize((config.Sapphire_table[i].prev + config.Sapphire_table[i].sub_heading[j]).toString()), "Sapphire");
+              await renameField(camelize((config.Sapphire_table[i].header + config.Sapphire_table[i].sub_heading[j]).toString()), camelize((config.Sapphire_table[i].prev + config.Sapphire_table[i].sub_heading[j]).toString()), "Sapphire", renameFieldCount);
 
             }
           } else {
-            await renameField(camelize(config.Sapphire_table[i].header), camelize(config.Sapphire_table[i].prev), "Sapphire");
+            await renameField(camelize(config.Sapphire_table[i].header), camelize(config.Sapphire_table[i].prev), "Sapphire", renameFieldCount);
           }
 
           config.Sapphire_table[i].prev = "";
@@ -778,7 +810,7 @@ app.post("/saveSettings", requireAuth, async (req, res) => {
 
     if (addDelField.size > 0) {
       const obj = Object.fromEntries(addDelField);
-      await updateFields(obj, "Sapphire");
+      await updateFields(obj, "Sapphire", renameFieldCount);
     }
 
   }
@@ -795,7 +827,7 @@ app.post("/saveSettings", requireAuth, async (req, res) => {
   }
 });
 
-async function renameField(newFieldName, oldFieldName, group) {
+async function renameField(newFieldName, oldFieldName, group, renameFieldCount) {
   var collection = "";
 
   if (group == "SKB") {
@@ -837,7 +869,7 @@ async function renameField(newFieldName, oldFieldName, group) {
       statusJson.status = "added field : " + newFieldName + " to Week " + j.toString();
       processedWeek++;
       if(isRename){
-        statusJson.progress = parseFloat(processedWeek/(2*snapshot.length*53))*100;
+        statusJson.progress = parseFloat(processedWeek/(snapshot.length*(renameFieldCount + 1)*53))*100;
       }else{
         statusJson.progress = parseFloat(processedWeek/(snapshot.length*53))*100;
       }
@@ -850,7 +882,7 @@ async function renameField(newFieldName, oldFieldName, group) {
 
 }
 
-async function updateFields(fieldObj, group) {
+async function updateFields(fieldObj, group, renameFieldCount) {
   var collection = "";
   if (group == "SKB") {
     collection = "users";
@@ -872,7 +904,7 @@ async function updateFields(fieldObj, group) {
       statusJson.status = `Updated week ${j.toString()}`;
       processedWeek++;
       if(isRename){
-        statusJson.progress = parseFloat(processedWeek/(2*snapshot.length*53))*100;
+        statusJson.progress = parseFloat(processedWeek/(snapshot.length*(renameFieldCount + 1)*53))*100;
       }else{
         statusJson.progress = parseFloat(processedWeek/(snapshot.length*53))*100;
       }
@@ -882,6 +914,53 @@ async function updateFields(fieldObj, group) {
 
   console.log("Updated !");
   statusJson.status = "done";
+}
+
+app.post("/export", requireAuth, async (req, res) => {
+  const group = req.body.group;
+  const field = req.body.field;
+
+  const data = await getFullCollectionData(group,field);
+
+  res.send(data);
+
+});
+
+async function getFullCollectionData(group,field){
+  var collection = "";
+
+  if (group == "SKB") {
+    collection = "users";
+  } else {
+    collection = "sapphire";
+  }
+
+  const snapshot = await db.collection(collection).listDocuments();
+  const docArray = [];
+
+  for (let i = 0; i < snapshot.length; i++) {
+    const data = new Map();
+
+    const namelist_link_snap = await db.collection(collection).doc(snapshot[i].id).get();
+    const namelist_link = namelist_link_snap.data();
+
+    data.set("namelist_link", namelist_link);
+
+
+    for(let year=2025; year<=2026; year++){
+      const yearData = new Map();
+      for(let week=1; week <= 53; week ++){
+        const snap = await db.collection(collection).doc(snapshot[i].id).collection(year.toString()).doc(week.toString()).get();
+        // yearData.set()
+        // data.set(newFieldName, prevData);
+        // obj = Object.fromEntries(addDelField);
+        
+      }
+    }
+
+    docArray.push();
+  }
+  return docArray;
 }
 
 // Routes will go here

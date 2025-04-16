@@ -246,7 +246,7 @@
                             <div class="row">
                               <div class="col-auto">
                               
-                                <select class="form-select" onchange="importExportDropDownOnChanged(this)">
+                                <select class="form-select" onchange="importExportDropDownOnChanged(this)" id="reqType">
                                   <option>Export Data</option>
                                   <option>Import Data</option>
                                 </select>
@@ -274,7 +274,22 @@
                           </div>
                          
                           <div class="col-auto">
-                            <button type="button" class="btn btn-primary">Process</button>
+                            <button type="button" id="processBtn" class="btn btn-primary" onclick="processRequest()">Process</button>
+                          </div>
+                        </div>
+                        <br><br>
+                        <div class="card bg-success-subtle text-success-emphasis loading_import" style="width: 38rem;">
+                          <div class="card-body ">
+                            <h5 class="card-title">
+                              Status : 
+                              <span class="">in progress... </span>
+                              <div class="spinner-border spinner-border-sm" role="status">
+                              </div>
+                            </h5>
+                            <p class="card-text status"></p>
+                            <div class="progress" role="progressbar" style="height: 2px">
+                              <div class="progress-bar bg-dark" style="width: 0%"></div>
+                            </div>
                           </div>
                         </div>
                       </div>
