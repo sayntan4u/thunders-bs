@@ -279,7 +279,7 @@ $("#saveConfigSKB").click(function () {
     $(".alert_skb").addClass("hide");
 
     $(".status").html("");
-    $(".progress-bar").css("width","0%");
+    $(".progress-bar").css("width", "0%");
 
     const data = { config: settingsJson };
     const xhttp = new XMLHttpRequest();
@@ -289,7 +289,7 @@ $("#saveConfigSKB").click(function () {
         loadSettings();
         $("#saveConfigSKB").prop("disabled", false);
         $(".loading").addClass("hide");
-        
+
         $(".alert_skb").removeClass("hide");
         setTimeout(function () { $(".alert_skb").addClass("hide"); }, 10000);
 
@@ -601,14 +601,14 @@ $("#saveConfigSapphire").click(function () {
     $(".alert_sapphire").addClass("hide");
 
     $(".status").html("");
-    $(".progress-bar").css("width","0%");
+    $(".progress-bar").css("width", "0%");
 
     const data = { config: settingsJson };
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/saveSettings");
     xhttp.onload = function () {
         clearInterval(idInterval);
-        
+
         loadSettings();
 
         $("#saveConfigSapphire").prop("disabled", false);
@@ -671,12 +671,12 @@ function saveColSpan(elem, page, group) {
 
 //Import/Export methods
 
-function importExportDropDownOnChanged(elem){
+function importExportDropDownOnChanged(elem) {
     const dropDownVal = $(elem).val();
-    if(dropDownVal == "Import Data"){
+    if (dropDownVal == "Import Data") {
         $(elem).parent().siblings(".browse_container").removeClass("hide");
         $(elem).parent().siblings(".selectCollection_container").addClass("hide");
-    }else{
+    } else {
         $(elem).parent().siblings(".browse_container").addClass("hide");
         $(elem).parent().siblings(".selectCollection_container").removeClass("hide");
     }
@@ -719,24 +719,39 @@ function generateNameDropDown() {
     xhttp.send(JSON.stringify(data));
 }
 
-function processRequest(){
+function processRequest() {
+    var idInterval = null;
+
     $("#processBtn").prop("disabled", true);
+    $(".loading_import").removeClass("hide");
+    $(".alert_import").addClass("hide");
+
+    $(".status").html("");
+    $(".progress-bar").css("width", "0%");
+
     const reqType = $("#reqType").val();
     const group = $("#selectCollection").val();
     const field = $("#name").val();
 
-    if(reqType == "Export Data"){
-        const data = {group : group, field : field};
+    if (reqType == "Export Data") {
+        const data = { group: group, field: field };
         const xhttp = new XMLHttpRequest();
         xhttp.open("POST", "/export");
         xhttp.onload = function () {
-            const response = JSON.parse(this.responseText);
-            console.log(response);
-            
+            clearInterval(idInterval);
+            // const response = this.responseText;
+            // console.log(response);
+            $("#processBtn").prop("disabled", false);
+            $(".loading_import").addClass("hide");
+            $(".alert_import").removeClass("hide");
+            setTimeout(function () { $(".alert_import").addClass("hide"); }, 10000);
+
         }
         xhttp.setRequestHeader('Content-Type', 'application/json');
         xhttp.send(JSON.stringify(data));
-    }else{
+        idInterval = setInterval(getStatusImportExport, 1000);
+
+    } else {
 
     }
 }
@@ -788,14 +803,27 @@ function loadSettings() {
     xhttp.send();
 }
 
-function getStatus(){
+function getStatus() {
     const xhttp = new XMLHttpRequest();
     xhttp.open("GET", "/getStatus");
     xhttp.onload = function () {
-       const response = JSON.parse(this.responseText);
-       console.log(response);
-       $(".status").html(response.procName  + " <b>" + response.docName + "</b> => " + response.status);
-       $(".progress-bar").css("width",parseInt(response.progress).toString() + "%");
+        const response = JSON.parse(this.responseText);
+        console.log(response);
+        $(".status").html(response.procName + " <b>" + response.docName + "</b> => " + response.status);
+        $(".progress-bar").css("width", parseInt(response.progress).toString() + "%");
+    }
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send();
+}
+
+function getStatusImportExport() {
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "/getStatus");
+    xhttp.onload = function () {
+        const response = JSON.parse(this.responseText);
+        // console.log(response);
+        $(".status").html(response.procName + " <b>" + response.docName + "</b> => " + response.status + " - <b>Week " + response.week + ", " + response.year + "</b>");
+        $(".progress-bar").css("width", parseInt(response.progress).toString() + "%");
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send();

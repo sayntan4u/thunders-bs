@@ -1,14 +1,11 @@
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
-// const { PDFNet } = require('@pdftron/pdfnet-node');
-
-// Load our library that generates the document
 const Docxtemplater = require("docxtemplater");
-// Load PizZip library to load the docx/pptx/xlsx file in memory
 const PizZip = require("pizzip");
 const fs = require("fs");
 var _ = require('lodash');
+const ExcelJS = require("exceljs");
 
 
 
@@ -16,7 +13,7 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 const admin = require('firebase-admin');
-const credentials = require('./key1.json');
+const credentials = require('./key.json');
 
 
 function getFields(group) {
@@ -548,14 +545,14 @@ async function getClosings() {
   for (let i = 0; i < snapshot.length; i++) {
 
     const snap = await db.collection("closings").doc(snapshot[i].id).get();
-    
-    docArray.push({ 
-      id: snapshot[i].id, 
-      irName : snap.data().irName,
-      prosName : snap.data().prosName,
-      uv : snap.data().uv,
-      node : snap.data().node,
-      status : snap.data().status
+
+    docArray.push({
+      id: snapshot[i].id,
+      irName: snap.data().irName,
+      prosName: snap.data().prosName,
+      uv: snap.data().uv,
+      node: snap.data().node,
+      status: snap.data().status
     });
   }
   return docArray;
@@ -570,7 +567,7 @@ app.post('/updateClosingStatus', requireAuth, async function (req, res) {
   const id = req.body.id;
   const status = req.body.status;
 
-  await db.collection("closings").doc(id).update({status : status});
+  await db.collection("closings").doc(id).update({ status: status });
 
   // console.log("updated");
 });
@@ -579,7 +576,7 @@ app.post('/updateClosingUV', requireAuth, async function (req, res) {
   const id = req.body.id;
   const uv = req.body.uv;
 
-  await db.collection("closings").doc(id).update({uv : uv});
+  await db.collection("closings").doc(id).update({ uv: uv });
 
   // console.log("updated");
 });
@@ -594,17 +591,19 @@ app.post('/deleteClosing', requireAuth, async function (req, res) {
 //Settings Page
 
 var statusJson = {
-  procName : "",
-  docName : "",
-  status : "",
-  progress : 0
+  procName: "",
+  docName: "",
+  status: "",
+  week : "",
+  year : "",
+  progress: 0
 };
 
 var processedWeek = 0;
 var isRename = false;
 
 app.get("/getStatus", requireAuth, async (req, res) => {
- res.send(statusJson);
+  res.send(statusJson);
 });
 
 app.post("/getSettings", requireAuth, async (req, res) => {
@@ -650,7 +649,7 @@ app.post("/saveSettings", requireAuth, async (req, res) => {
       if (config.SKB_table[i].isAdded) {
         //Newly added field
         // 
-       
+
       } else {
         if (config.SKB_table[i].isEdited) {
           //Edited field..change in DB
@@ -737,7 +736,7 @@ app.post("/saveSettings", requireAuth, async (req, res) => {
       if (config.Sapphire_table[i].isAdded) {
         //Newly added field
         // 
-       
+
       } else {
         if (config.Sapphire_table[i].isEdited) {
           //Edited field..change in DB
@@ -868,10 +867,10 @@ async function renameField(newFieldName, oldFieldName, group, renameFieldCount) 
       await db.collection(collection).doc(snapshot[i].id).collection((year + 1).toString()).doc(j.toString()).update(obj);
       statusJson.status = "added field : " + newFieldName + " to Week " + j.toString();
       processedWeek++;
-      if(isRename){
-        statusJson.progress = parseFloat(processedWeek/(snapshot.length*(renameFieldCount + 1)*53))*100;
-      }else{
-        statusJson.progress = parseFloat(processedWeek/(snapshot.length*53))*100;
+      if (isRename) {
+        statusJson.progress = parseFloat(processedWeek / (snapshot.length * (renameFieldCount + 1) * 53)) * 100;
+      } else {
+        statusJson.progress = parseFloat(processedWeek / (snapshot.length * 53)) * 100;
       }
     }
 
@@ -900,15 +899,15 @@ async function updateFields(fieldObj, group, renameFieldCount) {
     statusJson.docName = snapshot[i].id;
     for (let j = 1; j <= 53; j++) {
       await db.collection(collection).doc(snapshot[i].id).collection(year.toString()).doc(j.toString()).update(fieldObj);
-      await db.collection(collection).doc(snapshot[i].id).collection((year + 1).toString()).doc(j.toString()).update(fieldObj); 
+      await db.collection(collection).doc(snapshot[i].id).collection((year + 1).toString()).doc(j.toString()).update(fieldObj);
       statusJson.status = `Updated week ${j.toString()}`;
       processedWeek++;
-      if(isRename){
-        statusJson.progress = parseFloat(processedWeek/(snapshot.length*(renameFieldCount + 1)*53))*100;
-      }else{
-        statusJson.progress = parseFloat(processedWeek/(snapshot.length*53))*100;
+      if (isRename) {
+        statusJson.progress = parseFloat(processedWeek / (snapshot.length * (renameFieldCount + 1) * 53)) * 100;
+      } else {
+        statusJson.progress = parseFloat(processedWeek / (snapshot.length * 53)) * 100;
       }
-      
+
     }
   }
 
@@ -920,14 +919,32 @@ app.post("/export", requireAuth, async (req, res) => {
   const group = req.body.group;
   const field = req.body.field;
 
-  const data = await getFullCollectionData(group,field);
+  statusJson.procName = "Export" ;
 
-  res.send(data);
+  const data = await getFullCollectionData(group, field);
 
+  const time = new Date();
+
+  try {
+    fs.writeFile(
+      './backup/' + group + '_' + field + '_' + time.toTimeString() + '.db',
+      JSON.stringify(data, null, 2),
+      function (err) {
+        if (err) throw err;
+        // console.log('Saved!');
+        res.send("Saved");
+      });
+
+  } catch (err) {
+    res.send(err);
+  }
 });
 
-async function getFullCollectionData(group,field){
+async function getFullCollectionData(group, field) {
+  processedWeek = 0;
+  statusJson.status = "Reading data...";
   var collection = "";
+  // const workbook = new ExcelJS.Workbook();
 
   if (group == "SKB") {
     collection = "users";
@@ -935,32 +952,93 @@ async function getFullCollectionData(group,field){
     collection = "sapphire";
   }
 
-  const snapshot = await db.collection(collection).listDocuments();
-  const docArray = [];
+  if (field == "All") {
+    
+    const nameData = new Map();
+    const snapshot = await db.collection(collection).listDocuments();
+    var totalWeek = snapshot.length*53*2;
 
-  for (let i = 0; i < snapshot.length; i++) {
-    const data = new Map();
-
-    const namelist_link_snap = await db.collection(collection).doc(snapshot[i].id).get();
-    const namelist_link = namelist_link_snap.data();
-
-    data.set("namelist_link", namelist_link);
-
-
-    for(let year=2025; year<=2026; year++){
+    for (let i = 0; i < snapshot.length; i++) {
+      statusJson.docName = snapshot[i].id;
       const yearData = new Map();
-      for(let week=1; week <= 53; week ++){
-        const snap = await db.collection(collection).doc(snapshot[i].id).collection(year.toString()).doc(week.toString()).get();
-        // yearData.set()
-        // data.set(newFieldName, prevData);
-        // obj = Object.fromEntries(addDelField);
-        
+
+      if (group == "SKB") {
+        const namelist_link_snap = await db.collection(collection).doc(snapshot[i].id).get();
+        const namelist_link = namelist_link_snap.data().namelist_link;
+        yearData.set("namelist_link", namelist_link);
       }
+
+      for (let year = 2025; year <= 2026; year++) {
+        const weekArray = [];
+        statusJson.year = year.toString();
+        for (let week = 1; week <= 53; week++) {
+          const snap = await db.collection(collection).doc(snapshot[i].id).collection(year.toString()).doc(week.toString()).get();
+          const weekData = new Map();
+          weekData.set(week, snap.data());
+
+          var weekObj = Object.fromEntries(weekData);
+          weekArray.push(JSON.stringify(weekObj));
+
+          statusJson.week = week.toString();
+          processedWeek++;
+          statusJson.progress = parseFloat(processedWeek/totalWeek)*100;
+          // console.log(statusJson.progress);
+        }
+        yearData.set(year, weekArray);
+      }
+
+      var yearObj = Object.fromEntries(yearData);
+
+      nameData.set(snapshot[i].id, yearObj);
+      // Add a new worksheet named "Sheet1"
+
     }
 
-    docArray.push();
+    var nameObj = Object.fromEntries(nameData);
+    const data = new Map();
+    data.set(collection, nameObj);
+    var dataObj = Object.fromEntries(data);
+    return dataObj;
+
+  } else {
+    const yearData = new Map();
+    var totalWeek = 53*2;
+
+    if (group == "SKB") {
+      const namelist_link_snap = await db.collection(collection).doc(field).get();
+      const namelist_link = namelist_link_snap.data().namelist_link;
+      yearData.set("namelist_link", namelist_link);
+    }
+
+    statusJson.docName = field;
+    for (let year = 2025; year <= 2026; year++) {
+      const weekArray = [];
+      statusJson.year = year.toString();
+      for (let week = 1; week <= 53; week++) {
+        const snap = await db.collection(collection).doc(field).collection(year.toString()).doc(week.toString()).get();
+        const weekData = new Map();
+        weekData.set(week, snap.data());
+
+        var weekObj = Object.fromEntries(weekData);
+        weekArray.push(JSON.stringify(weekObj));
+
+        statusJson.week = week.toString();
+        processedWeek++;
+        statusJson.progress = parseFloat(processedWeek/totalWeek)*100;
+      }
+      yearData.set(year, weekArray);
+    }
+
+    var yearObj = Object.fromEntries(yearData);
+    const nameData = new Map();
+    nameData.set(field, yearObj);
+    var nameObj = Object.fromEntries(nameData);
+    return nameObj;
   }
-  return docArray;
+
+
+
+
 }
 
 // Routes will go here
