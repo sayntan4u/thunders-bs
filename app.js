@@ -14,7 +14,7 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 const admin = require('firebase-admin');
-const credentials = require('./key.json');
+const credentials = require('./key1.json');
 
 //Setup directories
 var dir = ['./backup', './public/legal', './uploads'];
@@ -937,7 +937,7 @@ app.post("/export", requireAuth, async (req, res) => {
 
   try {
     fs.writeFile(
-      './backup/' + group + '_' + field + '_' + dt + '.db',
+      './backup/' + group + '_' + field + '_' + dt.toString().replace(/:/g, "") + '.db',
       JSON.stringify(data, null, 2),
       function (err) {
         if (err) throw err;
