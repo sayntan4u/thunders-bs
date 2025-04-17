@@ -15,6 +15,17 @@ const port = process.env.PORT || 8080;
 const admin = require('firebase-admin');
 const credentials = require('./key.json');
 
+var dir = './backup';
+
+if (!fs.existsSync(dir)){
+    fs.mkdirSync(dir);
+}
+dir = './public/legal';
+
+if (!fs.existsSync(dir)){
+    fs.mkdirSync(dir);
+}
+
 
 function getFields(group) {
   const fields = [];
