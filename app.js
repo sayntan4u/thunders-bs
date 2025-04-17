@@ -14,7 +14,7 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 const admin = require('firebase-admin');
-const credentials = require('./key1.json');
+const credentials = require('./key.json');
 
 //Setup directories
 var dir = ['./backup', './public/legal', './uploads'];
