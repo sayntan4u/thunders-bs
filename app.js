@@ -14,7 +14,7 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 const admin = require('firebase-admin');
-const credentials = require('./key.json');
+const credentials = require('./key1.json');
 
 //Setup directories
 var dir = ['./backup', './public/legal', './uploads'];
@@ -850,7 +850,7 @@ async function renameField(newFieldName, oldFieldName, group, renameFieldCount) 
 
   const snapshot = await db.collection(collection).listDocuments();
 
-  statusJson.procName = "Rename :";
+  statusJson.procName = "Rename";
 
   for (let i = 0; i < snapshot.length; i++) {
     statusJson.docName = snapshot[i].id;
@@ -904,7 +904,7 @@ async function updateFields(fieldObj, group, renameFieldCount) {
 
   const snapshot = await db.collection(collection).listDocuments();
 
-  statusJson.procName = "Update :";
+  statusJson.procName = "Update";
   for (let i = 0; i < snapshot.length; i++) {
     statusJson.docName = snapshot[i].id;
     for (let j = 1; j <= 53; j++) {

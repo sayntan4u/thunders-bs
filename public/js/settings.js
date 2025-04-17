@@ -746,7 +746,7 @@ function processRequest() {
         }
         xhttp.setRequestHeader('Content-Type', 'application/json');
         xhttp.send(JSON.stringify(data));
-        idInterval = setInterval(getStatusImportExport, 2000);
+        idInterval = setInterval(getStatusExport, 2000);
 
     } else {
         const importDb = importFile.files[0];
@@ -808,26 +808,30 @@ function loadSettings() {
     xhttp.send();
 }
 
+//status functions
+
 function getStatus() {
     const xhttp = new XMLHttpRequest();
     xhttp.open("GET", "/getStatus");
     xhttp.onload = function () {
         const response = JSON.parse(this.responseText);
         console.log(response);
-        $(".status").html(response.procName + " <b>" + response.docName + "</b> => " + response.status);
+        $(".status").html("<span class='badge rounded-pill text-bg-success'>" + response.procName + "</span> &nbsp; <b>" + response.docName + "</b> => " + response.status);
+        $(".progress_percentage").html(parseInt(response.progress).toString() + "%");
         $(".progress-bar").css("width", parseInt(response.progress).toString() + "%");
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send();
 }
 
-function getStatusImportExport() {
+function getStatusExport() {
     const xhttp = new XMLHttpRequest();
     xhttp.open("GET", "/getStatus");
     xhttp.onload = function () {
         const response = JSON.parse(this.responseText);
         // console.log(response);
-        $(".status").html(response.procName + " <b>" + response.docName + "</b> => " + response.status + " - <b>Week " + response.week + ", " + response.year + "</b>");
+        $(".status").html("<span class='badge rounded-pill text-bg-success'>" + response.procName + "</span> &nbsp; <b>" + response.docName + "</b> => " + response.status + " - <b>Week " + response.week + ", " + response.year + "</b>");
+        $(".progress_percentage").html(parseInt(response.progress).toString() + "%");
         $(".progress-bar").css("width", parseInt(response.progress).toString() + "%");
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
@@ -847,7 +851,8 @@ function getStatusImport() {
             setTimeout(function () { $(".alert_import").addClass("hide"); }, 10000);
         }
         // console.log(response);
-        $(".status").html(response.procName + " <b>" + response.docName + "</b> => " + response.status + " - <b>Week " + response.week + ", " + response.year + "</b>");
+        $(".status").html("<span class='badge rounded-pill text-bg-success'>" + response.procName + "</span> &nbsp; <b>" + response.docName + "</b> => " + response.status + " - <b>Week " + response.week + ", " + response.year + "</b>");
+        $(".progress_percentage").html(parseInt(response.progress).toString() + "%");
         $(".progress-bar").css("width", parseInt(response.progress).toString() + "%");
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
