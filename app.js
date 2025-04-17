@@ -14,7 +14,7 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 const admin = require('firebase-admin');
-const credentials = require('./key1.json');
+const credentials = require('./key.json');
 
 //Setup directories
 var dir = ['./backup', './public/legal', './uploads'];
@@ -956,10 +956,12 @@ app.post("/upload", requireAuth, async (req, res) => {
     // console.log(files.file[0].filepath);
     var oldpath = files.file[0].filepath;
     var newpath = './uploads/' + files.file[0].originalFilename;
-    fs.rename(oldpath, newpath, function (err) {
-      if (err) throw err;
-      uploadFullCollectionData(newpath);
-    });
+    fs.copyFileSync(oldpath, newpath);
+    // fs.rename(oldpath, newpath, function (err) {
+    //   if (err) throw err;
+    //   uploadFullCollectionData(newpath);
+    // });
+    uploadFullCollectionData(newpath);
   });
 });
 
@@ -1058,9 +1060,9 @@ async function uploadFullCollectionData(path) {
 
   var totalWeek = 0;
 
-  if(importData.collectionName == "sapphire"){
-    totalWeek = importData.data.length * 2 * 53 ;
-  }else{
+  if (importData.collectionName == "sapphire") {
+    totalWeek = importData.data.length * 2 * 53;
+  } else {
     totalWeek = importData.data.length * 2 * 53 + importData.data.length;
   }
 
@@ -1072,19 +1074,21 @@ async function uploadFullCollectionData(path) {
       const yearData = user.data[j];
       statusJson.year = yearData.year;
 
-      for ( let k = 0; k < yearData.data.length; k++){
+      for (let k = 0; k < yearData.data.length; k++) {
         const weekData = yearData.data[k];
         statusJson.week = weekData.week;
 
         await db.collection(importData.collectionName).doc(user.name).collection(yearData.year.toString()).doc(weekData.week.toString()).set(weekData.data);
-        
+
         processedWeek++;
-        statusJson.progress = parseFloat(processedWeek/totalWeek) * 100;
+        statusJson.progress = parseFloat(processedWeek / totalWeek) * 100;
       }
     }
-    await db.collection(importData.collectionName).doc(user.name).set({ namelist_link: user.namelist_link });
-    processedWeek++;
-    statusJson.progress = parseFloat(processedWeek/totalWeek) * 100;
+    if (importData.collectionName != "sapphire") {
+      await db.collection(importData.collectionName).doc(user.name).set({ namelist_link: user.namelist_link });
+      processedWeek++;
+      statusJson.progress = parseFloat(processedWeek / totalWeek) * 100;
+    }
   }
 
   statusJson.status = "done";
