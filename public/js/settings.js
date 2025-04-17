@@ -719,8 +719,8 @@ function generateNameDropDown() {
     xhttp.send(JSON.stringify(data));
 }
 
+var idInterval = null;
 function processRequest() {
-    var idInterval = null;
 
     $("#processBtn").prop("disabled", true);
     $(".loading_import").removeClass("hide");
@@ -739,20 +739,25 @@ function processRequest() {
         xhttp.open("POST", "/export");
         xhttp.onload = function () {
             clearInterval(idInterval);
-            // const response = this.responseText;
-            // console.log(response);
             $("#processBtn").prop("disabled", false);
             $(".loading_import").addClass("hide");
             $(".alert_import").removeClass("hide");
             setTimeout(function () { $(".alert_import").addClass("hide"); }, 10000);
-
         }
         xhttp.setRequestHeader('Content-Type', 'application/json');
         xhttp.send(JSON.stringify(data));
         idInterval = setInterval(getStatusImportExport, 2000);
 
     } else {
-
+        const importDb = importFile.files[0];
+        let formData = new FormData();
+        formData.append("file", importDb);
+        fetch('/upload', {
+            method: "POST",
+            body: formData
+        });
+        // console.log("hello");
+        idInterval = setInterval(getStatusImport, 2000);
     }
 }
 
@@ -821,6 +826,26 @@ function getStatusImportExport() {
     xhttp.open("GET", "/getStatus");
     xhttp.onload = function () {
         const response = JSON.parse(this.responseText);
+        // console.log(response);
+        $(".status").html(response.procName + " <b>" + response.docName + "</b> => " + response.status + " - <b>Week " + response.week + ", " + response.year + "</b>");
+        $(".progress-bar").css("width", parseInt(response.progress).toString() + "%");
+    }
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send();
+}
+
+function getStatusImport() {
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "/getStatus");
+    xhttp.onload = function () {
+        const response = JSON.parse(this.responseText);
+        if(response.status == "done"){
+            clearInterval(idInterval);
+            $("#processBtn").prop("disabled", false);
+            $(".loading_import").addClass("hide");
+            $(".alert_import").removeClass("hide");
+            setTimeout(function () { $(".alert_import").addClass("hide"); }, 10000);
+        }
         // console.log(response);
         $(".status").html(response.procName + " <b>" + response.docName + "</b> => " + response.status + " - <b>Week " + response.week + ", " + response.year + "</b>");
         $(".progress-bar").css("width", parseInt(response.progress).toString() + "%");

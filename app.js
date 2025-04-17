@@ -6,6 +6,7 @@ const PizZip = require("pizzip");
 const fs = require("fs");
 var _ = require('lodash');
 const ExcelJS = require("exceljs");
+var formidable = require('formidable');
 
 
 
@@ -13,18 +14,16 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 const admin = require('firebase-admin');
-const credentials = require('./key.json');
+const credentials = require('./key1.json');
 
-var dir = './backup';
+//Setup directories
+var dir = ['./backup', './public/legal', './uploads'];
 
-if (!fs.existsSync(dir)){
-    fs.mkdirSync(dir);
-}
-dir = './public/legal';
-
-if (!fs.existsSync(dir)){
-    fs.mkdirSync(dir);
-}
+dir.forEach(function (currentValue, index, arr) {
+  if (!fs.existsSync(currentValue)) {
+    fs.mkdirSync(currentValue);
+  }
+});
 
 
 function getFields(group) {
@@ -605,8 +604,8 @@ var statusJson = {
   procName: "",
   docName: "",
   status: "",
-  week : "",
-  year : "",
+  week: "",
+  year: "",
   progress: 0
 };
 
@@ -930,15 +929,15 @@ app.post("/export", requireAuth, async (req, res) => {
   const group = req.body.group;
   const field = req.body.field;
 
-  statusJson.procName = "Export" ;
+  statusJson.procName = "Export";
 
-  const data = await getFullCollectionData(group, field);
+  const data = await getFullCollectionDataNew(group, field);
 
-  const time = new Date();
+  const dt = new Date();
 
   try {
     fs.writeFile(
-      './backup/' + group + '_' + field + '_' + time.toTimeString() + '.db',
+      './backup/' + group + '_' + field + '_' + dt + '.db',
       JSON.stringify(data, null, 2),
       function (err) {
         if (err) throw err;
@@ -951,11 +950,24 @@ app.post("/export", requireAuth, async (req, res) => {
   }
 });
 
-async function getFullCollectionData(group, field) {
+app.post("/upload", requireAuth, async (req, res) => {
+  var form = new formidable.IncomingForm();
+  form.parse(req, function (err, fields, files) {
+    // console.log(files.file[0].filepath);
+    var oldpath = files.file[0].filepath;
+    var newpath = './uploads/' + files.file[0].originalFilename;
+    fs.rename(oldpath, newpath, function (err) {
+      if (err) throw err;
+      uploadFullCollectionData(newpath);
+    });
+  });
+});
+
+async function getFullCollectionDataNew(group, field) {
   processedWeek = 0;
   statusJson.status = "Reading data...";
   var collection = "";
-  // const workbook = new ExcelJS.Workbook();
+  var dataArray = [];
 
   if (group == "SKB") {
     collection = "users";
@@ -964,92 +976,118 @@ async function getFullCollectionData(group, field) {
   }
 
   if (field == "All") {
-    
-    const nameData = new Map();
     const snapshot = await db.collection(collection).listDocuments();
-    var totalWeek = snapshot.length*53*2;
+    var totalWeek = snapshot.length * 53 * 2;
 
     for (let i = 0; i < snapshot.length; i++) {
       statusJson.docName = snapshot[i].id;
-      const yearData = new Map();
-
-      if (group == "SKB") {
-        const namelist_link_snap = await db.collection(collection).doc(snapshot[i].id).get();
-        const namelist_link = namelist_link_snap.data().namelist_link;
-        yearData.set("namelist_link", namelist_link);
-      }
+      const yearData = [];
 
       for (let year = 2025; year <= 2026; year++) {
         const weekArray = [];
         statusJson.year = year.toString();
         for (let week = 1; week <= 53; week++) {
           const snap = await db.collection(collection).doc(snapshot[i].id).collection(year.toString()).doc(week.toString()).get();
-          const weekData = new Map();
-          weekData.set(week, snap.data());
 
-          var weekObj = Object.fromEntries(weekData);
-          weekArray.push(JSON.stringify(weekObj));
+          weekArray.push({ week: week, data: snap.data() });
 
           statusJson.week = week.toString();
           processedWeek++;
-          statusJson.progress = parseFloat(processedWeek/totalWeek)*100;
+          statusJson.progress = parseFloat(processedWeek / totalWeek) * 100;
           // console.log(statusJson.progress);
         }
-        yearData.set(year, weekArray);
+        yearData.push({ year: year, data: weekArray });
+      }
+      if (group == "SKB") {
+        const namelist_link_snap = await db.collection(collection).doc(snapshot[i].id).get();
+        const namelist_link = namelist_link_snap.data().namelist_link;
+        dataArray.push({ name: snapshot[i].id, data: yearData, namelist_link: namelist_link });
+      } else {
+        dataArray.push({ name: snapshot[i].id, data: yearData });
       }
 
-      var yearObj = Object.fromEntries(yearData);
-
-      nameData.set(snapshot[i].id, yearObj);
-      // Add a new worksheet named "Sheet1"
 
     }
-
-    var nameObj = Object.fromEntries(nameData);
-    const data = new Map();
-    data.set(collection, nameObj);
-    var dataObj = Object.fromEntries(data);
-    return dataObj;
 
   } else {
-    const yearData = new Map();
-    var totalWeek = 53*2;
-
-    if (group == "SKB") {
-      const namelist_link_snap = await db.collection(collection).doc(field).get();
-      const namelist_link = namelist_link_snap.data().namelist_link;
-      yearData.set("namelist_link", namelist_link);
-    }
+    var totalWeek = 53 * 2;
 
     statusJson.docName = field;
+    const yearData = [];
+
     for (let year = 2025; year <= 2026; year++) {
       const weekArray = [];
       statusJson.year = year.toString();
       for (let week = 1; week <= 53; week++) {
         const snap = await db.collection(collection).doc(field).collection(year.toString()).doc(week.toString()).get();
-        const weekData = new Map();
-        weekData.set(week, snap.data());
 
-        var weekObj = Object.fromEntries(weekData);
-        weekArray.push(JSON.stringify(weekObj));
+        weekArray.push({ week: week, data: snap.data() });
 
         statusJson.week = week.toString();
         processedWeek++;
-        statusJson.progress = parseFloat(processedWeek/totalWeek)*100;
+        statusJson.progress = parseFloat(processedWeek / totalWeek) * 100;
+        // console.log(statusJson.progress);
       }
-      yearData.set(year, weekArray);
+      yearData.push({ year: year, data: weekArray });
+    }
+    if (group == "SKB") {
+      const namelist_link_snap = await db.collection(collection).doc(field).get();
+      const namelist_link = namelist_link_snap.data().namelist_link;
+      dataArray.push({ name: field, data: yearData, namelist_link: namelist_link });
+    } else {
+      dataArray.push({ name: field, data: yearData });
     }
 
-    var yearObj = Object.fromEntries(yearData);
-    const nameData = new Map();
-    nameData.set(field, yearObj);
-    var nameObj = Object.fromEntries(nameData);
-    return nameObj;
   }
 
+  var retData = {
+    collectionName: collection,
+    data: dataArray
+  };
 
+  return retData;
+}
 
+async function uploadFullCollectionData(path) {
+  processedWeek = 0;
+  statusJson.procName = "Import";
+  statusJson.status = "Uploading...";
 
+  const data = fs.readFileSync(path, 'utf8');
+  const importData = JSON.parse(data);
+
+  var totalWeek = 0;
+
+  if(importData.collectionName == "sapphire"){
+    totalWeek = importData.data.length * 2 * 53 ;
+  }else{
+    totalWeek = importData.data.length * 2 * 53 + importData.data.length;
+  }
+
+  for (let i = 0; i < importData.data.length; i++) {
+    const user = importData.data[i];
+    statusJson.docName = user.name;
+
+    for (let j = 0; j < user.data.length; j++) {
+      const yearData = user.data[j];
+      statusJson.year = yearData.year;
+
+      for ( let k = 0; k < yearData.data.length; k++){
+        const weekData = yearData.data[k];
+        statusJson.week = weekData.week;
+
+        await db.collection(importData.collectionName).doc(user.name).collection(yearData.year.toString()).doc(weekData.week.toString()).set(weekData.data);
+        
+        processedWeek++;
+        statusJson.progress = parseFloat(processedWeek/totalWeek) * 100;
+      }
+    }
+    await db.collection(importData.collectionName).doc(user.name).set({ namelist_link: user.namelist_link });
+    processedWeek++;
+    statusJson.progress = parseFloat(processedWeek/totalWeek) * 100;
+  }
+
+  statusJson.status = "done";
 }
 
 // Routes will go here
