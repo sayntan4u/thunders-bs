@@ -14,7 +14,7 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 const admin = require('firebase-admin');
-const credentials = require('./key1.json');
+const credentials = require('./key.json');
 
 //Setup directories
 var dir = ['./backup', './public/legal', './uploads'];
@@ -1090,6 +1090,11 @@ async function uploadFullCollectionData(path) {
       statusJson.progress = parseFloat(processedWeek / totalWeek) * 100;
     }
   }
+
+  fs.unlink(path,
+    (err => {
+        if (err) console.log(err);
+    }));
 
   statusJson.status = "done";
 }
