@@ -128,7 +128,7 @@ function generateNamesTable(response, group = "SKB") {
                     `);
         } else {
             $(".names").append(`
-                <tr>
+                <tr class="align-middle">
                     <th scope="row">${i + 1}</th>
                     <td>${response[i].name}</td>
                     <td>
