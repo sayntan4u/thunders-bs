@@ -13,9 +13,6 @@ var formidable = require('formidable');
 const app = express();
 const port = process.env.PORT || 8080;
 
-// const admin = require('firebase-admin');
-// const credentials = require('./key.json');
-
 //Setup directories
 var dir = ['./backup', './public/legal', './uploads'];
 
@@ -63,11 +60,8 @@ function getFields(group) {
   return fields;
 }
 
-// admin.initializeApp({
-//   credential: admin.credential.cert(credentials)
-// });
-
 const db = require("./lib/db");
+const dbm = require("./lib/dbmanager");
 
 app.set('view engine', 'ejs');
 
@@ -106,7 +100,6 @@ app.post("/getData", requireAuth, async (req, res) => {
     var data = [];
 
     data = await getCollectionData(group, year, week);
-
 
     res.send(data);
   } catch (err) {
@@ -1148,16 +1141,6 @@ app.get('/analyze', requireAuth, async function (req, res) {
   res.render('analyze', { userName: req.session.userId, page: 'analyze' });
 });
 
-async function getUserNames() {
-  const snapshot = await db.collection("users").listDocuments();
-  const docArray = [];
-  for (let i = 0; i < snapshot.length; i++) {
-    const namelist_link = await db.collection("users").doc(snapshot[i].id).get();
-    // console.log(namelist_link.data());
-    docArray.push({ name: snapshot[i].id, namelist: namelist_link.data().namelist_link });
-  }
-  return docArray;
-}
 
 app.get('/utilities', requireAuth, function (req, res) {
   res.render('utilities', { userName: req.session.userId, page: 'utilities' });
