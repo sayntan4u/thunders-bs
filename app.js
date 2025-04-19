@@ -49,6 +49,10 @@ app.get('/', requireAuth, function (req, res) {
 const userNameRoute = require('./router/username');
 app.use('/getUserName', userNameRoute);
 
+//Roster
+const rosterRoute = require('./router/roster');
+app.use('/roster', rosterRoute);
+
 //Login page
 const loginRoute = require('./router/login');
 app.use('/login', loginRoute);
