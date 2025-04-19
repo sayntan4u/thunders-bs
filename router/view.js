@@ -33,7 +33,7 @@ router.post("/getData", requireAuth, async (req, res) => {
 
 router.post("/updateUser", requireAuth, async (req, res) => {
     // console.log(req);
-    console.log(req.body);
+    // console.log(req.body);
     try {
         const name = req.body.name;
         const week = req.body.week;

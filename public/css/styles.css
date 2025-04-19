@@ -355,4 +355,18 @@ select{
     text-align: center !important;
 }
 
+.roster input[type="text"]{
+    font-weight: bold !important;
+    background-color: transparent !important;
+    border: none !important;
+    text-align: center !important; 
+}
+
+.roster input[type=text]:focus {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+  }
+
 
