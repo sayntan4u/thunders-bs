@@ -99,7 +99,7 @@ app.post("/getData", requireAuth, async (req, res) => {
 
     var data = [];
 
-    data = await getCollectionData(group, year, week);
+    data = await dbm.getCollectionData(group, year, week);
 
     res.send(data);
   } catch (err) {
@@ -118,19 +118,8 @@ app.post("/updateUser", requireAuth, async (req, res) => {
     const group = req.body.group;
 
 
-    var userJson = '{"' + fieldName + '" : ' + value + '}';
-    if (fieldName == "remarks") {
-      userJson = '{"' + fieldName + '" : "' + value + '"}';
-    }
-    // console.log(userJson);
-    const obj = JSON.parse(userJson);
-    // console.log(obj);
-
-    if (group == "SKB") {
-      db.collection("users").doc(name).collection(year).doc(week).update(obj);
-    } else {
-      db.collection("sapphire").doc(name).collection(year).doc(week).update(obj);
-    }
+    // 
+    dbm.updateUser(name, week, year, fieldName, value, group);
 
     // const response = db.collection("users").doc(name).collection("2025").doc(week).set(userJson);
     res.send("success");
@@ -139,45 +128,6 @@ app.post("/updateUser", requireAuth, async (req, res) => {
   }
 });
 
-async function getCollectionData(group, year, week) {
-
-  var collection = "";
-
-  if (group == "SKB") {
-    collection = "users";
-  } else {
-    collection = "sapphire";
-  }
-
-  const snapshot = await db.collection(collection).listDocuments();
-  const docArray = [];
-
-  for (let i = 0; i < snapshot.length; i++) {
-
-    const snap = await db.collection(collection).doc(snapshot[i].id).collection(year).doc(week).get();
-
-    var dataRow = "{";
-    dataRow += ' "sl" : "' + (i + 1) + '",';
-    dataRow += ' "name" : "' + snapshot[i].id + '",';
-    var fields = getFields(group);
-    fields.push("remarks");
-
-    for (let i = 0; i < fields.length; i++) {
-      dataRow += '"' + fields[i] + '" : "' + snap.data()[fields[i]] + '"';
-      // dataRow.push(snap.data()[fields[i]]);
-      if (i != fields.length - 1) {
-        dataRow += ',';
-      }
-    }
-    dataRow += '}';
-
-    docArray.push(JSON.parse(dataRow));
-
-  }
-
-  // console.log(docArray);
-  return docArray;
-}
 
 //Team page 
 
@@ -186,8 +136,6 @@ function camelize(str) {
     return index === 0 ? word.toLowerCase() : word.toUpperCase();
   }).replace(/\s+/g, '');
 }
-
-// console.log(camelize("Pending Plans"));
 
 app.post("/addUser", requireAuth, async (req, res) => {
   const name = req.body.name;
