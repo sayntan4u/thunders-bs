@@ -82,10 +82,10 @@ function sumData() {
     var wkTo = document.getElementById("inputWeekTo").value;
 
     var totalNetworkingDone = $(".totalnetworkingDone").html();
-    var totalInfosDone = $(".totalinfoDone").html();
-    var totalReinfosDone = $(".totalreinfoDone").html();
-    var totalInviDone = $(".totalinviDone").html();
-    var totalPlanDone = $(".totalplan").html();
+    var totalInfosDone = $(".totalinfosDone").html();
+    var totalReinfosDone = $(".totalreinfosDone").html();
+    var totalInviDone = $(".totalinvisDone").html();
+    var totalPlanDone = $(".totalplans").html();
 
     const weekCount = wkTo - wkFrom + 1;
 
