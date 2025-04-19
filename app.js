@@ -2,11 +2,11 @@ const express = require('express');
 const path = require('path');
 const session = require('express-session');
 const fs = require("fs");
-var _ = require('lodash');
 var formidable = require('formidable');
 
+//custom modules
 const util = require("./lib/utilitiesmanager");
-
+const dbm = require("./lib/dbmanager");
 
 
 const app = express();
@@ -21,7 +21,6 @@ dir.forEach(function (currentValue, index, arr) {
   }
 });
 
-const dbm = require("./lib/dbmanager");
 
 app.set('view engine', 'ejs');
 
