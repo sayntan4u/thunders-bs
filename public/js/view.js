@@ -80,7 +80,7 @@ function getTDClassSapphire(field) {
     if (field.toLowerCase().includes("meeting")) {
         ret = "bg-warning";
     } else if (field.toLowerCase().includes("uv")) {
-        ret = "bg-danger";
+        ret = "bg-danger-subtle";
     } else if (field.toLowerCase().includes("node")) {
         ret = "bg-info";
     } else if (field == "plans") {
@@ -211,7 +211,7 @@ function getData() {
         }
 
     }
-    xhttp.open("POST", "getData");
+    xhttp.open("POST", "/view/getData");
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
     // $('.alert').addClass("show");
@@ -237,7 +237,7 @@ function valueChanged(docName, triggeredFrom, group = "SKB") {
         const data = { week: wk, year: yr, name: docName, fieldName: triggeredFrom, value: value_input, group: "SKB" };
 
         const xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "updateUser");
+        xhttp.open("POST", "/view/updateUser");
         xhttp.setRequestHeader('Content-Type', 'application/json');
         xhttp.send(JSON.stringify(data));
         sumData();
@@ -252,7 +252,7 @@ function valueChanged(docName, triggeredFrom, group = "SKB") {
         const data = { week: wk, year: yr, name: docName, fieldName: triggeredFrom, value: value_input, group: "Sapphire" };
 
         const xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "updateUser");
+        xhttp.open("POST", "/view/updateUser");
         xhttp.setRequestHeader('Content-Type', 'application/json');
         xhttp.send(JSON.stringify(data));
         sumSapphireData();
@@ -304,7 +304,7 @@ function getPrevWeekData(wk, yr) {
         $("#prevWeekTable").removeClass("hide");
         $(".loading_prev").addClass("hide");
     }
-    xhttp.open("POST", "getData");
+    xhttp.open("POST", "/view/getData");
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
 }
@@ -526,7 +526,7 @@ function generatePrevSapphireTable(Sapphire_table) {
 
 function loadSettings() {
     const xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/getSettings");
+    xhttp.open("POST", "/settings/getSettings");
     xhttp.onload = function () {
         const response = JSON.parse(this.responseText);
         settingsJson = response;

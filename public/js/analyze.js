@@ -47,7 +47,7 @@ function getTDClassSapphire(field) {
     if (field.toLowerCase().includes("meeting")) {
         ret = "bg-warning";
     } else if (field.toLowerCase().includes("uv")) {
-        ret = "bg-danger";
+        ret = "bg-danger-subtle";
     } else if (field.toLowerCase().includes("node")) {
         ret = "bg-info";
     } else if (field == "plans") {
@@ -82,10 +82,10 @@ function sumData() {
     var wkTo = document.getElementById("inputWeekTo").value;
 
     var totalNetworkingDone = $(".totalnetworkingDone").html();
-    var totalInfosDone = $(".totalinfoDone").html();
-    var totalReinfosDone = $(".totalreinfoDone").html();
-    var totalInviDone = $(".totalinviDone").html();
-    var totalPlanDone = $(".totalplan").html();
+    var totalInfosDone = $(".totalinfosDone").html();
+    var totalReinfosDone = $(".totalreinfosDone").html();
+    var totalInviDone = $(".totalinvisDone").html();
+    var totalPlanDone = $(".totalplans").html();
 
     const weekCount = wkTo - wkFrom + 1;
 
@@ -228,7 +228,7 @@ function getData() {
 
         $(".loading").addClass("hide");
     }
-    xhttp.open("POST", "analyzeData");
+    xhttp.open("POST", "/analyze/analyzeData");
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
     // $('.alert').addClass("show");
@@ -398,7 +398,7 @@ function generateSapphireTable(Sapphire_table) {
 
 function loadSettings() {
     const xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/getSettings");
+    xhttp.open("POST", "/settings/getSettings");
     xhttp.onload = function () {
         const response = JSON.parse(this.responseText);
         settingsJson = response;

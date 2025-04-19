@@ -39,7 +39,7 @@ function generateLegalDoc(){
         $("#legalDocResult").removeClass("hide");
 
       }
-    xhttp.open("POST", "generateLegalDoc");
+    xhttp.open("POST", "/utilities/generateLegalDoc");
     xhttp.setRequestHeader('Content-Type', 'application/json'); 
     xhttp.send(JSON.stringify(data));
 }

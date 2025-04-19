@@ -7,7 +7,7 @@ td, .middle{
     background-color: #f8fad7 !important;
 }
 
-.bg-warning, .bg-success, .bg-info{
+.bg-warning, .bg-success, .bg-info, .bg-danger-subtle{
     font-weight:bold;
 }
 

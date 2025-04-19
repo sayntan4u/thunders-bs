@@ -26,7 +26,7 @@ function addPerson() {
             setTimeout(function () { $('.add_alert').removeClass("show").addClass("hide"); }, 6000);
         }
     }
-    xhttp.open("POST", "/addUser");
+    xhttp.open("POST", "/add/addUser");
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
     $(".names").html("");
@@ -50,7 +50,7 @@ function addName(name) {
 
 function loadNames() {
     const xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/getNames");
+    xhttp.open("POST", "/add/getNames");
     xhttp.onload = function () {
 
         const response = JSON.parse(this.responseText);
@@ -69,7 +69,7 @@ function loadNames() {
 
 function loadSapphire() {
     const xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/getNamesSapphire");
+    xhttp.open("POST", "/add/getNamesSapphire");
     xhttp.onload = function () {
         const response = JSON.parse(this.responseText);
         sapphireJson = response;
@@ -102,7 +102,7 @@ function generateNamesTable(response, group = "SKB") {
 
         if (group == "SKB") {
             $(".names").append(`
-                <tr>
+                <tr class="align-middle">
                     <th scope="row">${i + 1}</th>
                     <td>${response[i].name}</td>
                     <td class="namelist_container">
@@ -128,7 +128,7 @@ function generateNamesTable(response, group = "SKB") {
                     `);
         } else {
             $(".names").append(`
-                <tr>
+                <tr class="align-middle">
                     <th scope="row">${i + 1}</th>
                     <td>${response[i].name}</td>
                     <td>
@@ -152,7 +152,7 @@ function show_editText(name) {
         const data = { name: name, link: $("#" + name + "-text").val() };
 
         const xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "/updateNamelist");
+        xhttp.open("POST", "/add/updateNamelist");
         xhttp.setRequestHeader('Content-Type', 'application/json');
         xhttp.send(JSON.stringify(data));
 
@@ -215,7 +215,7 @@ function deleteUser() {
     // location.href = "/delete?name=" + name;
 
     const xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/delete");
+    xhttp.open("POST", "/add/delete");
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
 

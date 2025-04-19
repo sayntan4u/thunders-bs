@@ -273,23 +273,34 @@ function generateSKBTable(SKB_table) {
 }
 
 $("#saveConfigSKB").click(function () {
+    var idInterval = null;
     $("#saveConfigSKB").prop("disabled", true);
     $(".loading").removeClass("hide");
+    $(".alert_skb").addClass("hide");
 
+    $(".status").html();
+    $(".progress_percentage").html();
+    $(".progress-bar").css("width", "0%");
 
     const data = { config: settingsJson };
     const xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/saveSettings");
+    xhttp.open("POST", "/settings/saveSettings");
     xhttp.onload = function () {
+        clearInterval(idInterval);
         loadSettings();
         $("#saveConfigSKB").prop("disabled", false);
         $(".loading").addClass("hide");
-        $(".alert_skb").toggleClass("hide");
-        setTimeout(function () { $(".alert_skb").toggleClass("hide"); }, 10000);
+
+        $(".alert_skb").removeClass("hide");
+        setTimeout(function () { $(".alert_skb").addClass("hide"); }, 10000);
+
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
+    idInterval = setInterval(getStatus, 2000);
 });
+
+
 
 function dragstartHandlerSKB(ev) {
     ev.dataTransfer.setData("text", $(ev.target).children("span").html());
@@ -585,24 +596,32 @@ function generateSapphireTable(Sapphire_table) {
 }
 
 $("#saveConfigSapphire").click(function () {
+    var idInterval = null;
     $("#saveConfigSapphire").prop("disabled", true);
     $(".loading_sapphire").removeClass("hide");
+    $(".alert_sapphire").addClass("hide");
+
+    $(".status").html();
+    $(".progress_percentage").html();
+    $(".progress-bar").css("width", "0%");
 
     const data = { config: settingsJson };
     const xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/saveSettings");
+    xhttp.open("POST", "/settings/saveSettings");
     xhttp.onload = function () {
+        clearInterval(idInterval);
 
         loadSettings();
 
         $("#saveConfigSapphire").prop("disabled", false);
         $(".loading_sapphire").addClass("hide");
 
-        $(".alert_sapphire").toggleClass("hide");
-        setTimeout(function () { $(".alert_sapphire").toggleClass("hide"); }, 10000);
+        $(".alert_sapphire").removeClass("hide");
+        setTimeout(function () { $(".alert_sapphire").addClass("hide"); }, 10000);
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
+    idInterval = setInterval(getStatus, 2000);
 });
 
 function dragstartHandlerSapphire(ev) {
@@ -652,6 +671,99 @@ function saveColSpan(elem, page, group) {
 
 }
 
+//Import/Export methods
+
+function importExportDropDownOnChanged(elem) {
+    const dropDownVal = $(elem).val();
+    if (dropDownVal == "Import Data") {
+        $(elem).parent().siblings(".browse_container").removeClass("hide");
+        $(elem).parent().siblings(".selectCollection_container").addClass("hide");
+    } else {
+        $(elem).parent().siblings(".browse_container").addClass("hide");
+        $(elem).parent().siblings(".selectCollection_container").removeClass("hide");
+    }
+}
+
+function generateNameDropDown() {
+    $("#selectCollection").prop('disabled', true);
+    $("#name").html("");
+    $("#name").addClass("text-success");
+    $("#name").append("<option > Loading ... </option>");
+    const group = $("#selectCollection").val();
+
+    // console.log(group);
+    var data = {};
+
+    const xhttp = new XMLHttpRequest();
+    xhttp.onload = function () {
+        // alert(JSON.parse(this.responseText).length);
+
+        const response = JSON.parse(this.responseText);
+        $("#name").html("");
+        $("#name").removeClass("text-success");
+        $("#name").append("<option>All</option>");
+
+        for (let i = 0; i < response.length; i++) {
+            $("#name").append("<option>" + response[i].name + "</option>");
+        }
+        $("#selectCollection").prop('disabled', false);
+
+
+    }
+    xhttp.open("POST", "getUserName");
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    if (group == "SKB") {
+        data = { group: "SKB" };
+    }
+    else {
+        data = { group: "Sapphire" }
+    }
+    xhttp.send(JSON.stringify(data));
+}
+
+var idInterval = null;
+function processRequest() {
+
+    $("#processBtn").prop("disabled", true);
+    $(".loading_import").removeClass("hide");
+    $(".alert_import").addClass("hide");
+
+    $(".status").html();
+    $(".progress_percentage").html();
+    $(".progress-bar").css("width", "0%");
+
+    const reqType = $("#reqType").val();
+    const group = $("#selectCollection").val();
+    const field = $("#name").val();
+
+    if (reqType == "Export Data") {
+        const data = { group: group, field: field };
+        const xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "/settings/export");
+        xhttp.onload = function () {
+            clearInterval(idInterval);
+            $("#processBtn").prop("disabled", false);
+            $(".loading_import").addClass("hide");
+            $(".alert_import").removeClass("hide");
+            setTimeout(function () { $(".alert_import").addClass("hide"); }, 10000);
+        }
+        xhttp.setRequestHeader('Content-Type', 'application/json');
+        xhttp.send(JSON.stringify(data));
+        idInterval = setInterval(getStatusExport, 2000);
+
+    } else {
+        const importDb = importFile.files[0];
+        let formData = new FormData();
+        formData.append("file", importDb);
+        fetch('/settings/upload', {
+            method: "POST",
+            body: formData
+        });
+        // console.log("hello");
+        idInterval = setInterval(getStatusImport, 2000);
+    }
+}
+
 //Helper
 function swapElements(itemA, itemB, jsonData) {
     var indexA = null;
@@ -674,7 +786,7 @@ function swapElements(itemA, itemB, jsonData) {
 
 function loadSettings() {
     const xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/getSettings");
+    xhttp.open("POST", "/settings/getSettings");
     xhttp.onload = function () {
         const response = JSON.parse(this.responseText);
         settingsJson = response;
@@ -699,4 +811,57 @@ function loadSettings() {
     xhttp.send();
 }
 
+//status functions
+
+function getStatus() {
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "/settings/getStatus");
+    xhttp.onload = function () {
+        const response = JSON.parse(this.responseText);
+        console.log(response);
+        $(".status").html("<span class='badge rounded-pill text-bg-success'>" + response.procName + "</span> &nbsp; <b>" + response.docName + "</b> => " + response.status);
+        $(".progress_percentage").html(parseInt(response.progress).toString() + "%");
+        $(".progress-bar").css("width", parseInt(response.progress).toString() + "%");
+    }
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send();
+}
+
+function getStatusExport() {
+
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "/settings/getStatus");
+    xhttp.onload = function () {
+        const response = JSON.parse(this.responseText);
+        // console.log(response);
+        $(".status").html("<span class='badge rounded-pill text-bg-success'>" + response.procName + "</span> &nbsp; <b>" + response.docName + "</b> => " + response.status + "   <b>Week " + response.week + ", " + response.year + "</b>");
+        $(".progress_percentage").html(parseInt(response.progress).toString() + "%");
+        $(".progress-bar").css("width", parseInt(response.progress).toString() + "%");
+    }
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send();
+}
+
+function getStatusImport() {
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "/settings/getStatus");
+    xhttp.onload = function () {
+        const response = JSON.parse(this.responseText);
+        if(response.status == "done"){
+            clearInterval(idInterval);
+            $("#processBtn").prop("disabled", false);
+            $(".loading_import").addClass("hide");
+            $(".alert_import").removeClass("hide");
+            setTimeout(function () { $(".alert_import").addClass("hide"); }, 10000);
+        }
+        // console.log(response);
+        $(".status").html("<span class='badge rounded-pill text-bg-success'>" + response.procName + "</span> &nbsp; <b>" + response.docName + "</b> => " + response.status + "   <b>Week " + response.week + ", " + response.year + "</b>");
+        $(".progress_percentage").html(parseInt(response.progress).toString() + "%");
+        $(".progress-bar").css("width", parseInt(response.progress).toString() + "%");
+    }
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send();
+}
+
 loadSettings();
+generateNameDropDown();
