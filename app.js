@@ -1,12 +1,11 @@
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
-const Docxtemplater = require("docxtemplater");
-const PizZip = require("pizzip");
 const fs = require("fs");
 var _ = require('lodash');
-// const ExcelJS = require("exceljs");
 var formidable = require('formidable');
+
+const util = require("./lib/utilitiesmanager");
 
 
 
@@ -22,45 +21,6 @@ dir.forEach(function (currentValue, index, arr) {
   }
 });
 
-
-function getFields(group) {
-  const fields = [];
-  const data = fs.readFileSync('./settings.conf', 'utf8');
-
-  if (group == "SKB") {
-    const SKB_table = JSON.parse(data).SKB_table;
-    for (let i = 0; i < SKB_table.length; i++) {
-      // addField(SKB_table[i].header);
-
-      if (SKB_table[i].sub_heading.length > 0) {
-        for (let j = 0; j < SKB_table[i].sub_heading.length; j++) {
-          // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
-          fields.push(camelize((SKB_table[i].header + SKB_table[i].sub_heading[j]).toString()));
-        }
-      } else {
-        fields.push(camelize(SKB_table[i].header));
-      }
-    }
-  } else if (group == "Sapphire") {
-    const Sapphire_table = JSON.parse(data).Sapphire_table;
-    for (let i = 0; i < Sapphire_table.length; i++) {
-      // addField(SKB_table[i].header);
-
-      if (Sapphire_table[i].sub_heading.length > 0) {
-        for (let j = 0; j < Sapphire_table[i].sub_heading.length; j++) {
-          // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
-          fields.push(camelize((Sapphire_table[i].header + Sapphire_table[i].sub_heading[j]).toString()));
-        }
-      } else {
-        fields.push(camelize(Sapphire_table[i].header));
-      }
-    }
-  }
-
-  return fields;
-}
-
-const db = require("./lib/db");
 const dbm = require("./lib/dbmanager");
 
 app.set('view engine', 'ejs');
@@ -131,53 +91,11 @@ app.post("/updateUser", requireAuth, async (req, res) => {
 
 //Team page 
 
-function camelize(str) {
-  return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
-    return index === 0 ? word.toLowerCase() : word.toUpperCase();
-  }).replace(/\s+/g, '');
-}
-
 app.post("/addUser", requireAuth, async (req, res) => {
   const name = req.body.name;
   const group = req.body.group;
 
-  const fields = getFields(group);
-
-  var test = "{";
-  for (let i = 0; i < fields.length; i++) {
-    test += '"' + fields[i] + '" : 0,';
-  }
-  test = test + ' "remarks" : "" }';
-
-  // console.log(JSON.parse(test));
-
-  if (group == "SKB") {
-
-    const userJson = JSON.parse(test);
-
-    const d = new Date();
-    let year = d.getFullYear();
-    // console.log(year + 1);
-
-    for (let i = 1; i <= 53; i++) {
-      await db.collection("users").doc(name).collection(year.toString()).doc(i.toString()).set(userJson);
-      await db.collection("users").doc(name).collection((year + 1).toString()).doc(i.toString()).set(userJson);
-    }
-    await db.collection("users").doc(name).set({ namelist_link: "" });
-  } else {
-    const userJson = JSON.parse(test);
-
-    const d = new Date();
-    let year = d.getFullYear();
-
-    for (let i = 1; i <= 53; i++) {
-      await db.collection("sapphire").doc(name).collection(year.toString()).doc(i.toString()).set(userJson);
-      await db.collection("sapphire").doc(name).collection((year + 1).toString()).doc(i.toString()).set(userJson);
-    }
-    // db.collection("sapphire").doc(name).set({namelist_link : ""});
-
-  }
-
+  await dbm.addUser(name, group);
   res.send("success");
 
 });
@@ -185,67 +103,32 @@ app.post("/addUser", requireAuth, async (req, res) => {
 
 app.post("/getNames", requireAuth, async (req, res) => {
 
-  const docArray = await getUserNames();
+  const docArray = await dbm.getUserNames();
 
   res.send(docArray);
 });
-
-async function getUserNames() {
-  const snapshot = await db.collection("users").listDocuments();
-  const docArray = [];
-  for (let i = 0; i < snapshot.length; i++) {
-    const namelist_link = await db.collection("users").doc(snapshot[i].id).get();
-    // console.log(namelist_link.data());
-    docArray.push({ name: snapshot[i].id, namelist: namelist_link.data().namelist_link });
-  }
-  return docArray;
-}
 
 app.post("/getNamesSapphire", requireAuth, async (req, res) => {
 
-  const docArray = await getUserNamesSapphire();
-
+  const docArray = await dbm.getUserNamesSapphire();
   res.send(docArray);
 });
-
-async function getUserNamesSapphire() {
-  const snapshot = await db.collection("sapphire").listDocuments();
-  const docArray = [];
-  for (let i = 0; i < snapshot.length; i++) {
-    docArray.push({ name: snapshot[i].id });
-  }
-  return docArray;
-}
 
 app.post("/updateNamelist", requireAuth, async (req, res) => {
   const name = req.body.name;
   const link = req.body.link;
 
-  const namelistJson = { namelist_link: link };
-
-  db.collection("users").doc(name).set(namelistJson);
+  dbm.updateNamelist(name, link);
 
   res.redirect("/add");
 });
 
 app.post("/delete", requireAuth, async (req, res) => {
-  // console.log(req.query);
-  // res.send(req.query.name);
-
-
   const name = req.body.name;
   const group = req.body.group;
 
-  if (group == "SKB") {
-    await db.recursiveDelete(db.collection("users").doc(name));
-  } else {
-    await db.recursiveDelete(db.collection("sapphire").doc(name));
-  }
-  // console.log(name);
+  await dbm.delete(name, group);
 
-  // console.log("done");
-
-  // res.redirect('/add');
 });
 
 
@@ -257,9 +140,9 @@ app.post('/getUserName', requireAuth, async function (req, res) {
   var docArray = [];
 
   if (group == "SKB") {
-    docArray = await getUserNames();
+    docArray = await dbm.getUserNames();
   } else {
-    docArray = await getUserNamesSapphire();
+    docArray = await dbm.getUserNamesSapphire();
   }
 
   res.send(docArray);
@@ -275,88 +158,12 @@ app.post("/analyzeData", requireAuth, async (req, res) => {
     const group = req.body.group;
 
 
-    const data = await getAnalyzeData(year, weekFrom, weekTo, name, group);
+    const data = await dbm.getAnalyzeData(year, weekFrom, weekTo, name, group);
     res.send(data);
   } catch (err) {
     res.send(err);
   }
 });
-
-async function getAnalyzeData(year, weekFrom, weekTo, name, group) {
-  const docArray = [];
-  const idArray = [];
-
-  if (group == "SKB") {
-    const snapshot = await db.collection("users").doc(name.toString()).collection(year.toString()).listDocuments();
-    let sl = 1;
-
-    for (let i = 1; i <= snapshot.length; i++) {
-      if (parseInt(snapshot[i - 1].id) >= parseInt(weekFrom) && parseInt(snapshot[i - 1].id) <= parseInt(weekTo)) {
-        idArray.push(parseInt(snapshot[i - 1].id));
-      }
-    }
-
-    idArray.sort(function (a, b) { return a - b });
-
-    for (let j = 0; j < idArray.length; j++) {
-      const snap = await db.collection("users").doc(name.toString()).collection(year.toString()).doc(idArray[j].toString()).get();
-
-      var dataRow = "{";
-      dataRow += ' "sl" : "' + sl + '",';
-      dataRow += ' "week" : "Week ' + parseInt(idArray[j]) + '",';
-      var fields = getFields(group);
-
-      for (let i = 0; i < fields.length; i++) {
-        dataRow += '"' + fields[i] + '" : "' + snap.data()[fields[i]] + '"';
-        // dataRow.push(snap.data()[fields[i]]);
-        if (i != fields.length - 1) {
-          dataRow += ',';
-        }
-      }
-      dataRow += '}';
-
-      sl++;
-
-      docArray.push(JSON.parse(dataRow));
-    }
-  } else {
-    const snapshot = await db.collection("sapphire").doc(name.toString()).collection(year.toString()).listDocuments();
-    let sl = 1;
-
-    for (let i = 1; i <= snapshot.length; i++) {
-      if (parseInt(snapshot[i - 1].id) >= parseInt(weekFrom) && parseInt(snapshot[i - 1].id) <= parseInt(weekTo)) {
-        idArray.push(parseInt(snapshot[i - 1].id));
-      }
-    }
-
-    idArray.sort(function (a, b) { return a - b });
-
-    for (let j = 0; j < idArray.length; j++) {
-      const snap = await db.collection("sapphire").doc(name.toString()).collection(year.toString()).doc(idArray[j].toString()).get();
-
-      var dataRow = "{";
-      dataRow += ' "sl" : "' + sl + '",';
-      dataRow += ' "week" : "Week ' + parseInt(idArray[j]) + '",';
-      var fields = getFields(group);
-
-      for (let i = 0; i < fields.length; i++) {
-        dataRow += '"' + fields[i] + '" : "' + snap.data()[fields[i]] + '"';
-        // dataRow.push(snap.data()[fields[i]]);
-        if (i != fields.length - 1) {
-          dataRow += ',';
-        }
-      }
-      dataRow += '}';
-
-      sl++;
-
-      docArray.push(JSON.parse(dataRow));
-    }
-  }
-
-  // console.log(docArray);
-  return docArray;
-}
 
 //Utilities page
 
@@ -364,7 +171,7 @@ async function getAnalyzeData(year, weekFrom, weekTo, name, group) {
 app.post("/generateLegalDoc", requireAuth, async (req, res) => {
   try {
 
-    const outputFiles = createLegalDocumentAndDeclaration(
+    const outputFiles = util.createLegalDocumentAndDeclaration(
       req.body.prospectName,
       req.body.prospectAddress,
       req.body.irID,
@@ -386,131 +193,17 @@ app.post("/generateLegalDoc", requireAuth, async (req, res) => {
   }
 });
 
-function createLegalDocumentAndDeclaration(
-  prospectName, prospectAddress, irID, amt, amtWords,
-  bankAcc, bankName, irName, irAddress,
-  product1 = "", product2 = "", product3 = "", product4 = "", product5 = ""
-) {
-
-  const inputPathDeclaration = path.resolve(__dirname, "./files/DECLARATION.docx");
-  const outputPathDeclaration = path.resolve(__dirname, "./public/legal/DECLARATION - " + prospectName + ".docx");
-
-  const inputPathLegal = path.resolve(__dirname, "./files/LEGAL.docx");
-  const outputPathLegal = path.resolve(__dirname, "./public/legal/LEGAL DOCUMENT - " + prospectName + ".docx");
-
-
-  //Declaration
-
-  //Load the docx file as binary content
-  const content = fs.readFileSync(
-    inputPathDeclaration,
-    "binary"
-  );
-  // Unzip the content of the file
-  const zip = new PizZip(content);
-  const doc = new Docxtemplater(zip, {
-    paragraphLoop: true,
-    linebreaks: true,
-  });
-  doc.render({
-    prospectName: prospectName,
-    prospectAddress: prospectAddress,
-    irID: irID,
-    amt: amt,
-    amtWords: amtWords,
-    bankAcc: bankAcc,
-    bankName: bankName,
-    irName: irName,
-    irAddress: irAddress,
-    product1: product1,
-    product2: product2,
-    product3: product3,
-    product4: product4,
-    product5: product5
-
-  });
-
-  const buf = doc.getZip().generate({
-    type: "nodebuffer",
-    /*
-     * Compression: DEFLATE adds a compression step.
-     * For a 50MB document, expect 500ms additional CPU time.
-     */
-    compression: "DEFLATE",
-  });
-
-  // Write the Node.js Buffer to a file
-  fs.writeFileSync(outputPathDeclaration, buf);
-
-
-  // //Legal
-
-  // Load the docx file as binary content
-  const contentLegal = fs.readFileSync(
-    inputPathLegal,
-    "binary"
-  );
-  // Unzip the content of the file
-  const zipLegal = new PizZip(contentLegal);
-  const docLegal = new Docxtemplater(zipLegal, {
-    paragraphLoop: true,
-    linebreaks: true,
-  });
-  docLegal.render({
-    prospectName: prospectName,
-    prospectAddress: prospectAddress,
-    amt: amt,
-    amtWords: amtWords,
-    irName: irName,
-    irAddress: irAddress,
-  });
-
-  const bufLegal = docLegal.getZip().generate({
-    type: "nodebuffer",
-    /*
-     * Compression: DEFLATE adds a compression step.
-     * For a 50MB document, expect 500ms additional CPU time.
-     */
-    compression: "DEFLATE",
-  });
-
-  // Write the Node.js Buffer to a file
-  fs.writeFileSync(outputPathLegal, bufLegal);
-
-  return [outputPathLegal, outputPathDeclaration];
-}
-
 //Closings Page
 
 app.post('/getClosings', requireAuth, async function (req, res) {
   var docArray = [];
-  docArray = await getClosings();
+  docArray = await dbm.getClosings();
   // console.log(docArray);
   res.send(docArray);
 });
 
-async function getClosings() {
-  const snapshot = await db.collection("closings").listDocuments();
-
-  const docArray = [];
-  for (let i = 0; i < snapshot.length; i++) {
-
-    const snap = await db.collection("closings").doc(snapshot[i].id).get();
-
-    docArray.push({
-      id: snapshot[i].id,
-      irName: snap.data().irName,
-      prosName: snap.data().prosName,
-      uv: snap.data().uv,
-      node: snap.data().node,
-      status: snap.data().status
-    });
-  }
-  return docArray;
-}
-
 app.post('/addClosing', requireAuth, async function (req, res) {
-  await db.collection("closings").doc().set(req.body);
+  await dbm.addClosing(req.body);
   res.send("added closing");
 });
 
@@ -518,8 +211,7 @@ app.post('/updateClosingStatus', requireAuth, async function (req, res) {
   const id = req.body.id;
   const status = req.body.status;
 
-  await db.collection("closings").doc(id).update({ status: status });
-
+  await dbm.updateClosingStatus(id, status);
   // console.log("updated");
 });
 
@@ -527,34 +219,23 @@ app.post('/updateClosingUV', requireAuth, async function (req, res) {
   const id = req.body.id;
   const uv = req.body.uv;
 
-  await db.collection("closings").doc(id).update({ uv: uv });
+  await dbm.updateClosingUV(id, uv);
 
   // console.log("updated");
 });
 
 app.post('/deleteClosing', requireAuth, async function (req, res) {
   const id = req.body.id;
-  await db.recursiveDelete(db.collection("closings").doc(id));
+  await dbm.deleteClosing(id);
   res.send("deleted !");
 });
 
 
 //Settings Page
 
-var statusJson = {
-  procName: "",
-  docName: "",
-  status: "",
-  week: "",
-  year: "",
-  progress: 0
-};
-
-var processedWeek = 0;
-var isRename = false;
 
 app.get("/getStatus", requireAuth, async (req, res) => {
-  res.send(statusJson);
+  res.send(dbm.statusJson);
 });
 
 app.post("/getSettings", requireAuth, async (req, res) => {
@@ -574,305 +255,20 @@ app.post("/getSettings", requireAuth, async (req, res) => {
 });
 
 app.post("/saveSettings", requireAuth, async (req, res) => {
-
-  processedWeek = 0;
-  isRename = false;
-
   const config = req.body.config;
 
-  const data = fs.readFileSync('./settings.conf', 'utf8');
+  await dbm.saveSettings(config);
 
-  const settingsJson = JSON.parse(data);
-
-  console.log("save settings clicked");
-
-  // await addField("helloWorld", "SKB");
-  // await deleteField("helloWorld", "SKB");
-
-  if (!_.isEqual(config, settingsJson)) {
-    var addDelField = new Map();
-    var renameFieldCount = 0;
-
-    //Check new SKB Table ADD / Edit
-
-    //Count edited fields
-    for (let i = 0; i < config.SKB_table.length; i++) {
-      if (config.SKB_table[i].isAdded) {
-        //Newly added field
-        // 
-
-      } else {
-        if (config.SKB_table[i].isEdited) {
-          //Edited field..change in DB
-          renameFieldCount++;
-
-        }
-      }
-    }
-    console.log(renameFieldCount);
-
-    for (let i = 0; i < config.SKB_table.length; i++) {
-      if (config.SKB_table[i].isAdded) {
-        //Newly added field
-        // 
-        // await addField(camelize(config.SKB_table[i].header), "SKB");
-        if (config.SKB_table[i].sub_heading.length > 0) {
-          for (let j = 0; j < config.SKB_table[i].sub_heading.length; j++) {
-            // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
-            addDelField.set(camelize((config.SKB_table[i].header + config.SKB_table[i].sub_heading[j]).toString()), 0);
-            // config.SKB_table[i].isAdded = false;
-          }
-        } else {
-          addDelField.set(camelize(config.SKB_table[i].header), 0);
-
-        }
-        config.SKB_table[i].isAdded = false;
-      } else {
-        if (config.SKB_table[i].isEdited) {
-          //Edited field..change in DB
-          isRename = true;
-
-          if (config.SKB_table[i].sub_heading.length > 0) {
-            for (let j = 0; j < config.SKB_table[i].sub_heading.length; j++) {
-              // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
-              await renameField(camelize((config.SKB_table[i].header + config.SKB_table[i].sub_heading[j]).toString()), camelize((config.SKB_table[i].prev + config.SKB_table[i].sub_heading[j]).toString()), "SKB", renameFieldCount);
-
-            }
-          } else {
-            await renameField(camelize(config.SKB_table[i].header), camelize(config.SKB_table[i].prev), "SKB", renameFieldCount);
-          }
-
-          config.SKB_table[i].prev = "";
-          config.SKB_table[i].isEdited = false;
-        }
-      }
-    }
-
-    //Check for Delete
-    for (let i = 0; i < settingsJson.SKB_table.length; i++) {
-      var notFound = true;
-
-      for (let j = 0; j < config.SKB_table.length; j++) {
-        if (settingsJson.SKB_table[i].header == config.SKB_table[j].header) {
-          notFound = false;
-          break;
-        }
-      }
-      if (notFound) {
-        //Add delete field
-        if (settingsJson.SKB_table[i].sub_heading.length > 0) {
-          for (let j = 0; j < settingsJson.SKB_table[i].sub_heading.length; j++) {
-            // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
-            addDelField.set(camelize((settingsJson.SKB_table[i].header + settingsJson.SKB_table[i].sub_heading[j]).toString()), admin.firestore.FieldValue.delete());
-          }
-        } else {
-          addDelField.set(camelize(settingsJson.SKB_table[i].header), admin.firestore.FieldValue.delete());
-        }
-      }
-    }
-
-    if (addDelField.size > 0) {
-      const obj = Object.fromEntries(addDelField);
-      await updateFields(obj, "SKB", renameFieldCount);
-    }
-
-    //Check new Sapphire Table ADD / Edit
-
-    isRename = false;
-    renameFieldCount = 0;
-    addDelField = new Map();
-
-    //Count edited fields
-    for (let i = 0; i < config.Sapphire_table.length; i++) {
-      if (config.Sapphire_table[i].isAdded) {
-        //Newly added field
-        // 
-
-      } else {
-        if (config.Sapphire_table[i].isEdited) {
-          //Edited field..change in DB
-          renameFieldCount++;
-
-        }
-      }
-    }
-    console.log(renameFieldCount);
-
-    for (let i = 0; i < config.Sapphire_table.length; i++) {
-      if (config.Sapphire_table[i].isAdded) {
-        //Newly added field
-        // 
-        // await addField(camelize(config.SKB_table[i].header), "SKB");
-        if (config.Sapphire_table[i].sub_heading.length > 0) {
-          for (let j = 0; j < config.Sapphire_table[i].sub_heading.length; j++) {
-            // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
-            addDelField.set(camelize((config.Sapphire_table[i].header + config.Sapphire_table[i].sub_heading[j]).toString()), 0);
-            // config.SKB_table[i].isAdded = false;
-          }
-        } else {
-          addDelField.set(camelize(config.Sapphire_table[i].header), 0);
-
-        }
-        config.Sapphire_table[i].isAdded = false;
-      } else {
-        if (config.Sapphire_table[i].isEdited) {
-          //Edited field..change in DB
-          isRename = true;
-
-          if (config.Sapphire_table[i].sub_heading.length > 0) {
-            for (let j = 0; j < config.Sapphire_table[i].sub_heading.length; j++) {
-              // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
-              await renameField(camelize((config.Sapphire_table[i].header + config.Sapphire_table[i].sub_heading[j]).toString()), camelize((config.Sapphire_table[i].prev + config.Sapphire_table[i].sub_heading[j]).toString()), "Sapphire", renameFieldCount);
-
-            }
-          } else {
-            await renameField(camelize(config.Sapphire_table[i].header), camelize(config.Sapphire_table[i].prev), "Sapphire", renameFieldCount);
-          }
-
-          config.Sapphire_table[i].prev = "";
-          config.Sapphire_table[i].isEdited = false;
-        }
-      }
-    }
-
-    //Check for Delete
-    for (let i = 0; i < settingsJson.Sapphire_table.length; i++) {
-      var notFound = true;
-
-      for (let j = 0; j < config.Sapphire_table.length; j++) {
-        if (settingsJson.Sapphire_table[i].header == config.Sapphire_table[j].header) {
-          notFound = false;
-          break;
-        }
-      }
-      if (notFound) {
-        //Add delete field
-        if (settingsJson.Sapphire_table[i].sub_heading.length > 0) {
-          for (let j = 0; j < settingsJson.Sapphire_table[i].sub_heading.length; j++) {
-            // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
-            addDelField.set(camelize((settingsJson.Sapphire_table[i].header + settingsJson.Sapphire_table[i].sub_heading[j]).toString()), admin.firestore.FieldValue.delete());
-          }
-        } else {
-          addDelField.set(camelize(settingsJson.Sapphire_table[i].header), admin.firestore.FieldValue.delete());
-        }
-      }
-    }
-
-    if (addDelField.size > 0) {
-      const obj = Object.fromEntries(addDelField);
-      await updateFields(obj, "Sapphire", renameFieldCount);
-    }
-
-  }
-
-  try {
-    fs.writeFile('./settings.conf', JSON.stringify(config, null, 2), function (err) {
-      if (err) throw err;
-      // console.log('Saved!');
-      res.send("Saved");
-    });
-
-  } catch (err) {
-    res.send(err);
-  }
+  res.send("success");
 });
-
-async function renameField(newFieldName, oldFieldName, group, renameFieldCount) {
-  var collection = "";
-
-  if (group == "SKB") {
-    collection = "users";
-  } else {
-    collection = "sapphire";
-  }
-
-  const d = new Date();
-  let year = d.getFullYear();
-
-  const snapshot = await db.collection(collection).listDocuments();
-
-  statusJson.procName = "Rename";
-
-  for (let i = 0; i < snapshot.length; i++) {
-    statusJson.docName = snapshot[i].id;
-    for (let j = 1; j <= 53; j++) {
-      var snap = await db.collection(collection).doc(snapshot[i].id).collection(year.toString()).doc(j.toString()).get();
-
-      var addDelField = new Map();
-      var prevData = snap.data()[oldFieldName];
-      addDelField.set(newFieldName, prevData);
-      // addDelField.set(oldFieldName, admin.firestore.FieldValue.delete());
-
-      var obj = Object.fromEntries(addDelField);
-      await db.collection(collection).doc(snapshot[i].id).collection(year.toString()).doc(j.toString()).update(obj);
-
-
-      snap = await db.collection(collection).doc(snapshot[i].id).collection((year + 1).toString()).doc(j.toString()).get();
-
-      addDelField = new Map();
-      prevData = snap.data()[oldFieldName];
-      addDelField.set(newFieldName, prevData);
-      // addDelField.set(oldFieldName, admin.firestore.FieldValue.delete());
-
-      obj = Object.fromEntries(addDelField);
-      await db.collection(collection).doc(snapshot[i].id).collection((year + 1).toString()).doc(j.toString()).update(obj);
-      statusJson.status = "added field : " + newFieldName + " to Week " + j.toString();
-      processedWeek++;
-      if (isRename) {
-        statusJson.progress = parseFloat(processedWeek / (snapshot.length * (renameFieldCount + 1) * 53)) * 100;
-      } else {
-        statusJson.progress = parseFloat(processedWeek / (snapshot.length * 53)) * 100;
-      }
-    }
-
-  }
-
-  statusJson.status = "Rename done";
-  // console.log("Renamed Fields !");
-
-}
-
-async function updateFields(fieldObj, group, renameFieldCount) {
-  var collection = "";
-  if (group == "SKB") {
-    collection = "users";
-  } else {
-    collection = "sapphire";
-  }
-
-  const d = new Date();
-  let year = d.getFullYear();
-
-  const snapshot = await db.collection(collection).listDocuments();
-
-  statusJson.procName = "Update";
-  for (let i = 0; i < snapshot.length; i++) {
-    statusJson.docName = snapshot[i].id;
-    for (let j = 1; j <= 53; j++) {
-      await db.collection(collection).doc(snapshot[i].id).collection(year.toString()).doc(j.toString()).update(fieldObj);
-      await db.collection(collection).doc(snapshot[i].id).collection((year + 1).toString()).doc(j.toString()).update(fieldObj);
-      statusJson.status = `Updated week ${j.toString()}`;
-      processedWeek++;
-      if (isRename) {
-        statusJson.progress = parseFloat(processedWeek / (snapshot.length * (renameFieldCount + 1) * 53)) * 100;
-      } else {
-        statusJson.progress = parseFloat(processedWeek / (snapshot.length * 53)) * 100;
-      }
-
-    }
-  }
-
-  console.log("Updated !");
-  statusJson.status = "done";
-}
 
 app.post("/export", requireAuth, async (req, res) => {
   const group = req.body.group;
   const field = req.body.field;
 
-  statusJson.procName = "Export";
+  dbm.statusJson.procName = "Export";
 
-  const data = await getFullCollectionDataNew(group, field);
+  const data = await dbm.getFullCollectionData(group, field);
 
   const dt = new Date();
 
@@ -898,147 +294,10 @@ app.post("/upload", requireAuth, async (req, res) => {
     var oldpath = files.file[0].filepath;
     var newpath = './uploads/' + files.file[0].originalFilename;
     fs.copyFileSync(oldpath, newpath);
-    // fs.rename(oldpath, newpath, function (err) {
-    //   if (err) throw err;
-    //   uploadFullCollectionData(newpath);
-    // });
-    uploadFullCollectionData(newpath);
+    
+    dbm.uploadFullCollectionData(newpath);
   });
 });
-
-async function getFullCollectionDataNew(group, field) {
-  processedWeek = 0;
-  statusJson.status = "Reading data...";
-  var collection = "";
-  var dataArray = [];
-
-  if (group == "SKB") {
-    collection = "users";
-  } else {
-    collection = "sapphire";
-  }
-
-  if (field == "All") {
-    const snapshot = await db.collection(collection).listDocuments();
-    var totalWeek = snapshot.length * 53 * 2;
-
-    for (let i = 0; i < snapshot.length; i++) {
-      statusJson.docName = snapshot[i].id;
-      const yearData = [];
-
-      for (let year = 2025; year <= 2026; year++) {
-        const weekArray = [];
-        statusJson.year = year.toString();
-        for (let week = 1; week <= 53; week++) {
-          const snap = await db.collection(collection).doc(snapshot[i].id).collection(year.toString()).doc(week.toString()).get();
-
-          weekArray.push({ week: week, data: snap.data() });
-
-          statusJson.week = week.toString();
-          processedWeek++;
-          statusJson.progress = parseFloat(processedWeek / totalWeek) * 100;
-          // console.log(statusJson.progress);
-        }
-        yearData.push({ year: year, data: weekArray });
-      }
-      if (group == "SKB") {
-        const namelist_link_snap = await db.collection(collection).doc(snapshot[i].id).get();
-        const namelist_link = namelist_link_snap.data().namelist_link;
-        dataArray.push({ name: snapshot[i].id, data: yearData, namelist_link: namelist_link });
-      } else {
-        dataArray.push({ name: snapshot[i].id, data: yearData });
-      }
-
-
-    }
-
-  } else {
-    var totalWeek = 53 * 2;
-
-    statusJson.docName = field;
-    const yearData = [];
-
-    for (let year = 2025; year <= 2026; year++) {
-      const weekArray = [];
-      statusJson.year = year.toString();
-      for (let week = 1; week <= 53; week++) {
-        const snap = await db.collection(collection).doc(field).collection(year.toString()).doc(week.toString()).get();
-
-        weekArray.push({ week: week, data: snap.data() });
-
-        statusJson.week = week.toString();
-        processedWeek++;
-        statusJson.progress = parseFloat(processedWeek / totalWeek) * 100;
-        // console.log(statusJson.progress);
-      }
-      yearData.push({ year: year, data: weekArray });
-    }
-    if (group == "SKB") {
-      const namelist_link_snap = await db.collection(collection).doc(field).get();
-      const namelist_link = namelist_link_snap.data().namelist_link;
-      dataArray.push({ name: field, data: yearData, namelist_link: namelist_link });
-    } else {
-      dataArray.push({ name: field, data: yearData });
-    }
-
-  }
-
-  var retData = {
-    collectionName: collection,
-    data: dataArray
-  };
-
-  return retData;
-}
-
-async function uploadFullCollectionData(path) {
-  processedWeek = 0;
-  statusJson.procName = "Import";
-  statusJson.status = "Uploading...";
-
-  const data = fs.readFileSync(path, 'utf8');
-  const importData = JSON.parse(data);
-
-  var totalWeek = 0;
-
-  if (importData.collectionName == "sapphire") {
-    totalWeek = importData.data.length * 2 * 53;
-  } else {
-    totalWeek = importData.data.length * 2 * 53 + importData.data.length;
-  }
-
-  for (let i = 0; i < importData.data.length; i++) {
-    const user = importData.data[i];
-    statusJson.docName = user.name;
-
-    for (let j = 0; j < user.data.length; j++) {
-      const yearData = user.data[j];
-      statusJson.year = yearData.year;
-
-      for (let k = 0; k < yearData.data.length; k++) {
-        const weekData = yearData.data[k];
-        statusJson.week = weekData.week;
-
-        await db.collection(importData.collectionName).doc(user.name).collection(yearData.year.toString()).doc(weekData.week.toString()).set(weekData.data);
-
-        processedWeek++;
-        statusJson.progress = parseFloat(processedWeek / totalWeek) * 100;
-      }
-    }
-    if (importData.collectionName != "sapphire") {
-      await db.collection(importData.collectionName).doc(user.name).set({ namelist_link: user.namelist_link });
-      processedWeek++;
-      statusJson.progress = parseFloat(processedWeek / totalWeek) * 100;
-    }
-  }
-
-  fs.unlink(path,
-    (err => {
-        if (err) console.log(err);
-    }));
-
-  statusJson.status = "done";
-}
 
 // Routes will go here
 

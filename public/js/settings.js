@@ -278,7 +278,8 @@ $("#saveConfigSKB").click(function () {
     $(".loading").removeClass("hide");
     $(".alert_skb").addClass("hide");
 
-    $(".status").html("");
+    $(".status").html();
+    $(".progress_percentage").html();
     $(".progress-bar").css("width", "0%");
 
     const data = { config: settingsJson };
@@ -296,7 +297,7 @@ $("#saveConfigSKB").click(function () {
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
-    idInterval = setInterval(getStatus, 3000);
+    idInterval = setInterval(getStatus, 2000);
 });
 
 
@@ -600,7 +601,8 @@ $("#saveConfigSapphire").click(function () {
     $(".loading_sapphire").removeClass("hide");
     $(".alert_sapphire").addClass("hide");
 
-    $(".status").html("");
+    $(".status").html();
+    $(".progress_percentage").html();
     $(".progress-bar").css("width", "0%");
 
     const data = { config: settingsJson };
@@ -619,7 +621,7 @@ $("#saveConfigSapphire").click(function () {
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
-    idInterval = setInterval(getStatus, 3000);
+    idInterval = setInterval(getStatus, 2000);
 });
 
 function dragstartHandlerSapphire(ev) {
@@ -726,7 +728,8 @@ function processRequest() {
     $(".loading_import").removeClass("hide");
     $(".alert_import").addClass("hide");
 
-    $(".status").html("");
+    $(".status").html();
+    $(".progress_percentage").html();
     $(".progress-bar").css("width", "0%");
 
     const reqType = $("#reqType").val();
@@ -825,12 +828,13 @@ function getStatus() {
 }
 
 function getStatusExport() {
+
     const xhttp = new XMLHttpRequest();
     xhttp.open("GET", "/getStatus");
     xhttp.onload = function () {
         const response = JSON.parse(this.responseText);
         // console.log(response);
-        $(".status").html("<span class='badge rounded-pill text-bg-success'>" + response.procName + "</span> &nbsp; <b>" + response.docName + "</b> => " + response.status + " - <b>Week " + response.week + ", " + response.year + "</b>");
+        $(".status").html("<span class='badge rounded-pill text-bg-success'>" + response.procName + "</span> &nbsp; <b>" + response.docName + "</b> => " + response.status + "   <b>Week " + response.week + ", " + response.year + "</b>");
         $(".progress_percentage").html(parseInt(response.progress).toString() + "%");
         $(".progress-bar").css("width", parseInt(response.progress).toString() + "%");
     }
@@ -851,7 +855,7 @@ function getStatusImport() {
             setTimeout(function () { $(".alert_import").addClass("hide"); }, 10000);
         }
         // console.log(response);
-        $(".status").html("<span class='badge rounded-pill text-bg-success'>" + response.procName + "</span> &nbsp; <b>" + response.docName + "</b> => " + response.status + " - <b>Week " + response.week + ", " + response.year + "</b>");
+        $(".status").html("<span class='badge rounded-pill text-bg-success'>" + response.procName + "</span> &nbsp; <b>" + response.docName + "</b> => " + response.status + "   <b>Week " + response.week + ", " + response.year + "</b>");
         $(".progress_percentage").html(parseInt(response.progress).toString() + "%");
         $(".progress-bar").css("width", parseInt(response.progress).toString() + "%");
     }
