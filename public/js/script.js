@@ -17,7 +17,7 @@ $(document).ready(function () {
     // Logout Confirmation
     $('#confirmLogout').on('click', function() {
         // Here you would typically make an API call to logout
-        window.location.href = '/logout';
+        window.location.href = '/login/logout';
     });
 
 

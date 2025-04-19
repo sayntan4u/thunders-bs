@@ -32,7 +32,7 @@ function addClosing() {
         console.log(response);
         loadClosings();
     }
-    xhttp.open("POST", "addClosing");
+    xhttp.open("POST", "/closing/addClosing");
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
 
@@ -133,7 +133,7 @@ function closingStatusChanged(id, elem) {
     };
 
     const xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/updateClosingStatus");
+    xhttp.open("POST", "/closing/updateClosingStatus");
     // xhttp.onload = function () {
     //     const response = JSON.parse(this.responseText);
     //     // console.log(response);
@@ -164,14 +164,14 @@ function closingUVChanged(id, elem) {
     };
 
     const xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/updateClosingUV");
+    xhttp.open("POST", "/closing/updateClosingUV");
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
 }
 
 function loadClosings() {
     const xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/getClosings");
+    xhttp.open("POST", "/closing/getClosings");
     xhttp.onload = function () {
         const response = JSON.parse(this.responseText);
         // console.log(response);
@@ -221,7 +221,7 @@ function deleteClosing() {
     };
 
     const xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/deleteClosing");
+    xhttp.open("POST", "/closing/deleteClosing");
     xhttp.onload = function () {
         loadClosings();
 

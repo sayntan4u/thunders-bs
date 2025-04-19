@@ -284,7 +284,7 @@ $("#saveConfigSKB").click(function () {
 
     const data = { config: settingsJson };
     const xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/saveSettings");
+    xhttp.open("POST", "/settings/saveSettings");
     xhttp.onload = function () {
         clearInterval(idInterval);
         loadSettings();
@@ -607,7 +607,7 @@ $("#saveConfigSapphire").click(function () {
 
     const data = { config: settingsJson };
     const xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/saveSettings");
+    xhttp.open("POST", "/settings/saveSettings");
     xhttp.onload = function () {
         clearInterval(idInterval);
 
@@ -739,7 +739,7 @@ function processRequest() {
     if (reqType == "Export Data") {
         const data = { group: group, field: field };
         const xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "/export");
+        xhttp.open("POST", "/settings/export");
         xhttp.onload = function () {
             clearInterval(idInterval);
             $("#processBtn").prop("disabled", false);
@@ -755,7 +755,7 @@ function processRequest() {
         const importDb = importFile.files[0];
         let formData = new FormData();
         formData.append("file", importDb);
-        fetch('/upload', {
+        fetch('/settings/upload', {
             method: "POST",
             body: formData
         });
@@ -786,7 +786,7 @@ function swapElements(itemA, itemB, jsonData) {
 
 function loadSettings() {
     const xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/getSettings");
+    xhttp.open("POST", "/settings/getSettings");
     xhttp.onload = function () {
         const response = JSON.parse(this.responseText);
         settingsJson = response;
@@ -815,7 +815,7 @@ function loadSettings() {
 
 function getStatus() {
     const xhttp = new XMLHttpRequest();
-    xhttp.open("GET", "/getStatus");
+    xhttp.open("GET", "/settings/getStatus");
     xhttp.onload = function () {
         const response = JSON.parse(this.responseText);
         console.log(response);
@@ -830,7 +830,7 @@ function getStatus() {
 function getStatusExport() {
 
     const xhttp = new XMLHttpRequest();
-    xhttp.open("GET", "/getStatus");
+    xhttp.open("GET", "/settings/getStatus");
     xhttp.onload = function () {
         const response = JSON.parse(this.responseText);
         // console.log(response);
@@ -844,7 +844,7 @@ function getStatusExport() {
 
 function getStatusImport() {
     const xhttp = new XMLHttpRequest();
-    xhttp.open("GET", "/getStatus");
+    xhttp.open("GET", "/settings/getStatus");
     xhttp.onload = function () {
         const response = JSON.parse(this.responseText);
         if(response.status == "done"){

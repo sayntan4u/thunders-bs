@@ -1,6 +1,14 @@
 const express = require('express');
+const router = express.Router();
 
-const router = express.router();
+const requireAuth = (req, res, next) => {
+    if (req.session.userId) {
+        next(); // User is authenticated, continue to next middleware
+    } else {
+        res.redirect('/login'); // User is not authenticated, redirect to login page
+    }
+}
+
 
 router.get('/', function (req, res) {
     if (req.session.userId) {
@@ -25,9 +33,9 @@ router.post('/', function (req, res) {
 
 router.get('/logout', requireAuth, function (req, res) {
     req.session.destroy(function (err) {
-      res.redirect('/');
+        res.redirect('/');
     });
-  });
+});
 
 
 module.exports = router;

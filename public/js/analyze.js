@@ -228,7 +228,7 @@ function getData() {
 
         $(".loading").addClass("hide");
     }
-    xhttp.open("POST", "analyzeData");
+    xhttp.open("POST", "/analyze/analyzeData");
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
     // $('.alert').addClass("show");
@@ -398,7 +398,7 @@ function generateSapphireTable(Sapphire_table) {
 
 function loadSettings() {
     const xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/getSettings");
+    xhttp.open("POST", "/settings/getSettings");
     xhttp.onload = function () {
         const response = JSON.parse(this.responseText);
         settingsJson = response;
