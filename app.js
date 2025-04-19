@@ -13,8 +13,8 @@ var formidable = require('formidable');
 const app = express();
 const port = process.env.PORT || 8080;
 
-const admin = require('firebase-admin');
-const credentials = require('./key.json');
+// const admin = require('firebase-admin');
+// const credentials = require('./key.json');
 
 //Setup directories
 var dir = ['./backup', './public/legal', './uploads'];
@@ -63,11 +63,11 @@ function getFields(group) {
   return fields;
 }
 
-admin.initializeApp({
-  credential: admin.credential.cert(credentials)
-});
+// admin.initializeApp({
+//   credential: admin.credential.cert(credentials)
+// });
 
-const db = admin.firestore();
+const db = require("./lib/db");
 
 app.set('view engine', 'ejs');
 
