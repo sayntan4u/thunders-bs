@@ -61,7 +61,7 @@ function generateRosterTable(data) {
         const bodyRow = $('<tr></tr>');
         bodyRow.append(`<th scope="row" class="align-middle">${time}</th>`);
         $.each(data, function (index, item) {
-            bodyRow.append(`<td><input type="text" class="form-control ${item.day}-${time}" value="${item.data[time]}" onchange='valueChangedRoster(this,"${item.day}","${time}")'></td>`);
+            bodyRow.append(`<td class="${item.data[time] == '' ? '' : 'has_data'}"><input type="text" class="form-control ${item.data[time] == '' ? '' : 'has_data'} ${item.day}-${time}" value="${item.data[time]}" onchange='valueChangedRoster(this,"${item.day}","${time}")'></td>`);
         });
         $('.roster-body').append(bodyRow);
     });
@@ -81,6 +81,11 @@ function clearRosterTable() {
 
 function valueChangedRoster(elem, day, time) {
     const value = $(elem).val();
+    if(value != ""){
+        $(elem).parent().addClass("has_data");
+    }else{
+        $(elem).parent().removeClass("has_data");
+    }
     updateRoster(day, time, value);
 }
 

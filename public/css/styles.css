@@ -356,8 +356,10 @@ select{
 }
 
 .roster input[type="text"]{
+    padding: 12px !important;
     font-weight: bold !important;
     background-color: transparent !important;
+    border-radius: 0 !important;
     border: none !important;
     text-align: center !important; 
 }
@@ -366,7 +368,25 @@ select{
     border: none !important;
     outline: none !important;
     box-shadow: none !important;
-    background-color: transparent !important;
+    /* background-color: transparent !important; */
   }
+
+.roster td{
+    padding: 0 !important;
+}
+
+.roster .has_data{
+    background-color: #d0d0f6 !important;
+}
+
+.roster .has_data:focus{
+    background-color: #bbbbf1 !important;
+}
+
+.roster .has_data:hover{
+    background-color: #bbbbf1 !important;
+}
+
+
 
 
