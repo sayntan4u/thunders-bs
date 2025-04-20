@@ -16,11 +16,13 @@ router.get('/getRoster', requireAuth, async function (req, res) {
 });
 
 router.post('/updateRoster', requireAuth, function (req, res) {
-    res.send("roster updated");
+    const { day, time, irName } = req.body;
+    console.log(day, time, irName);
+    dbm.updateRoster(day, time, irName);
 });
 
 router.post('/clearRoster', requireAuth, function (req, res) {
-    res.send("roster clear");
+    dbm.clearRoster();
 });
 
 module.exports = router;

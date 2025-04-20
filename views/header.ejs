@@ -72,8 +72,9 @@
             </div>
             <div class="modal-body">
                 <table class="roster table table-warning table-striped table-bordered table-hover table-sm text-center">
-                    <thead>
-                        <tr>
+                    <thead class="roster-header">
+                        <tr></tr>
+                        <!-- <tr>
                             <th scope="col" class="text-left"><i class="fa-solid fa-clock"></i></th>
                             <th scope="col">Sat</th>
                             <th scope="col">Sun</th>
@@ -82,14 +83,12 @@
                             <th scope="col">Wed</th>
                             <th scope="col">Thu</th>
                             <th scope="col">Fri</th>
-                        </tr>
+                        </tr> -->
                     </thead>
-                    <tbody>
-                        <tr>
+                    <tbody class="roster-body">
+                        <!-- <tr>
                             <th scope="row" class="align-middle">11AM</th>
-                            <td>
-                                <input type="text" class="form-control">
-                            </td>
+                            <td><input type="text" class="form-control"></td>
                             <td><input type="text" class="form-control"></td>
                             <td><input type="text" class="form-control"></td>
                             <td><input type="text" class="form-control"></td>
@@ -137,14 +136,14 @@
                             <td><input type="text" class="form-control"></td>
                             <td><input type="text" class="form-control"></td>
                             <td><input type="text" class="form-control"></td>
-                        </tr>
+                        </tr> -->
 
                     </tbody>
                 </table>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger">Clear All</button>
+                <button type="button" class="btn btn-danger" onclick="clearRoster()">Clear All</button>
             </div>
         </div>
     </div>
