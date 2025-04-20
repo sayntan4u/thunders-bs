@@ -387,6 +387,10 @@ select{
     background-color: #bbbbf1 !important;
 }
 
+.roster .time{
+    width: 100px !important;
+}
+
 
 
 

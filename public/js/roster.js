@@ -50,16 +50,16 @@ function generateRosterTable(data) {
 
     const headerRow = $('.roster-header tr');
     // headerRow.append('<tr></tr>');
-    headerRow.append('<th scope="col" class="text-left"><i class="fa-solid fa-clock"></i></th>');
+    headerRow.append('<th scope="col" class="bg-dark text-light"><i class="fa-solid fa-clock"></i></th>');
     weekArray.forEach(function (day) {
-        headerRow.append('<th scope="col">' + day + '</th>');
+        headerRow.append('<th scope="col" class="bg-dark text-light">' + day + '</th>');
     });
     // headerRow.append('');
 
 
     timeArray.forEach(function (time) {
         const bodyRow = $('<tr></tr>');
-        bodyRow.append(`<th scope="row" class="align-middle">${time}</th>`);
+        bodyRow.append(`<th scope="row" class="time align-middle bg-dark text-light">${time}</th>`);
         $.each(data, function (index, item) {
             bodyRow.append(`<td class="${item.data[time] == '' ? '' : 'has_data'}"><input type="text" class="form-control ${item.data[time] == '' ? '' : 'has_data'} ${item.day}-${time}" value="${item.data[time]}" onchange='valueChangedRoster(this,"${item.day}","${time}")'></td>`);
         });
