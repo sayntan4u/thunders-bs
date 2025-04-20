@@ -47,6 +47,8 @@
     color: #ffffff;
     transition: all 0.3s;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+    position: fixed;
+    height: 100vh;
 }
 
 #sidebar.active {
@@ -182,6 +184,7 @@
     min-height: 100vh;
     transition: all 0.3s;
     background: #f8f9fa;
+    margin-left: 80px;
 }
 
 /* Navbar Styles */
