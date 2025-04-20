@@ -375,6 +375,10 @@ select{
     padding: 0 !important;
 }
 
+.roster .roster-header th{
+    padding: 10px !important;
+}
+
 .roster .has_data{
     background-color: #d0d0f6 !important;
 }

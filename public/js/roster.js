@@ -45,6 +45,12 @@ function clearRoster() {
 function generateRosterTable(data) {
     const weekArray = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
     const timeArray = ['11AM', '1PM', '3PM', '5PM', '7PM'];
+
+    //get today
+    const d = new Date();
+    const today = d.getDay();// 0-6 (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+    const dayArray = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
     $('.roster-header tr').empty(); // Clear existing header rows
     $('.roster-body').empty(); // Clear existing body rows
 
@@ -52,7 +58,7 @@ function generateRosterTable(data) {
     // headerRow.append('<tr></tr>');
     headerRow.append('<th scope="col" class="bg-dark text-light"><i class="fa-solid fa-clock"></i></th>');
     weekArray.forEach(function (day) {
-        headerRow.append('<th scope="col" class="bg-dark text-light">' + day + '</th>');
+        headerRow.append(`<th scope="col" class="${dayArray[today] == day ? 'bg-success-subtle text-success-emphasis' : 'bg-dark text-light'}">` + day + '</th>');
     });
     // headerRow.append('');
 
@@ -81,9 +87,9 @@ function clearRosterTable() {
 
 function valueChangedRoster(elem, day, time) {
     const value = $(elem).val();
-    if(value != ""){
+    if (value != "") {
         $(elem).parent().addClass("has_data");
-    }else{
+    } else {
         $(elem).parent().removeClass("has_data");
     }
     updateRoster(day, time, value);
