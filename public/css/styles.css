@@ -1,3 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+.rajdhani-light {
+    font-family: "Rajdhani", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+}
+
+.rajdhani-regular {
+    font-family: "Rajdhani", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.rajdhani-medium {
+    font-family: "Rajdhani", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.rajdhani-semibold {
+    font-family: "Rajdhani", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+}
+
+.rajdhani-bold {
+    font-family: "Rajdhani", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+}
+
 /* Main Layout */
 .wrapper {
     display: flex;
@@ -92,7 +124,7 @@
     transition: all 0.3s;
 }
 
-#sidebar ul li.active > a {
+#sidebar ul li.active>a {
     background: rgba(0, 188, 212, 0.1);
     color: #fff;
     border-left: 4px solid #00bcd4;
@@ -100,17 +132,17 @@
     overflow: hidden;
 }
 
-#sidebar ul li.active > a::before {
+#sidebar ul li.active>a::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(90deg, 
-        rgba(0, 188, 212, 0) 0%, 
-        rgba(0, 188, 212, 0.2) 50%, 
-        rgba(0, 188, 212, 0) 100%);
+    background: linear-gradient(90deg,
+            rgba(0, 188, 212, 0) 0%,
+            rgba(0, 188, 212, 0.2) 50%,
+            rgba(0, 188, 212, 0) 100%);
     animation: shimmer 2s infinite;
 }
 
@@ -118,12 +150,13 @@
     0% {
         transform: translateX(-100%);
     }
+
     100% {
         transform: translateX(100%);
     }
 }
 
-#sidebar ul li.active > a i {
+#sidebar ul li.active>a i {
     color: #00bcd4;
     position: relative;
     z-index: 1;
@@ -277,9 +310,11 @@
     #sidebar {
         margin-left: -250px;
     }
+
     #sidebar.active {
         margin-left: 0;
     }
+
     #content {
         width: 100%;
     }
@@ -337,31 +372,32 @@
 
 .btn-close:hover {
     opacity: 1;
-} 
+}
 
-select{
+select {
     width: 200px !important;
 }
 
-.hide{
+.hide {
     display: none !important;
 }
 
-.table-bordered td,.table-bordered th{
+.table-bordered td,
+.table-bordered th {
     border: 1px solid black !important;
 }
 
-.txt-align-center{
+.txt-align-center {
     text-align: center !important;
 }
 
-.roster input[type="text"]{
+.roster input[type="text"] {
     padding: 12px !important;
     font-weight: bold !important;
     background-color: transparent !important;
     border-radius: 0 !important;
     border: none !important;
-    text-align: center !important; 
+    text-align: center !important;
 }
 
 .roster input[type=text]:focus {
@@ -369,32 +405,28 @@ select{
     outline: none !important;
     box-shadow: none !important;
     /* background-color: transparent !important; */
-  }
+}
 
-.roster td{
+.roster td {
     padding: 0 !important;
 }
 
-.roster .roster-header th{
+.roster .roster-header th {
     padding: 10px !important;
 }
 
-.roster .has_data{
+.roster .has_data {
     background-color: #d0d0f6 !important;
 }
 
-.roster .has_data:focus{
+.roster .has_data:focus {
     background-color: #bbbbf1 !important;
 }
 
-.roster .has_data:hover{
+.roster .has_data:hover {
     background-color: #bbbbf1 !important;
 }
 
-.roster .time{
+.roster .time {
     width: 100px !important;
 }
-
-
-
-
