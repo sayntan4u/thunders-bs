@@ -6,7 +6,7 @@ function loadRoster() {
         dataType: 'json',
         success: function (data) {  
             generateRosterTable(data);
-            $(".loading").addClass("hide");
+            $(".loading_roster").addClass("hide");
         },
         error: function (xhr, status, error) {
             console.error('Error loading roster:', error);
