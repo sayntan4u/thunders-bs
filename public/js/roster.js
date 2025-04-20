@@ -5,11 +5,7 @@ function loadRoster() {
         type: 'GET',
         dataType: 'json',
         success: function (data) {
-            // $('#roster').empty();
-            // $.each(data, function(index, item) {
-            //     console.log(item);
-            // });
-            console.log(data);
+            $(".loading").addClass("hide");
             generateRosterTable(data);
         },
         error: function (xhr, status, error) {
