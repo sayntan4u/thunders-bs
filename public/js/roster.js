@@ -4,9 +4,9 @@ function loadRoster() {
         url: '/roster/getRoster',
         type: 'GET',
         dataType: 'json',
-        success: function (data) {
-            $(".loading").addClass("hide");
+        success: function (data) {  
             generateRosterTable(data);
+            $(".loading").addClass("hide");
         },
         error: function (xhr, status, error) {
             console.error('Error loading roster:', error);
