@@ -53,4 +53,20 @@ router.post("/updateUser", requireAuth, async (req, res) => {
     }
 });
 
+router.post("/updateTotalToSapphire", requireAuth, async (req, res) => {
+  // console.log(req);
+  // console.log(req.body);
+  try {
+      const week = req.body.week;
+      const year = req.body.year;
+      const obj = req.body.obj;
+
+      dbm.updateTotalToSapphire(week, year, obj);
+
+      res.send("success");
+  } catch (err) {
+      res.send(err);
+  }
+});
+
 module.exports= router;

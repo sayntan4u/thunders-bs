@@ -1,3 +1,27 @@
+function camelize(str) {
+    return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
+        return index === 0 ? word.toLowerCase() : word.toUpperCase();
+    }).replace(/\s+/g, '');
+}
+
+function getFields(table) {
+    const fields = [];
+    for (let i = 0; i < table.length; i++) {
+        // addField(SKB_table[i].header);
+
+        if (table[i].sub_heading.length > 0) {
+            for (let j = 0; j < table[i].sub_heading.length; j++) {
+                // addSubField(SKB_table[i].sub_heading[j], SKB_table[i].header);
+                fields.push(camelize((table[i].header + table[i].sub_heading[j]).toString()));
+            }
+        } else {
+            fields.push(camelize(table[i].header));
+        }
+    }
+
+    return fields;
+}
+
 var settingsJson = {};
 
 //SKB methods
@@ -806,6 +830,9 @@ function loadSettings() {
         $("#settingsJsonTextSapphire").val(JSON.stringify(settingsJson.Sapphire_table, null, 2));
         generateSapphireTableTree(settingsJson.Sapphire_table);
         generateSapphireTable(settingsJson.Sapphire_table);
+
+        console.log("Node Editor Loaded");
+        const editor = new NodeEditor();
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send();
@@ -847,7 +874,7 @@ function getStatusImport() {
     xhttp.open("GET", "/settings/getStatus");
     xhttp.onload = function () {
         const response = JSON.parse(this.responseText);
-        if(response.status == "done"){
+        if (response.status == "done") {
             clearInterval(idInterval);
             $("#processBtn").prop("disabled", false);
             $(".loading_import").addClass("hide");
@@ -865,3 +892,452 @@ function getStatusImport() {
 
 loadSettings();
 generateNameDropDown();
+
+//Node connections
+
+function addConnection(startNode, endNode) {
+    settingsJson.connections.push(
+        {
+            startNode: startNode.title,
+            endNode: endNode.title
+        }
+    );
+    console.log(settingsJson.connections);
+}
+
+function removeConnection(startNode) {
+    for(let i = 0; i < settingsJson.connections.length; i++) {
+        if(settingsJson.connections[i].startNode == startNode.title) {
+            settingsJson.connections.splice(i, 1);
+            break;
+        }
+    }
+    console.log(settingsJson.connections);
+}
+
+$("#saveConnections").click(function () {
+    $("#saveConnections").prop("disabled", true);
+    $(".loading_connection").removeClass("hide");
+    $(".alert_connection").addClass("hide");
+
+    const data = { config: settingsJson };
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/settings/saveSettings");
+    xhttp.onload = function () {
+        // clearInterval(idInterval);
+
+        // loadSettings();
+
+        $("#saveConnections").prop("disabled", false);
+        $(".loading_connection").addClass("hide");
+        $(".alert_connection").removeClass("hide");
+        setTimeout(function () { $(".alert_connection").addClass("hide"); }, 10000);
+    }
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send(JSON.stringify(data));
+    // idInterval = setInterval(getStatus, 2000);
+});
+
+class Node {
+    constructor(x, y, title = 'Node', type = 'default') {
+        this.x = x;
+        this.y = y;
+        this.width = 150;
+        this.height = 40;
+        this.title = title;
+        this.type = type;
+
+        // Set inputs and outputs based on node type
+        switch (type) {
+            case 'input-only':
+                this.inputs = [{ name: 'in' }];
+                this.outputs = [];
+                break;
+            case 'output-only':
+                this.inputs = [];
+                this.outputs = [{ name: 'out' }];
+                break;
+            default:
+                this.inputs = [{ name: 'in' }];
+                this.outputs = [{ name: 'out' }];
+        }
+    }
+
+    getInputPortPosition(index) {
+        return {
+            x: this.x,
+            y: this.y + this.height / 2 // Center the single port vertically
+        };
+    }
+
+    getOutputPortPosition(index) {
+        return {
+            x: this.x + this.width,
+            y: this.y + this.height / 2 // Center the single port vertically
+        };
+    }
+}
+
+class NodeEditor {
+    constructor() {
+        this.canvas = document.getElementById('nodeCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.nodes = [];
+        this.selectedNode = null;
+        this.connections = [];
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.clickConnection = null;
+
+        this.setupCanvas();
+        this.addEventListeners();
+        this.createInitialNodes();
+        this.draw(); // Initial draw
+    }
+
+    setupCanvas() {
+        this.resizeCanvas();
+        this.resizeObserver = new ResizeObserver(() => this.resizeCanvas());
+        this.resizeObserver.observe(this.canvas);
+    }
+
+    resizeCanvas() {
+        // Get the actual dimensions of the container
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        const dpr = window.devicePixelRatio;
+
+        // Set the canvas display size
+        this.canvas.style.width = rect.width + 'px';
+        this.canvas.style.height = rect.height + 'px';
+
+        // Set canvas buffer size
+        this.canvas.width = rect.width * dpr;
+        this.canvas.height = rect.height * dpr;
+
+        // Scale the context to account for the device pixel ratio
+        this.ctx.scale(dpr, dpr);
+
+        // Store the canvas bounds for coordinate conversions
+        this.canvasBounds = {
+            width: rect.width,
+            height: rect.height,
+            dpr: dpr
+        };
+
+        // Request a redraw
+        this.draw();
+    }
+
+    addEventListeners() {
+        this.canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
+        window.addEventListener('mousemove', this.onMouseMove.bind(this));
+        window.addEventListener('keydown', this.onKeyDown.bind(this));
+    }
+
+    onKeyDown(e) {
+        if (e.key === 'Escape' && this.clickConnection) {
+            this.clickConnection = null;
+            this.selectedNode = null;
+            requestAnimationFrame(() => this.draw());
+        }
+    }
+
+    showNotification(message, type = 'addition') {
+        // Log with color based on type
+        const color = type === 'addition' ? '#4CAF50' : '#f44336';
+        console.log(`%c${message}`, `color: ${color}`);
+    }
+
+    createInitialNodes() {
+        const fieldsSKB = getFields(settingsJson.SKB_table);
+        const fieldsSapphire = getFields(settingsJson.Sapphire_table);
+
+
+        for (let i = 0; i < fieldsSKB.length; i++) {
+            this.addNode(100, 100 + i * 50, fieldsSKB[i], 'output-only');
+        }
+
+        for (let i = 0; i < fieldsSapphire.length; i++) {
+            this.addNode(500, 100 + i * 50, fieldsSapphire[i], 'input-only');
+        }
+
+        // console.log(settingsJson.connections);
+
+        for (let i = 0; i < settingsJson.connections.length; i++) {
+            const startNode = this.nodes.find(node => node.title === settingsJson.connections[i].startNode);
+            const endNode = this.nodes.find(node => node.title === settingsJson.connections[i].endNode);
+            if (startNode && endNode) {
+                this.connections.push({
+                    startNode: startNode,
+                    startPortIndex: 0,
+                    endNode: endNode,
+                    endPortIndex: 0
+                });
+                // Show notification for initial connection
+                this.showNotification(`Connected "${startNode.title}" to "${endNode.title}"`, 'addition');
+            }
+        }
+
+    }
+
+    addNode(x, y, title, type = 'default') {
+        const node = new Node(x, y, title, type);
+        this.nodes.push(node);
+        return node;
+    }
+
+    findConnectionForPort(node, portIndex, isOutput) {
+        return this.connections.findIndex(conn => {
+            if (isOutput) {
+                return conn.startNode === node && conn.startPortIndex === portIndex;
+            } else {
+                return conn.endNode === node && conn.endPortIndex === portIndex;
+            }
+        });
+    }
+
+    onMouseDown(e) {
+        if (e.button !== 0) return; // Only handle left clicks
+
+        const rect = this.canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        // Find clicked node first
+        const clickedNode = this.findNodeUnderMouse(x, y);
+        if (clickedNode) {
+            // If we already have a click connection started
+            if (this.clickConnection) {
+                // Only allow output to input node connections
+                if (clickedNode.type === 'input-only' && this.clickConnection.type === 'output-only') {
+                    // Check if the input node already has a connection and remove it
+                    const existingConnection = this.connections.find(conn => conn.endNode === clickedNode);
+                    if (existingConnection) {
+                        const index = this.connections.indexOf(existingConnection);
+                        this.showNotification(`Removed connection from "${existingConnection.startNode.title}"`, 'removal');
+                        this.connections.splice(index, 1);
+                        removeConnection(existingConnection.startNode);
+                    }
+
+                    // Create new connection
+                    this.connections.push({
+                        startNode: this.clickConnection,
+                        startPortIndex: 0,
+                        endNode: clickedNode,
+                        endPortIndex: 0
+                    });
+                    this.showNotification(`Connected "${this.clickConnection.title}" to "${clickedNode.title}"`, 'addition');
+                    addConnection(this.clickConnection, clickedNode);
+                }
+                this.clickConnection = null;
+                this.selectedNode = null;
+            } else {
+                // Check if clicked node is connected and delete connection if it is
+                const isInput = clickedNode.type === 'input-only';
+                const existingConnection = this.connections.find(conn =>
+                    isInput ? conn.endNode === clickedNode : conn.startNode === clickedNode
+                );
+
+                if (existingConnection) {
+                    // Remove the connection
+                    const index = this.connections.indexOf(existingConnection);
+                    this.showNotification(`Removed connection between "${existingConnection.startNode.title}" and "${existingConnection.endNode.title}"`, 'removal');
+                    this.connections.splice(index, 1);
+                    removeConnection(existingConnection.startNode);
+                } else if (clickedNode.type === 'output-only') {
+                    // Start new connection if it's an output node
+                    this.clickConnection = clickedNode;
+                    this.selectedNode = clickedNode;
+                    this.showNotification(`Started connection from "${clickedNode.title}"`, 'addition');
+                }
+            }
+            requestAnimationFrame(() => this.draw());
+            return;
+        }
+
+        // If clicked outside nodes, cancel any pending click connection
+        if (this.clickConnection) {
+            this.clickConnection = null;
+            this.selectedNode = null;
+            requestAnimationFrame(() => this.draw());
+        }
+    }
+
+    onMouseMove(e) {
+        this.mouseX = (e.clientX - this.canvas.getBoundingClientRect().left);
+        this.mouseY = (e.clientY - this.canvas.getBoundingClientRect().top);
+        requestAnimationFrame(() => this.draw());
+    }
+
+    findPortUnderMouse(x, y) {
+        const portRadius = 8; // Slightly larger than visual size for easier clicking
+
+        for (const node of this.nodes) {
+            // Check output ports
+            for (let i = 0; i < node.outputs.length; i++) {
+                const pos = node.getOutputPortPosition(i);
+                if (Math.hypot(x - pos.x, y - pos.y) < portRadius) {
+                    return { node, portIndex: i, isOutput: true };
+                }
+            }
+
+            // Check input ports
+            for (let i = 0; i < node.inputs.length; i++) {
+                const pos = node.getInputPortPosition(i);
+                if (Math.hypot(x - pos.x, y - pos.y) < portRadius) {
+                    return { node, portIndex: i, isOutput: false };
+                }
+            }
+        }
+        return null;
+    }
+
+    isPortConnected(node, portIndex, isOutput) {
+        return this.connections.some(conn => {
+            if (isOutput) {
+                return conn.startNode === node && conn.startPortIndex === portIndex;
+            } else {
+                return conn.endNode === node && conn.endPortIndex === portIndex;
+            }
+        });
+    }
+
+    drawNode(node) {
+        // Check if node has any connections
+        const hasConnection = this.connections.some(conn =>
+            conn.startNode === node || conn.endNode === node
+        );
+
+        // Draw main node body with highlight
+        this.ctx.fillStyle = '#3a3a3a';
+        this.ctx.strokeStyle = this.selectedNode === node ? '#90EE90' : (hasConnection ? '#90EE90' : '#555');
+        this.ctx.lineWidth = 1.5;
+
+        this.ctx.beginPath();
+        this.ctx.roundRect(node.x, node.y, node.width, node.height, 5);
+        this.ctx.fill();
+        this.ctx.stroke();
+
+        // Draw node title
+        this.ctx.fillStyle = '#fff';
+        this.ctx.font = '14px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText(node.title, node.x + node.width / 2, node.y + node.height / 2);
+
+        // Draw input ports
+        node.inputs.forEach((input, index) => {
+            const pos = node.getInputPortPosition(index);
+            this.ctx.beginPath();
+            this.ctx.arc(pos.x, pos.y, 5, 0, Math.PI * 2);
+            this.ctx.fillStyle = this.isPortConnected(node, index, false) ? '#90ee90' : '#666';
+            this.ctx.fill();
+            this.ctx.stroke();
+        });
+
+        // Draw output ports
+        node.outputs.forEach((output, index) => {
+            const pos = node.getOutputPortPosition(index);
+            this.ctx.beginPath();
+            this.ctx.arc(pos.x, pos.y, 5, 0, Math.PI * 2);
+            this.ctx.fillStyle = this.isPortConnected(node, index, true) ? '#90ee90' : '#666';
+            this.ctx.fill();
+            this.ctx.stroke();
+        });
+    }
+
+    findNodeUnderMouse(x, y) {
+        return this.nodes.find(node =>
+            x >= node.x && x <= node.x + node.width &&
+            y >= node.y && y <= node.y + node.height
+        );
+    }
+
+    drawConnections() {
+        this.ctx.strokeStyle = '#90ee90';
+        this.ctx.lineWidth = 2;
+
+        this.connections.forEach(conn => {
+            const startPos = conn.startNode.getOutputPortPosition(conn.startPortIndex);
+            const endPos = conn.endNode.getInputPortPosition(conn.endPortIndex);
+
+            this.ctx.beginPath();
+            this.ctx.moveTo(startPos.x, startPos.y);
+
+            // Calculate control points for the bezier curve
+            const dx = endPos.x - startPos.x;
+            const controlOffset = Math.min(Math.abs(dx) * 0.5, 150);
+
+            this.ctx.bezierCurveTo(
+                startPos.x + controlOffset, startPos.y,
+                endPos.x - controlOffset, endPos.y,
+                endPos.x, endPos.y
+            );
+            this.ctx.stroke();
+        });
+    }
+
+    draw() {
+        // Clear with proper transform handling
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Apply device pixel ratio scaling
+        const dpr = this.canvasBounds.dpr;
+        this.ctx.scale(dpr, dpr);
+
+        // Draw output nodes group border and heading
+        const outputNodes = this.nodes.filter(node => node.type === 'output-only');
+        if (outputNodes.length > 0) {
+            // Calculate group bounds
+            const padding = 20;
+            const headerHeight = 30;
+            const minX = Math.min(...outputNodes.map(n => n.x)) - padding;
+            const maxX = Math.max(...outputNodes.map(n => n.x + n.width)) + padding;
+            const minY = Math.min(...outputNodes.map(n => n.y)) - padding - headerHeight;
+            const maxY = Math.max(...outputNodes.map(n => n.y + n.height)) + padding;
+
+            // Draw solid border
+            this.ctx.strokeStyle = '#666';
+            this.ctx.lineWidth = 1;
+            this.ctx.strokeRect(minX, minY, maxX - minX, maxY - minY);
+
+            // Draw centered heading
+            this.ctx.fillStyle = '#fff';
+            this.ctx.font = 'bold 16px Arial';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.fillText('SKB', minX + (maxX - minX) / 2, minY + headerHeight / 2);
+        }
+
+        // Draw input nodes group border and heading
+        const inputNodes = this.nodes.filter(node => node.type === 'input-only');
+        if (inputNodes.length > 0) {
+            // Calculate group bounds
+            const padding = 20;
+            const headerHeight = 30;
+            const minX = Math.min(...inputNodes.map(n => n.x)) - padding;
+            const maxX = Math.max(...inputNodes.map(n => n.x + n.width)) + padding;
+            const minY = Math.min(...inputNodes.map(n => n.y)) - padding - headerHeight;
+            const maxY = Math.max(...inputNodes.map(n => n.y + n.height)) + padding;
+
+            // Draw solid border
+            this.ctx.strokeStyle = '#666';
+            this.ctx.lineWidth = 1;
+            this.ctx.strokeRect(minX, minY, maxX - minX, maxY - minY);
+
+            // Draw centered heading
+            this.ctx.fillStyle = '#fff';
+            this.ctx.font = 'bold 16px Arial';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.fillText('Sapphire', minX + (maxX - minX) / 2, minY + headerHeight / 2);
+        }
+
+        // Draw connections with proper timing
+        this.drawConnections();
+
+        // Draw nodes on top
+        this.nodes.forEach(node => this.drawNode(node));
+    }
+}

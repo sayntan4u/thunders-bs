@@ -30,17 +30,21 @@ function getFields(table) {
 var settingsJson = {};
 var fields = [];
 var fieldsSapphire = [];
+var nodeCount = 0;
 
 function sumData() {
     for (let i = settingsJson.totalViewSKBColSpan; i < fields.length - 1; i++) {
         var total = 0;
         $(`.${fields[i]}`).each(function () {
+
             if ($(this).val() != "") {
                 total += parseInt($(this).val());
             }
         });
         $(".total" + fields[i]).html(total);
     }
+    console.log(fields);
+    console.log(fieldsSapphire);
 }
 
 function sumSapphireData() {
@@ -120,7 +124,7 @@ function getData() {
         // alert(JSON.parse(this.responseText).length);
 
         const response = JSON.parse(this.responseText);
-        // console.log(response);
+        nodeCount = response.length;
 
         if (groupSearch == "SKB") {
             $(".skbData").html("");
@@ -228,7 +232,6 @@ function valueChanged(docName, triggeredFrom, group = "SKB") {
 
     if (group == "SKB") {
         var value_input = $("." + docName + "-" + triggeredFrom).val();
-
 
         if (value_input == '' && triggeredFrom != "remarks") {
             value_input = 0;
