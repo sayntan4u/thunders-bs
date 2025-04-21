@@ -1065,7 +1065,7 @@ class NodeEditor {
 
         for (let i = 0; i < settingsJson.connections.length; i++) {
             const startNode = this.nodes.find(node => node.title === settingsJson.connections[i].startNode);
-            const endNode = this.nodes.find(node => node.title === settingsJson.connections[i].endNode);
+            const endNode = this.nodes.find(node => node.title === settingsJson.connections[i].endNode && node.type === 'input-only');
             if (startNode && endNode) {
                 this.connections.push({
                     startNode: startNode,
