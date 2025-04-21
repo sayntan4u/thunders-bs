@@ -84,7 +84,19 @@
     border-radius: 50%;
     box-shadow: 0 0 20px rgba(0, 188, 212, 0.8);
     transition: all 0.3s ease;
+    animation: glow 1s ease-in-out infinite alternate;
 }
+
+@keyframes glow {
+    from {
+      text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #00bcd4, 0 0 40px #00bcd4, 0 0 50px #00bcd4, 0 0 60px #00bcd4, 0 0 70px #00bcd4;
+    }
+    to {
+      text-shadow: 0 0 20px #fff, 0 0 30px #6fefff, 0 0 40px #6fefff, 0 0 50px #6fefff, 0 0 60px #6fefff, 0 0 70px #6fefff, 0 0 80px #6fefff;
+    }
+  }
+
+    
 
 /* Removing hover effect */
 #sidebar .sidebar-header h3 i:hover {
@@ -418,6 +430,10 @@ select {
     padding: 10px !important;
 }
 
+.roster .time {
+    width: 100px !important;
+}
+
 .roster .has_data {
     background-color: #d0d0f6 !important;
 }
@@ -428,8 +444,4 @@ select {
 
 .roster .has_data:hover {
     background-color: #bbbbf1 !important;
-}
-
-.roster .time {
-    width: 100px !important;
 }
