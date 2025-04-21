@@ -376,7 +376,7 @@ function getPrevWeekDataSapphire(wk, yr) {
         $("#prevWeekTableSapphire").removeClass("hide");
         $(".loading_prev_sapphire").addClass("hide");
     }
-    xhttp.open("POST", "getData");
+    xhttp.open("POST", "view/getData");
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
 }
