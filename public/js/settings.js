@@ -1030,17 +1030,17 @@ class NodeEditor {
 
     addEventListeners() {
         this.canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
-        window.addEventListener('mousemove', this.onMouseMove.bind(this));
-        window.addEventListener('keydown', this.onKeyDown.bind(this));
+        // window.addEventListener('mousemove', this.onMouseMove.bind(this));
+        // window.addEventListener('keydown', this.onKeyDown.bind(this));
     }
 
-    onKeyDown(e) {
-        if (e.key === 'Escape' && this.clickConnection) {
-            this.clickConnection = null;
-            this.selectedNode = null;
-            requestAnimationFrame(() => this.draw());
-        }
-    }
+    // onKeyDown(e) {
+    //     if (e.key === 'Escape' && this.clickConnection) {
+    //         this.clickConnection = null;
+    //         this.selectedNode = null;
+    //         requestAnimationFrame(() => this.draw());
+    //     }
+    // }
 
     showNotification(message, type = 'addition') {
         // Log with color based on type
@@ -1163,11 +1163,11 @@ class NodeEditor {
         }
     }
 
-    onMouseMove(e) {
-        this.mouseX = (e.clientX - this.canvas.getBoundingClientRect().left);
-        this.mouseY = (e.clientY - this.canvas.getBoundingClientRect().top);
-        requestAnimationFrame(() => this.draw());
-    }
+    // onMouseMove(e) {
+    //     this.mouseX = (e.clientX - this.canvas.getBoundingClientRect().left);
+    //     this.mouseY = (e.clientY - this.canvas.getBoundingClientRect().top);
+    //     requestAnimationFrame(() => this.draw());
+    // }
 
     findPortUnderMouse(x, y) {
         const portRadius = 8; // Slightly larger than visual size for easier clicking
@@ -1291,7 +1291,7 @@ class NodeEditor {
         if (outputNodes.length > 0) {
             // Calculate group bounds
             const padding = 20;
-            const headerHeight = 30;
+            const headerHeight = 50;
             const minX = Math.min(...outputNodes.map(n => n.x)) - padding;
             const maxX = Math.max(...outputNodes.map(n => n.x + n.width)) + padding;
             const minY = Math.min(...outputNodes.map(n => n.y)) - padding - headerHeight;
@@ -1315,7 +1315,7 @@ class NodeEditor {
         if (inputNodes.length > 0) {
             // Calculate group bounds
             const padding = 20;
-            const headerHeight = 30;
+            const headerHeight = 50;
             const minX = Math.min(...inputNodes.map(n => n.x)) - padding;
             const maxX = Math.max(...inputNodes.map(n => n.x + n.width)) + padding;
             const minY = Math.min(...inputNodes.map(n => n.y)) - padding - headerHeight;

@@ -43,9 +43,34 @@ function sumData() {
         });
         $(".total" + fields[i]).html(total);
     }
-    console.log(fields);
-    console.log(fieldsSapphire);
+    // console.log(fields);
+    // console.log(fieldsSapphire);
+
 }
+
+function updateTotalToSapphire(week, year) {
+    //update total data to Sapphire Sayantan
+    console.log(settingsJson.connections);
+    console.log(nodeCount);
+
+    var data = "{";
+    data += `"nodeCount" : ` + nodeCount + ", ";
+    for (let i = 0; i < settingsJson.connections.length; i++) {
+        data += `"${settingsJson.connections[i].endNode}" : ` + $(".total" + settingsJson.connections[i].startNode).html();
+        if (i != settingsJson.connections.length - 1) {
+            data += ", ";
+        }
+    }
+    data += "}";
+    console.log(JSON.parse(data));
+
+    var updateData = { week: week, year: year, obj: JSON.parse(data) };
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/view/updateTotalToSapphire");
+    xhttp.setRequestHeader('Content-Type', 'application/json'); 
+    xhttp.send(JSON.stringify(updateData));
+}
+
 
 function sumSapphireData() {
     for (let i = settingsJson.totalViewSapphireColSpan; i < fieldsSapphire.length - 1; i++) {
@@ -173,7 +198,7 @@ function getData() {
                         rowTable += '<th scope="row" class="middle">' + response[i].sl + '</th>';
                     } else if (j == 1) {
                         rowTable += '<td>' + response[i][fieldsSapphire[j]] + '</td>';
-                    }else if (j == fieldsSapphire.length - 1) {
+                    } else if (j == fieldsSapphire.length - 1) {
                         rowTable += `<td><input type="text" class="form-control ${getTDClassSapphire(fieldsSapphire[j])} ${fieldsSapphire[j]}-Sapphire ${response[i].name + '-' + fieldsSapphire[j]}-Sapphire" value="${response[i][fieldsSapphire[j]]}" onchange="valueChanged('${response[i].name}', '${fieldsSapphire[j]}', 'Sapphire')"></td>`;
                     } else {
                         rowTable += `<td><input type="text" class="form-control ${getTDClassSapphire(fieldsSapphire[j])} ${fieldsSapphire[j]}-Sapphire ${response[i].name + '-' + fieldsSapphire[j]}-Sapphire" value="${(response[i][fieldsSapphire[j]] > 0) ? response[i][fieldsSapphire[j]] : ''}" onchange="valueChanged('${response[i].name}', '${fieldsSapphire[j]}', 'Sapphire')"></td>`;
@@ -222,10 +247,6 @@ function getData() {
 }
 
 function valueChanged(docName, triggeredFrom, group = "SKB") {
-    // console.log(docName);
-    // console.log(triggeredFrom);
-    // console.log($("." + docName + "-" + triggeredFrom).val());
-    // console.log($("." + docName + "-" + triggeredFrom + "-Sapphire").val());
 
     var wk = document.getElementById("inputWeek").value;
     var yr = document.getElementById("inputYear").value;
@@ -244,6 +265,7 @@ function valueChanged(docName, triggeredFrom, group = "SKB") {
         xhttp.setRequestHeader('Content-Type', 'application/json');
         xhttp.send(JSON.stringify(data));
         sumData();
+        updateTotalToSapphire(wk, yr);
     } else {
         var value_input = $("." + docName + "-" + triggeredFrom + "-Sapphire").val();
 
@@ -527,10 +549,10 @@ function generatePrevSapphireTable(Sapphire_table) {
     }
 }
 
-function generateWeekDropDown(){
+function generateWeekDropDown() {
     for (let i = 1; i <= 53; i++) {
-       $("#inputWeek").append(`<option value="${i}">${i}</option>`);
-      }
+        $("#inputWeek").append(`<option value="${i}">${i}</option>`);
+    }
 }
 
 function loadSettings() {
