@@ -524,6 +524,12 @@ function generatePrevSapphireTable(Sapphire_table) {
     }
 }
 
+function generateWeekDropDown(){
+    for (let i = 1; i <= 53; i++) {
+       $("#inputWeek").append(`<option value="${i}">${i}</option>`);
+      }
+}
+
 function loadSettings() {
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/settings/getSettings");
@@ -544,4 +550,5 @@ function loadSettings() {
     xhttp.send();
 }
 
+generateWeekDropDown();
 loadSettings();

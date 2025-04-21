@@ -17,7 +17,7 @@ router.get('/getRoster', requireAuth, async function (req, res) {
 
 router.post('/updateRoster', requireAuth, function (req, res) {
     const { day, time, irName } = req.body;
-    console.log(day, time, irName);
+    // console.log(day, time, irName);
     dbm.updateRoster(day, time, irName);
 });
 
