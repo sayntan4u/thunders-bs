@@ -445,3 +445,13 @@ select {
 .roster .has_data:hover {
     background-color: #bbbbf1 !important;
 }
+
+.btn-roster{
+    background: rgba(0, 188, 212, 0.4);
+    border: none;
+    color: black;
+}
+
+.btn-roster:hover{
+    background: #08e3ff;
+}
