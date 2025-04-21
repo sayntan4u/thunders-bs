@@ -902,7 +902,7 @@ function addConnection(startNode, endNode) {
             endNode: endNode.title
         }
     );
-    console.log(settingsJson.connections);
+    // console.log(settingsJson.connections);
 }
 
 function removeConnection(startNode) {
@@ -912,7 +912,7 @@ function removeConnection(startNode) {
             break;
         }
     }
-    console.log(settingsJson.connections);
+    // console.log(settingsJson.connections);
 }
 
 $("#saveConnections").click(function () {
