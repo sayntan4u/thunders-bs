@@ -4,7 +4,7 @@ function loadRoster() {
         url: '/roster/getRoster',
         type: 'GET',
         dataType: 'json',
-        success: function (data) {  
+        success: function (data) {
             generateRosterTable(data);
             $(".loading_roster").addClass("hide");
         },
@@ -38,8 +38,37 @@ function clearRoster() {
     });
 }
 
-function generateRosterTable(data) {
+function getWeekArray() {
     const weekArray = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+    //get today
+    const d = new Date();
+    const today = d.getDay();
+    const dayArray = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    // console.log(dayArray[today]);
+
+    var index = 0;
+
+    for (let i = 0; i < weekArray.length; i++) {
+        if (weekArray[i] == dayArray[today]) {
+            index = i;
+            break;
+        }
+    }
+    const arr1 = weekArray.slice(index);
+    const arr2 = weekArray.slice(0, index);
+
+    // console.log(arr1);
+    // console.log(arr2);
+
+    const arr3 = arr1.concat(arr2);
+
+    return arr3;
+
+}
+
+function generateRosterTable(data) {
+    const weekArray = getWeekArray();
     const timeArray = ['11AM', '1PM', '3PM', '5PM', '7PM'];
 
     //get today
