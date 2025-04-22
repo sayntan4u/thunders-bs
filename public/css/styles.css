@@ -447,15 +447,19 @@ select {
 }
 
 .btn-roster{
-    background: rgba(0, 188, 212, 0.4);
+    background: #d4b1f4;/*rgba(0, 188, 212, 0.4);*/
     border: none;
     color: black;
 }
 
 .btn-roster:hover{
-    background: #08e3ff;
+    background: #c89bf1;
 }
 
 .loading_roster .text-success{
     font-weight: bold !important;
+}
+
+.modal-header, .modal-footer{
+    border: none !important;
 }
