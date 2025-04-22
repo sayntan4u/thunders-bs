@@ -456,6 +456,6 @@ select {
     background: #08e3ff;
 }
 
-.roster text-success{
+.loading_roster .text-success{
     font-weight: bold !important;
 }
