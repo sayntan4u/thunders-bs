@@ -26,7 +26,11 @@ td, .middle{
 }
 
 .remarks{
-    min-width: 100px !important;
+    min-width: 200px !important;
+}
+
+.remarks-Sapphire{
+    min-width: 250px !important;
 }
 
 .card-title{
