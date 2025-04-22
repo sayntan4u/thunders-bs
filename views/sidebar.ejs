@@ -12,12 +12,12 @@
     </div>
 
     <ul class="list-unstyled components">
-        <!-- <li class="<%= (page=='dash')?'active':'' %>">
+        <li class="<%= (page=='dash')?'active':'' %>">
             <a href="/">
                 <i class="material-icons">dashboard</i>
                 <span>Dashboard</span>
             </a>
-        </li> -->
+        </li>
         <li class="<%= (page=='view')?'active':'' %>">
             <a href="/view">
                 <i class="material-icons">timeline</i>
@@ -40,6 +40,12 @@
             <a href="/closing">
                 <i class="material-icons">currency_rupee</i>
                 <span>Closings</span>
+            </a>
+        </li>
+        <li class="<%= (page=='agenda')?'active':'' %>">
+            <a href="/agenda">
+                <i class="material-icons">add_task</i>
+                <span>Agenda</span>
             </a>
         </li>
         <li class="<%= (page=='utilities')?'active':'' %>">

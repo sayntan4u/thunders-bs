@@ -41,8 +41,8 @@ const requireAuth = (req, res, next) => {
 // Routes will go here
 
 app.get('/', requireAuth, function (req, res) {
-  // res.render('dashboard', {userName : req.session.userId, page : 'dash'});
-  res.redirect("/view");
+  res.render('dashboard', {userName : req.session.userId, page : 'dash'});
+  // res.redirect("/view");
 });
 
 //getUserName
