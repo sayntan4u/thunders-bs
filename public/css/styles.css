@@ -455,3 +455,7 @@ select {
 .btn-roster:hover{
     background: #08e3ff;
 }
+
+.roster text-success{
+    font-weight: bold !important;
+}
