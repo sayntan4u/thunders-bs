@@ -3,11 +3,8 @@ const path = require('path');
 const session = require('express-session');
 const fs = require("fs");
 
-
 const app = express();
 const port = process.env.PORT || 8080;
-
-
 
 //Setup directories
 var dir = ['./backup', './public/legal', './uploads'];
@@ -41,8 +38,8 @@ const requireAuth = (req, res, next) => {
 // Routes will go here
 
 app.get('/', requireAuth, function (req, res) {
-  res.render('dashboard', {userName : req.session.userId, page : 'dash'});
-  // res.redirect("/view");
+  // res.render('dashboard', {userName : req.session.userId, page : 'dash'});
+  res.redirect("/agenda");
 });
 
 //getUserName
@@ -56,6 +53,11 @@ app.use('/roster', rosterRoute);
 //Login page
 const loginRoute = require('./router/login');
 app.use('/login', loginRoute);
+
+//Agenda page
+
+const agendaRoute = require('./router/agenda');
+app.use('/agenda', agendaRoute);
 
 //Activity page 
 const viewRoute = require('./router/view');

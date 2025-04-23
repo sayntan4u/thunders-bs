@@ -449,7 +449,7 @@ select {
 .btn-roster{
     background: #d4b1f4;/*rgba(0, 188, 212, 0.4);*/
     border: none;
-    color: black;
+    color: #343a40;
 }
 
 .btn-roster:hover{

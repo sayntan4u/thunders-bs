@@ -16,9 +16,11 @@
                                 <h4 class="mb-0 ms-3">Utilities</h4>
                                 <% } else if(page=='settings' ){ %>
                                     <h4 class="mb-0 ms-3">Settings</h4>
-                                    <% } else if(page=='closing' ){ %>
-                                        <h4 class="mb-0 ms-3">Closings</h4>
-                                        <% } %>
+                                    <% } else if(page=='agenda' ){ %>
+                                        <h4 class="mb-0 ms-3">Agenda</h4>
+                                        <% } else if(page=='closing' ){ %>
+                                            <h4 class="mb-0 ms-3">Closings</h4>
+                                            <% } %>
         </div>
         <div class="ms-auto">
             <span class="welcome-text me-3">Welcome, <%= userName %></span>
@@ -73,20 +75,20 @@
             <div class="modal-body">
                 <div class="loading_roster form-group">
                     <div class="d-flex align-items-center">
-                      <span class="text-success">Loading Roster...</span>
-                      &nbsp;
-                      <div class="spinner-border spinner-border-sm text-success" role="status">
+                        <span class="text-success">Loading Roster...</span>
+                        &nbsp;
+                        <div class="spinner-border spinner-border-sm text-success" role="status">
 
-                      </div>
+                        </div>
                     </div>
-                  </div>
+                </div>
                 <table class="roster table table-warning table-bordered table-sm text-center">
                     <thead class="roster-header">
                         <tr></tr>
-                       
+
                     </thead>
                     <tbody class="roster-body">
-                       
+
                     </tbody>
                 </table>
             </div>
