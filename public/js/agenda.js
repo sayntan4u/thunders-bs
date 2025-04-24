@@ -227,7 +227,7 @@ function loadAgendaFB() {
         tasks = response;
         loadAgendaList(response);
         loadCompletedAgendas(response);
-        $(".loading").addClass("hide");
+        $(".loading_agenda").addClass("hide");
         $(".tasks-container").removeClass("hide");
 
     }

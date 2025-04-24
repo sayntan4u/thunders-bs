@@ -4,6 +4,10 @@
     font-size: 16px !important;
 }
 
+.loading_agenda .spinner-border{
+    color : #d3d3d3 !important;
+}
+
 .task{
     min-height: 45px;
 }
