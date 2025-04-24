@@ -46,7 +46,7 @@ $(document).on("click", ".tasks .btn-delete", function () {
 $(document).on("click", ".completion_alerts .btn-undo", function () {
     const id = $(this).parent().siblings(".task_id").html();
     const task = $(this).parent().siblings(".task_content").html();
-    addAgendaUI(task,id);
+    addAgendaUI(task, id);
     updateConfirmAgendaFB(id, "", false);
     updateTaskCount("Add");
     $(this).parent().parent().parent().remove();
@@ -57,21 +57,21 @@ var tasksCount = 0;
 
 //Task count
 
-function updateTaskCount(type="Update") {
-    if(type == "Add"){
+function updateTaskCount(type = "Update") {
+    if (type == "Add") {
         tasksCount++;
-    }else if(type == "Update"){
-       //do nothing
-    }else{
+    } else if (type == "Update") {
+        //do nothing
+    } else {
         tasksCount--;
     }
 
-    if(tasksCount>1){
+    if (tasksCount > 1) {
         $(".task_count").html(tasksCount.toString() + " tasks");
-    }else{
+    } else {
         $(".task_count").html(tasksCount.toString() + " task");
     }
-    
+
 }
 
 
@@ -183,7 +183,7 @@ function checkKeyUpdateAgenda(e, elem) {
     const task = $(elem).val();
     if (task != "") {
         if (e.key === 'Enter' || e.keyCode === 13) {
-            const id =  $(elem).parent().parent().siblings(".task").children(".task_id").html();
+            const id = $(elem).parent().parent().siblings(".task").children(".task_id").html();
             updateAgendaFB(task, id);
             $(elem).parent().parent().siblings(".task").children(".task_content").html(task);
             $(elem).parent().parent().addClass("hide");
@@ -249,7 +249,7 @@ function loadAgendaList(data) {
 }
 
 function addAgendaFB(task, id) {
-    const data = { task: task , id: id};
+    const data = { task: task, id: id };
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/agenda/addAgenda");
     xhttp.setRequestHeader('Content-Type', 'application/json');
@@ -258,7 +258,7 @@ function addAgendaFB(task, id) {
 }
 
 function updateAgendaFB(task, id) {
-    const data = { task: task , id: id};
+    const data = { task: task, id: id };
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/agenda/updateAgenda");
     xhttp.setRequestHeader('Content-Type', 'application/json');
@@ -266,22 +266,22 @@ function updateAgendaFB(task, id) {
 }
 
 function deleteAgendaFB(id) {
-    const data = {id: id};
+    const data = { id: id };
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/agenda/deleteAgenda");
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
 }
 
-function updateConfirmAgendaFB(id, time, isCompleted=true){
-    const data = { id: id , time: time, isCompleted: isCompleted };
+function updateConfirmAgendaFB(id, time, isCompleted = true) {
+    const data = { id: id, time: time, isCompleted: isCompleted };
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/agenda/updateConfirmAgenda");
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
 }
 
-function loadCompletedAgendas(data){
+function loadCompletedAgendas(data) {
     for (let i = 0; i < data.length; i++) {
         if (data[i].isCompleted) {
             addCompletedNotification(data[i].id, data[i].task, data[i].time);
@@ -289,4 +289,17 @@ function loadCompletedAgendas(data){
     }
 }
 
+function getToday() {
+    const date = new Date();
+
+    let day = date.getDate();
+    let month = date.getMonth() + 1;
+    let year = date.getFullYear();
+
+    // This arrangement can be altered based on how we want the date's format to appear.
+    let currentDate = `${day}-${month}-${year}`;
+    $(".date").html(currentDate);
+}
+
+getToday();
 loadAgendaFB();
