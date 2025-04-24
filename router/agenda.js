@@ -10,8 +10,8 @@ const requireAuth = (req, res, next) => {
     }
 }
 
-router.get('/', requireAuth, async function (req,res){
-    res.render('agenda', {userName : req.session.userId, page : 'agenda'});
+router.get('/', requireAuth, async function (req, res) {
+    res.render('agenda', { userName: req.session.userId, page: 'agenda' });
 });
 
 router.post('/getAgendas', requireAuth, async function (req, res) {
@@ -29,6 +29,14 @@ router.post('/updateAgenda', requireAuth, async function (req, res) {
     const task = req.body.task;
     const id = req.body.id;
     dbm.updateAgenda(task, id);
+});
+
+router.post('/updateConfirmAgenda', requireAuth, async function (req, res) {
+    const time = req.body.time;
+    const id = req.body.id;
+    const isCompleted = req.body.isCompleted;
+    
+    dbm.updateAgenda("", id, isCompleted, time);
 });
 
 router.post('/deleteAgenda', requireAuth, async function (req, res) {

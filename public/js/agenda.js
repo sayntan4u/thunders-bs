@@ -19,7 +19,10 @@ $(document).on("click", ".tasks .btn-checkbox", function () {
     else {
         $(this).children(".material-icons").html("check_box");
     }
-    addCompletedNotification($(this).siblings("span").html());
+    updateTaskCount("Delete");
+    const dt = new Date();
+    updateConfirmAgendaFB($(this).siblings(".task_id").html(), dt.timeNow())
+    addCompletedNotification($(this).siblings(".task_id").html(), $(this).siblings("span").html(), dt.timeNow());
     $(this).parent().parent().remove();
 
 });
@@ -38,6 +41,15 @@ $(document).on("click", ".tasks .btn-delete", function () {
     deleteAgendaFB(id);
     $(this).parent().parent().parent().remove();
     updateTaskCount("Delete");
+});
+
+$(document).on("click", ".completion_alerts .btn-undo", function () {
+    const id = $(this).parent().siblings(".task_id").html();
+    const task = $(this).parent().siblings(".task_content").html();
+    addAgendaUI(task,id);
+    updateConfirmAgendaFB(id, "", false);
+    updateTaskCount("Add");
+    $(this).parent().parent().parent().remove();
 });
 
 var tasks = [];
@@ -65,15 +77,16 @@ function updateTaskCount(type="Update") {
 
 //Notifications
 
-function addCompletedNotification(task) {
-    var newDate = new Date();
+function addCompletedNotification(id, task, time) {
     $(".completion_alerts").append(`
         <div class="card bg-success-subtle text-success-emphasis border border-success-subtle">
                                         <div class="card-body">
-                                          <span><strong>Completed</strong> ${task}</span>
+                                          <strong>Completed</strong>
+                                          <span class="task_content">${task}</span>
+                                          <span class="task_id hide">${id}</span>
                                           <div class="d-flex justify-content-between align-items-center">    
-                                            <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis">${newDate.timeNow()}</span>
-                                            <button class="btn btn-sm btn-success"><i class="material-icons">undo</i></button>
+                                            <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis">${time}</span>
+                                            <button class="btn btn-sm btn-success btn-undo"><i class="material-icons">undo</i></button>
                                           </div>
                                         </div>
                                     </div>
@@ -212,9 +225,8 @@ function loadAgendaFB() {
     xhttp.onload = function () {
         const response = JSON.parse(this.responseText);
         tasks = response;
-        tasksCount = response.length;
-        updateTaskCount();
         loadAgendaList(response);
+        loadCompletedAgendas(response);
         $(".loading").addClass("hide");
         $(".tasks-container").removeClass("hide");
 
@@ -224,11 +236,16 @@ function loadAgendaFB() {
 }
 
 function loadAgendaList(data) {
+    var count = 0;
     for (let i = 0; i < data.length; i++) {
         if (!data[i].isCompleted) {
             addAgendaUI(data[i].task, data[i].id);
+            count++;
         }
     }
+    tasksCount = count;
+    updateTaskCount();
+
 }
 
 function addAgendaFB(task, id) {
@@ -254,6 +271,22 @@ function deleteAgendaFB(id) {
     xhttp.open("POST", "/agenda/deleteAgenda");
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(data));
+}
+
+function updateConfirmAgendaFB(id, time, isCompleted=true){
+    const data = { id: id , time: time, isCompleted: isCompleted };
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/agenda/updateConfirmAgenda");
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send(JSON.stringify(data));
+}
+
+function loadCompletedAgendas(data){
+    for (let i = 0; i < data.length; i++) {
+        if (data[i].isCompleted) {
+            addCompletedNotification(data[i].id, data[i].task, data[i].time);
+        }
+    }
 }
 
 loadAgendaFB();
