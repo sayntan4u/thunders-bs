@@ -29,62 +29,41 @@
                                 <div class="task_manager">
                                     <p class="h4">Today</p>
 
-                                    <span class="task_count">3 tasks</span> 
-
-                                    <div class="tasks">
-                                        <div>
-                                            <div class="card update-card hide">
+                                    <span class="task_count">0 tasks</span> 
+                                    
+                                    <!-- <div class="loading card bg-primary-subtle text-primary-emphasis mt-2">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-center">
+                                                <div class="spinner-border" role="status">
+                                                </div>    
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                    <div class="tasks-container hide">
+                                        <div class="tasks">
+                                        
+                                        </div>
+                                        <div class="controls">
+                                            <button class="btn bg-danger-subtle text-danger-emphasis btn_add_agenda"
+                                                onclick="showEditCard(this)"><i class="fa-solid fa-plus"></i> Add
+                                                agenda</button>
+                                            <div class="card edit-card hide">
                                                 <div class="card-body">
-                                                    <input type="text" class="form-control input-task"
+                                                    <input type="text" id="addAgendaTextBox" class="form-control input-task"
                                                         placeholder="to add new agenda click here.."
-                                                        onkeydown="valueChangedUpdateAgenda(this)" onkeyup="checkKeyUpdateAgenda(event, this)"/>
+                                                        onkeydown="valueChangedNewAgenda(this)" onkeyup="checkKeyNewAgenda(event, this)"/>
                                                     <div class="float-end controls-edit">
                                                         <button class="btn bg-secondary-subtle text-secondary-emphasis"
-                                                            onclick="hideUpdateCard(this)">Cancel</button>
-                                                        <button
-                                                            class="btn bg-danger-subtle text-danger-emphasis btn-update"
-                                                            onclick="updateAgenda(this)">Update</button>
+                                                            onclick="hideEditCard()">Cancel</button>
+                                                        <button id="btnAddAgenda"
+                                                            class="btn bg-danger-subtle text-danger-emphasis disabled">Add
+                                                            agenda</button>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="task align-middle">
-                                                <a class="btn btn-drag text-muted"><i
-                                                        class="material-icons">drag_indicator</i></a>
-                                                <a href="#" class="btn btn-checkbox"><i
-                                                        class="material-icons">check_box_outline_blank</i></a>
-                                                <span>Task 1</span>
-                                                <div class="float-end">
-                                                    <a class="btn btn-edit text-muted"><i
-                                                            class="material-icons">edit_note</i></a>
-                                                    <a class="btn btn-delete text-muted"><i
-                                                            class="material-icons">delete_forever</i></a>
-                                                </div>
-                                            </div>
-                                            <hr>
-                                        </div>
-                                        
-                                       
-
-                                    </div>
-                                    <div>
-                                        <button class="btn bg-danger-subtle text-danger-emphasis btn_add_agenda"
-                                            onclick="showEditCard(this)"><i class="fa-solid fa-plus"></i> Add
-                                            agenda</button>
-                                        <div class="card edit-card hide">
-                                            <div class="card-body">
-                                                <input type="text" id="addAgendaTextBox" class="form-control input-task"
-                                                    placeholder="to add new agenda click here.."
-                                                    onkeydown="valueChangedNewAgenda(this)" onkeyup="checkKeyNewAgenda(event, this)"/>
-                                                <div class="float-end controls-edit">
-                                                    <button class="btn bg-secondary-subtle text-secondary-emphasis"
-                                                        onclick="hideEditCard()">Cancel</button>
-                                                    <button id="btnAddAgenda"
-                                                        class="btn bg-danger-subtle text-danger-emphasis disabled">Add
-                                                        agenda</button>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
+                                    
 
 
                                 </div>
@@ -112,43 +91,10 @@
                                     </div>
                                 </div>
                                 <p class="text-center status_text"><i class="material-icons">task_alt</i> Completed</p>
+                                
                                 <div class="completion_alerts">
-                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            fill="currentColor"
-                                            class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2"
-                                            viewBox="0 0 16 16" role="img" aria-label="Warning:">
-                                            <path
-                                                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-                                        </svg>
-                                        <strong>Completed</strong> Task 2
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                            aria-label="Close"></button>
-                                    </div>
-                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            fill="currentColor"
-                                            class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2"
-                                            viewBox="0 0 16 16" role="img" aria-label="Warning:">
-                                            <path
-                                                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-                                        </svg>
-                                        <strong>Completed</strong> Task 2
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                            aria-label="Close"></button>
-                                    </div>
-                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            fill="currentColor"
-                                            class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2"
-                                            viewBox="0 0 16 16" role="img" aria-label="Warning:">
-                                            <path
-                                                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-                                        </svg>
-                                        <strong>Completed</strong> Task 2
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                            aria-label="Close"></button>
-                                    </div>
+                                    
+                                   
                                 </div>
 
 

@@ -14,19 +14,26 @@ router.get('/', requireAuth, async function (req,res){
     res.render('agenda', {userName : req.session.userId, page : 'agenda'});
 });
 
-// router.get('/getRoster', requireAuth, async function (req, res) {
-//     const data = await dbm.getRosterData();
-//     res.send(data);
-// });
+router.post('/getAgendas', requireAuth, async function (req, res) {
+    const data = await dbm.getAgendas();
+    res.send(data);
+});
 
-// router.post('/updateRoster', requireAuth, function (req, res) {
-//     const { day, time, irName } = req.body;
-//     // console.log(day, time, irName);
-//     dbm.updateRoster(day, time, irName);
-// });
+router.post('/addAgenda', requireAuth, async function (req, res) {
+    const task = req.body.task;
+    const id = req.body.id;
+    dbm.addAgenda(task, id);
+});
 
-// router.post('/clearRoster', requireAuth, function (req, res) {
-//     dbm.clearRoster();
-// });
+router.post('/updateAgenda', requireAuth, async function (req, res) {
+    const task = req.body.task;
+    const id = req.body.id;
+    dbm.updateAgenda(task, id);
+});
+
+router.post('/deleteAgenda', requireAuth, async function (req, res) {
+    const id = req.body.id;
+    dbm.deleteAgenda(id);
+});
 
 module.exports = router;
