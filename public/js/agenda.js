@@ -11,6 +11,22 @@ $("#btnAddAgenda").click(function () {
     hideEditCard();
 });
 
+$("#deleteAgendaBtn").click(function(){
+    const id = $(this).parent().siblings(".modal-body").children("p").children(".task_id").html();
+    deleteAgendaFB(id);
+    deleteAgendaUI(id);
+    updateTaskCount("Delete");
+});
+
+function deleteAgendaUI(id){
+    // console.log(id);
+    $(".tasks").children().each(function(){
+       if($(this).children(".task").children(".task_id").html() == id){
+        $(this).remove();
+       }
+    });
+}
+
 
 $(document).on("click", ".tasks .btn-checkbox", function () {
     if ($(this).children(".material-icons").html() == "check_box") {
@@ -37,10 +53,10 @@ $(document).on("click", ".tasks .btn-edit", function () {
 });
 
 $(document).on("click", ".tasks .btn-delete", function () {
-    const id = $(this).parent().siblings(".task_id").html();
-    deleteAgendaFB(id);
-    $(this).parent().parent().parent().remove();
-    updateTaskCount("Delete");
+    // const id = $(this).parent().siblings(".task_id").html();
+    // deleteAgendaFB(id);
+    // $(this).parent().parent().parent().remove();
+    // updateTaskCount("Delete");
 });
 
 $(document).on("click", ".completion_alerts .btn-undo", function () {
@@ -51,6 +67,28 @@ $(document).on("click", ".completion_alerts .btn-undo", function () {
     updateTaskCount("Add");
     $(this).parent().parent().parent().remove();
 });
+
+//Delete Agenda Modal
+const deleteAgendaModal = document.getElementById('deleteAgendaModal')
+if (deleteAgendaModal) {
+    deleteAgendaModal.addEventListener('show.bs.modal', event => {
+    // Button that triggered the modal
+    const button = event.relatedTarget;
+    // Extract info from data-bs-* attributes
+    const id = button.getAttribute('data-bs-id');
+    const task = button.getAttribute('data-bs-task');
+    // If necessary, you could initiate an Ajax request here
+    // and then do the updating in a callback.
+    console.log(id);
+    console.log(task);
+    // Update the modal's content.
+    const task_content = deleteAgendaModal.querySelector('.modal-body .task_content');
+    const task_id = deleteAgendaModal.querySelector('.modal-body .task_id');
+
+    task_content.textContent = task;
+    task_id.textContent = id;
+  })
+}
 
 var tasks = [];
 var tasksCount = 0;
@@ -74,7 +112,6 @@ function updateTaskCount(type = "Update") {
 
 }
 
-
 //Notifications
 
 function addCompletedNotification(id, task, time) {
@@ -92,7 +129,6 @@ function addCompletedNotification(id, task, time) {
                                     </div>
         `);
 }
-
 
 //Edit card functions
 function showEditCard(elem) {
@@ -162,7 +198,7 @@ function addAgendaUI(task, id) {
                                                 <div class="float-end">
                                                     <a class="btn btn-edit text-muted"><i
                                                             class="material-icons">edit_note</i></a>
-                                                    <a class="btn btn-delete text-muted"><i
+                                                    <a class="btn btn-delete text-muted" data-bs-toggle="modal" data-bs-target="#deleteAgendaModal" data-bs-id="${id}" data-bs-task="${task}"><i
                                                             class="material-icons">delete_forever</i></a>
                                                 </div>
                                             </div>

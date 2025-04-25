@@ -75,3 +75,7 @@
 .status_text{
     color:#949494;
 }
+
+#deleteAgendaModal .task_content{
+    font-weight: bold;
+}
