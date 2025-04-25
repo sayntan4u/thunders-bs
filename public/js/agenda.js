@@ -55,7 +55,8 @@ $(document).on("click", ".tasks .btn-edit", function () {
 
 $(document).on("click", ".completion_alerts .btn-undo", function () {
     const id = $(this).parent().siblings(".task_id").html();
-    const task = $(this).parent().siblings(".task_content").html();
+    const task = $(this).parent().siblings("strong").children(".task_content").html();
+
     addAgendaUI(task, id);
     updateConfirmAgendaFB(id, "", false);
     updateTaskCount("Add");
@@ -250,6 +251,7 @@ function updateAgenda(elem, id) {
 //Firebase functions
 
 function loadAgendaFB() {
+    const data = {date : getToday()};
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/agenda/getAgendas");
     xhttp.onload = function () {
@@ -262,7 +264,7 @@ function loadAgendaFB() {
 
     }
     xhttp.setRequestHeader('Content-Type', 'application/json');
-    xhttp.send();
+    xhttp.send(JSON.stringify(data));
 }
 
 function loadAgendaList(data) {
@@ -279,7 +281,7 @@ function loadAgendaList(data) {
 }
 
 function addAgendaFB(task, id) {
-    const data = { task: task, id: id };
+    const data = { task: task, id: id, date : getToday() };
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/agenda/addAgenda");
     xhttp.setRequestHeader('Content-Type', 'application/json');
@@ -288,7 +290,7 @@ function addAgendaFB(task, id) {
 }
 
 function updateAgendaFB(task, id) {
-    const data = { task: task, id: id };
+    const data = { task: task, id: id, date : getToday()};
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/agenda/updateAgenda");
     xhttp.setRequestHeader('Content-Type', 'application/json');
@@ -296,7 +298,7 @@ function updateAgendaFB(task, id) {
 }
 
 function deleteAgendaFB(id) {
-    const data = { id: id };
+    const data = { id: id ,date : getToday()};
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/agenda/deleteAgenda");
     xhttp.setRequestHeader('Content-Type', 'application/json');
@@ -304,7 +306,7 @@ function deleteAgendaFB(id) {
 }
 
 function updateConfirmAgendaFB(id, time, isCompleted = true) {
-    const data = { id: id, time: time, isCompleted: isCompleted };
+    const data = { id: id, time: time, isCompleted: isCompleted , date : getToday()};
     const xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/agenda/updateConfirmAgenda");
     xhttp.setRequestHeader('Content-Type', 'application/json');
@@ -319,7 +321,7 @@ function loadCompletedAgendas(data) {
     }
 }
 
-function getToday() {
+function setToday() {
     const date = new Date();
 
     let day = date.getDate();
@@ -329,6 +331,18 @@ function getToday() {
     // This arrangement can be altered based on how we want the date's format to appear.
     let currentDate = `${day}-${month}-${year}`;
     $(".date").html(currentDate);
+}
+
+function getToday(){
+    const date = new Date();
+
+    let day = date.getDate();
+    let month = date.getMonth() + 1;
+    let year = date.getFullYear();
+
+    // This arrangement can be altered based on how we want the date's format to appear.
+    let currentDate = `${day}-${month}-${year}`;
+    return currentDate;
 }
 
 function loadPlanRoster(){
@@ -355,6 +369,6 @@ function generatePlanRosterUI(data){
     $('#plan7PM').html(data[0].data["7PM"]);
 }
 
-getToday();
+setToday();
 loadAgendaFB();
 loadPlanRoster();
