@@ -52,12 +52,6 @@ $(document).on("click", ".tasks .btn-edit", function () {
     $(this).parent().parent().siblings(".update-card").children(".card-body").children(".input-task").focus();
 });
 
-$(document).on("click", ".tasks .btn-delete", function () {
-    // const id = $(this).parent().siblings(".task_id").html();
-    // deleteAgendaFB(id);
-    // $(this).parent().parent().parent().remove();
-    // updateTaskCount("Delete");
-});
 
 $(document).on("click", ".completion_alerts .btn-undo", function () {
     const id = $(this).parent().siblings(".task_id").html();
@@ -118,8 +112,8 @@ function addCompletedNotification(id, task, time) {
     $(".completion_alerts").append(`
         <div class="card bg-success-subtle text-success-emphasis border border-success-subtle">
                                         <div class="card-body">
-                                          <strong>Completed</strong>
-                                          <span class="task_content">${task}</span>
+                                          <i class="material-icons">task_alt</i> Completed task
+                                          <strong><span class="task_content">${task}</span></strong>
                                           <span class="task_id hide">${id}</span>
                                           <div class="d-flex justify-content-between align-items-center">    
                                             <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis">${time}</span>
@@ -337,5 +331,30 @@ function getToday() {
     $(".date").html(currentDate);
 }
 
+function loadPlanRoster(){
+    $.ajax({
+        url: '/roster/getRoster',
+        type: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            generatePlanRosterUI(data);
+            $('.slots_plan').removeClass('hide');
+            $(".loading_roster_agenda").addClass("hide");
+        },
+        error: function (xhr, status, error) {
+            console.error('Error loading roster:', error);
+        }
+    });
+}
+
+function generatePlanRosterUI(data){
+    $('#plan11AM').html(data[0].data["11AM"]);
+    $('#plan1PM').html(data[0].data["1PM"]);
+    $('#plan3PM').html(data[0].data["3PM"]);
+    $('#plan5PM').html(data[0].data["5PM"]);
+    $('#plan7PM').html(data[0].data["7PM"]);
+}
+
 getToday();
 loadAgendaFB();
+loadPlanRoster();
