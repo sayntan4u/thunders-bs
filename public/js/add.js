@@ -107,22 +107,22 @@ function generateNamesTable(response, group = "SKB") {
                     <td>${response[i].name}</td>
                     <td class="namelist_container">
                     
-                    <div class="row g-3">
+                    <div class="row g-3 align-items-center">
                         <div class="col-auto">
                         <a href="${response[i].namelist == "" ? "#" : response[i].namelist}" id="${response[i].name}-link" target="_blank" class=${response[i].namelist == "" ? "text-danger" : "text-success"}>${response[i].name}'s Namelist</a>
                            <input class="form-control hide" type="text" id="${response[i].name}-text"/> 
                         </div>
                         <div class="col-auto">
-                            <button id="${response[i].name}-btnCancel" class="btn btn-info btn-sm hide" onclick="cancel_edit('${response[i].name}')"><i class="fa-solid fa-xmark"></i></button>
+                            <button id="${response[i].name}-btnCancel" class="btn bg-info-subtle text-info-emphasis btn-sm hide" onclick="cancel_edit('${response[i].name}')"><i class="fa-solid fa-xmark"></i></button>
                         </div>
                         <div class="col-auto">
-                            <button id="${response[i].name}-btn" class="btn btn-info btn-sm" onclick="show_editText('${response[i].name}')"><i class="fa-solid fa-pen"></i></button>
+                            <button id="${response[i].name}-btn" class="btn bg-info-subtle text-info-emphasis btn-sm" onclick="show_editText('${response[i].name}')"><i class="fa-solid fa-pen"></i></button>
                         </div>
                     </div>
                     </td>
                     <td><b>${group}</b></td>
                     <td>
-                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteMemberModal" data-bs-name='${response[i].name}' data-bs-group = "SKB">Delete Person</button>
+                        <button class="btn bg-danger-subtle text-danger-emphasis" data-bs-toggle="modal" data-bs-target="#deleteMemberModal" data-bs-name='${response[i].name}' data-bs-group = "SKB">Delete Person</button>
                     </td>
                 </tr>
                     `);

@@ -79,3 +79,7 @@
 #deleteAgendaModal .task_content{
     font-weight: bold;
 }
+
+.slots_plan{
+    margin-left: 15px;
+}
