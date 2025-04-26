@@ -15,7 +15,9 @@ $("#btnAddAgenda").click(function () {
   const task = $("#addAgendaTextBox").val();
   const id = Date.now();
   // console.log(id);
-  addAgendaFB(task, id);
+  const date = $(".date").html();
+
+  addAgendaFB(task, id, date);
   addAgendaUI(task, id);
   hideEditCard();
 });
@@ -24,14 +26,20 @@ $("#btnAddAgenda").click(function () {
 $(".btn-back").click(function () {
   const today = $(".date").html();
   const yesterday = getYesterday(today);
+  const day = getDay(yesterday);
+  $(".day").html(day);
   $(".date").html(yesterday);
+  loadAgendaFB(yesterday);
 });
 
-//checvron forward
+//chevron forward
 $(".btn-forward").click(function () {
   const today = $(".date").html();
-  const yesterday = getTommorrow(today);
-  $(".date").html(yesterday);
+  const tommorrow = getTommorrow(today);
+  const day = getDay(tommorrow);
+  $(".day").html(day);
+  $(".date").html(tommorrow);
+  loadAgendaFB(tommorrow);
 });
 
 $("#deleteAgendaBtn").click(function () {
@@ -41,7 +49,8 @@ $("#deleteAgendaBtn").click(function () {
     .children("p")
     .children(".task_id")
     .html();
-  deleteAgendaFB(id);
+  const date = $(".date").html();
+  deleteAgendaFB(id, date);
   deleteAgendaUI(id);
   updateTaskCount("Delete");
 });
@@ -64,12 +73,16 @@ $(document).on("click", ".tasks .btn-checkbox", function () {
     $(this).children(".material-icons").html("check_box");
   }
   updateTaskCount("Delete");
-  const dt = new Date();
-  updateConfirmAgendaFB($(this).siblings(".task_id").html(), dt.timeNow());
+  const date = $(".date").html();
+  updateConfirmAgendaFB(
+    $(this).siblings(".task_id").html(),
+    moment().format("LT"),
+    date
+  );
   addCompletedNotification(
     $(this).siblings(".task_id").html(),
     $(this).siblings("span").html(),
-    dt.timeNow()
+    moment().format("LT")
   );
   $(this).parent().parent().remove();
 });
@@ -103,8 +116,10 @@ $(document).on("click", ".completion_alerts .btn-undo", function () {
     .children(".task_content")
     .html();
 
+  const date = $(".date").html();
+
   addAgendaUI(task, id);
-  updateConfirmAgendaFB(id, "", false);
+  updateConfirmAgendaFB(id, "", date, false);
   updateTaskCount("Add");
   $(this).parent().parent().parent().remove();
 });
@@ -203,7 +218,8 @@ function checkKeyNewAgenda(e, elem) {
     if (e.key === "Enter" || e.keyCode === 13) {
       const id = Date.now();
       // console.log(id);
-      addAgendaFB(task, id);
+      const date = $(".date").html();
+      addAgendaFB(task, id, date);
       addAgendaUI(task, id);
       hideEditCard();
     }
@@ -263,7 +279,8 @@ function checkKeyUpdateAgenda(e, elem) {
         .siblings(".task")
         .children(".task_id")
         .html();
-      updateAgendaFB(task, id);
+      const date = $(".date").html();
+      updateAgendaFB(task, id, date);
       $(elem)
         .parent()
         .parent()
@@ -292,7 +309,8 @@ function valueChangedUpdateAgenda(elem) {
 
 function updateAgenda(elem, id) {
   const task = $(elem).parent().siblings(".input-task").val();
-  updateAgendaFB(task, id);
+  const date = $(".date").html();
+  updateAgendaFB(task, id, date);
   // console.log(val);
   $(elem)
     .parent()
@@ -307,8 +325,22 @@ function updateAgenda(elem, id) {
 
 //Firebase functions
 
-function loadAgendaFB() {
-  const data = { date: getToday() };
+function loadAgendaFB(date = "") {
+  $(".loading_agenda").removeClass("hide");
+  $(".tasks-container").addClass("hide");
+
+  //UI clear containers for task and completions
+  $(".tasks").html("");
+  $(".completion_alerts").html("");
+
+  var data;
+
+  if (date == "") {
+    data = { date: getToday() };
+  } else {
+    data = { date: date };
+  }
+
   const xhttp = new XMLHttpRequest();
   xhttp.open("POST", "/agenda/getAgendas");
   xhttp.onload = function () {
@@ -335,8 +367,8 @@ function loadAgendaList(data) {
   updateTaskCount();
 }
 
-function addAgendaFB(task, id) {
-  const data = { task: task, id: id, date: getToday() };
+function addAgendaFB(task, id, date) {
+  const data = { task: task, id: id, date: date };
   const xhttp = new XMLHttpRequest();
   xhttp.open("POST", "/agenda/addAgenda");
   xhttp.setRequestHeader("Content-Type", "application/json");
@@ -344,28 +376,28 @@ function addAgendaFB(task, id) {
   updateTaskCount("Add");
 }
 
-function updateAgendaFB(task, id) {
-  const data = { task: task, id: id, date: getToday() };
+function updateAgendaFB(task, id, date) {
+  const data = { task: task, id: id, date: date };
   const xhttp = new XMLHttpRequest();
   xhttp.open("POST", "/agenda/updateAgenda");
   xhttp.setRequestHeader("Content-Type", "application/json");
   xhttp.send(JSON.stringify(data));
 }
 
-function deleteAgendaFB(id) {
-  const data = { id: id, date: getToday() };
+function deleteAgendaFB(id, date) {
+  const data = { id: id, date: date };
   const xhttp = new XMLHttpRequest();
   xhttp.open("POST", "/agenda/deleteAgenda");
   xhttp.setRequestHeader("Content-Type", "application/json");
   xhttp.send(JSON.stringify(data));
 }
 
-function updateConfirmAgendaFB(id, time, isCompleted = true) {
+function updateConfirmAgendaFB(id, time, date, isCompleted = true) {
   const data = {
     id: id,
     time: time,
     isCompleted: isCompleted,
-    date: getToday(),
+    date: date,
   };
   const xhttp = new XMLHttpRequest();
   xhttp.open("POST", "/agenda/updateConfirmAgenda");
@@ -382,35 +414,35 @@ function loadCompletedAgendas(data) {
 }
 
 function setToday() {
-  const date = new Date();
-
-  let day = date.getDate();
-  let month = date.getMonth() + 1;
-  let year = date.getFullYear();
-
-  // This arrangement can be altered based on how we want the date's format to appear.
-  let currentDate = `${day}-${month}-${year}`;
-  $(".date").html(currentDate);
+  const date = getToday();
+  $(".date").html(date);
+  const day = getDay(date);
+  $(".day").html(day);
 }
 
 function getToday() {
-  const date = new Date();
+  return moment().format("DD-MM-YYYY");
+}
 
-  let day = date.getDate();
-  let month = date.getMonth() + 1;
-  let year = date.getFullYear();
-
-  // This arrangement can be altered based on how we want the date's format to appear.
-  let currentDate = `${day}-${month}-${year}`;
-  return currentDate;
+function getDay(date){
+  if(date == moment().format("DD-MM-YYYY")){
+    return "Today";
+  }else if(date == moment().subtract(1, "days").format("DD-MM-YYYY")){
+    return "Yesterday";
+  }else if(date == moment().add(1, "days").format("DD-MM-YYYY")){
+    return "Tommorrow";
+  }else{
+    return moment(date, "DD-MM-YYYY").format('dddd');
+  }
+  
 }
 
 function getYesterday(dt) {
-  return moment(dt, "D-M-YYYY").subtract(1, "days").format("D-M-YYYY");
+  return moment(dt, "DD-MM-YYYY").subtract(1, "days").format("DD-MM-YYYY");
 }
 
 function getTommorrow(dt) {
-  return moment(dt, "D-M-YYYY").add(1, "days").format("D-M-YYYY");
+  return moment(dt, "DD-MM-YYYY").add(1, "days").format("DD-MM-YYYY");
 }
 
 function loadPlanRoster() {
