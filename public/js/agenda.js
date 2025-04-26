@@ -24,6 +24,9 @@ $("#btnAddAgenda").click(function () {
 
 //chevron back
 $(".btn-back").click(function () {
+  $(".btn-back").prop('disabled', true);
+  $(".btn-forward").prop('disabled', true);
+
   const today = $(".date").html();
   const yesterday = getYesterday(today);
   const day = getDay(yesterday);
@@ -34,6 +37,9 @@ $(".btn-back").click(function () {
 
 //chevron forward
 $(".btn-forward").click(function () {
+  $(".btn-back").prop('disabled', true);
+  $(".btn-forward").prop('disabled', true);
+
   const today = $(".date").html();
   const tommorrow = getTommorrow(today);
   const day = getDay(tommorrow);
@@ -345,6 +351,8 @@ function loadAgendaFB(date = "") {
   const xhttp = new XMLHttpRequest();
   xhttp.open("POST", "/agenda/getAgendas");
   xhttp.onload = function () {
+    $(".btn-back").prop('disabled', false);
+    $(".btn-forward").prop('disabled', false);
     const response = JSON.parse(this.responseText);
     tasks = response;
     loadAgendaList(response);
@@ -425,17 +433,17 @@ function getToday() {
   return moment().format("DD-MM-YYYY");
 }
 
-function getDay(date){
-  if(date == moment().format("DD-MM-YYYY")){
+function getDay(date) {
+  if (date == moment().format("DD-MM-YYYY")) {
     return "Today";
-  }else if(date == moment().subtract(1, "days").format("DD-MM-YYYY")){
+  } else if (date == moment().subtract(1, "days").format("DD-MM-YYYY")) {
     return "Yesterday";
-  }else if(date == moment().add(1, "days").format("DD-MM-YYYY")){
+  } else if (date == moment().add(1, "days").format("DD-MM-YYYY")) {
     return "Tommorrow";
-  }else{
+  } else {
     return moment(date, "DD-MM-YYYY").format('dddd');
   }
-  
+
 }
 
 function getYesterday(dt) {
