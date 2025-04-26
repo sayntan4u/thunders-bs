@@ -39,11 +39,10 @@
     background-color: #f8d7da !important;
 }
 
-.task .btn-drag:hover, .task .btn-edit:hover{
-    background-color: #e0e0e0;
-}
+/* .task .btn-drag:hover, */
 
-.task .btn-drag:hover, .task .btn-edit:hover{
+ .task .btn-edit:hover{
+    background-color: #e0e0e0;
     color:#212529 !important;
 }
 
@@ -82,4 +81,8 @@
 
 .slots_plan{
     margin-left: 15px;
+}
+
+.completion_alert{
+    font-size: 15px;
 }

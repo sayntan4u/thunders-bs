@@ -187,7 +187,7 @@ function updateTaskCount(type = "Update") {
 
 function addCompletedNotification(id, task, time) {
   $(".completion_alerts").append(`
-        <div class="card bg-success-subtle text-success-emphasis border border-success-subtle">
+        <div class="card completion_alert bg-success-subtle text-success-emphasis border border-success-subtle">
                                         <div class="card-body">
                                           <i class="material-icons">task_alt</i> Completed task
                                           <strong><span class="task_content">${task}</span></strong>
