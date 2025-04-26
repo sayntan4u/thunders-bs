@@ -328,6 +328,7 @@ function updateAgenda(elem, id) {
 function loadAgendaFB(date = "") {
   $(".loading_agenda").removeClass("hide");
   $(".tasks-container").addClass("hide");
+  $(".task_count").html("0 tasks");
 
   //UI clear containers for task and completions
   $(".tasks").html("");

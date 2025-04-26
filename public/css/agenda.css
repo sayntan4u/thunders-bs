@@ -5,7 +5,7 @@
 }
 
 .loading_agenda .spinner-border{
-    color : #ededed !important;
+    color : #e0e0e0 !important;
 }
 
 .task{
@@ -31,7 +31,7 @@
 
 .task .btn-drag, .task .btn-edit, .task .btn-delete{
     border-radius: 5px !important;
-    color: #d3d3d3 !important;
+    color: #e0e0e0 !important;
 }
 
 .task .btn-delete:hover{
@@ -40,7 +40,7 @@
 }
 
 .task .btn-drag:hover, .task .btn-edit:hover{
-    background-color: #d3d3d3;
+    background-color: #e0e0e0;
 }
 
 .task .btn-drag:hover, .task .btn-edit:hover{
@@ -48,7 +48,7 @@
 }
 
 .task_manager .edit-card, .task_manager .update-card{
-    border: 1px solid #d3d3d3;
+    border: 1px solid #e0e0e0;
 }
 
 .edit-card .input-task, .update-card .input-task{
