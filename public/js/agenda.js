@@ -130,6 +130,14 @@ $(document).on("click", ".completion_alerts .btn-undo", function () {
   $(this).parent().parent().parent().remove();
 });
 
+$(document).on("keydown", function (event) {
+  if (event.ctrlKey && event.key === 'a') {
+    $(".btn_add_agenda").addClass("hide");
+    $(".btn_add_agenda").siblings(".edit-card").removeClass("hide");
+    $("#addAgendaTextBox").focus();
+  }
+});
+
 //Delete Agenda Modal
 const deleteAgendaModal = document.getElementById("deleteAgendaModal");
 if (deleteAgendaModal) {
