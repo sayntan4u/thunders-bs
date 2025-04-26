@@ -454,21 +454,21 @@ function getTommorrow(dt) {
   return moment(dt, "DD-MM-YYYY").add(1, "days").format("DD-MM-YYYY");
 }
 
-function loadPlanRoster() {
-  $.ajax({
-    url: "/roster/getRoster",
-    type: "GET",
-    dataType: "json",
-    success: function (data) {
-      generatePlanRosterUI(data);
-      $(".slots_plan").removeClass("hide");
-      $(".loading_roster_agenda").addClass("hide");
-    },
-    error: function (xhr, status, error) {
-      console.error("Error loading roster:", error);
-    },
-  });
-}
+// function loadPlanRoster() {
+//   $.ajax({
+//     url: "/roster/getRoster",
+//     type: "GET",
+//     dataType: "json",
+//     success: function (data) {
+//       generatePlanRosterUI(data);
+//       $(".slots_plan").removeClass("hide");
+//       $(".loading_roster_agenda").addClass("hide");
+//     },
+//     error: function (xhr, status, error) {
+//       console.error("Error loading roster:", error);
+//     },
+//   });
+// }
 
 function generatePlanRosterUI(data) {
   $("#plan11AM").html(data[0].data["11AM"]);
@@ -480,4 +480,4 @@ function generatePlanRosterUI(data) {
 
 setToday();
 loadAgendaFB();
-loadPlanRoster();
+// loadPlanRoster();

@@ -1,3 +1,4 @@
+var rosterData = [];
 
 function loadRoster() {
     $.ajax({
@@ -5,6 +6,14 @@ function loadRoster() {
         type: 'GET',
         dataType: 'json',
         success: function (data) {
+            rosterData = data;
+            // console.log(rosterData);
+            //Agenda page plan roster container updation
+            if ($(".planRoster_agenda").length != 0) {
+                generatePlanRosterUI(data);
+                $(".slots_plan").removeClass("hide");
+                $(".loading_roster_agenda").addClass("hide");
+            } 
             generateRosterTable(data);
             $(".loading_roster").addClass("hide");
         },
@@ -19,14 +28,20 @@ function updateRoster(day, time, irName) {
         url: '/roster/updateRoster',
         type: 'POST',
         dataType: 'json',
-        data: { day: day, time: time, irName: irName },
-        success: function (data) {
-            // Handle success
-        },
-        error: function (xhr, status, error) {
-            console.error('Error updating roster:', error);
-        }
+        data: { day: day, time: time, irName: irName }
     });
+}
+
+function updateLocalRosterData(day, time, irName){
+    for(let i=0; i<rosterData.length; i++){
+        if(rosterData[i].day == day){
+            rosterData[i].data[time] = irName;
+            break;
+        }
+    }
+    if ($(".planRoster_agenda").length != 0) {
+        generatePlanRosterUI(rosterData);
+    } 
 }
 
 function clearRoster() {
@@ -118,6 +133,7 @@ function valueChangedRoster(elem, day, time) {
         $(elem).parent().removeClass("has_data");
     }
     updateRoster(day, time, value);
+    updateLocalRosterData(day, time, value);
 }
 
 loadRoster();
