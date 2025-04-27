@@ -15,6 +15,11 @@
             font-weight: bold;
             border-radius: 0px;
         }
+
+        .irName,
+        .plan_roster {
+            font-size: 15px;
+        }
     </style>
 </head>
 
@@ -39,29 +44,153 @@
                 <tr>
                     <th scope="row">11AM</th>
                     <td>
-                        <div class="dropdown-center">
-                           
-                          </div>
-                        <button type="button" class="btn btn-roster-data" data-bs-toggle="dropdown">Light</button>
-                        <form class="dropdown-menu p-4 ">
+                        <button type="button" class="btn btn-roster-data" data-bs-toggle="dropdown">
+                            <span class="irName"></span>
+                            <span class="plan_status badge rounded-pill"></span>
+                        </button>
+                        <div class="dropdown-menu p-4 ">
                             <div class="mb-3">
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" value="" onkeyup="rosterUpdate(this)" onchange="rosterUpdate(this)">
                             </div>
                             <div class="mb-3">
-                                <select class="form-select form-select-sm" aria-label="Small select example">
-                                    <option>One</option>
-                                    <option>Two</option>
-                                    <option>Three</option>
+                                <select class="form-select form-select-sm" onchange="changePlanStatus(this)">
+                                    <option>-select-</option>
+                                    <option>Confirmed</option>
+                                    <option>Reconfirmed</option>
+                                    <option>Done</option>
+                                    <option>Rescheduled</option>
+                                    <option>Cancelled</option>
                                 </select>
                             </div>
-                        </form>
+                        </div>
                     </td>
-                    <td><button type="button" class="btn btn-roster-data">Light</button></td>
-                    <td><button type="button" class="btn btn-roster-data"></button></td>
-                    <td><button type="button" class="btn btn-roster-data">Light</button></td>
-                    <td><button type="button" class="btn btn-roster-data">Light</button></td>
-                    <td><button type="button" class="btn btn-roster-data">Light</button></td>
-                    <td><button type="button" class="btn btn-roster-data">Light</button></td>
+                    <td>
+                        <button type="button" class="btn btn-roster-data" data-bs-toggle="dropdown">
+                            <span class="irName"></span>
+                            <span class="plan_status badge rounded-pill"></span>
+                        </button>
+                        <div class="dropdown-menu p-4 ">
+                            <div class="mb-3">
+                                <input type="text" class="form-control" value="" onkeyup="rosterUpdate(this)" onchange="rosterUpdate(this)">
+                            </div>
+                            <div class="mb-3">
+                                <select class="form-select form-select-sm" onchange="changePlanStatus(this)">
+                                    <option>-select-</option>
+                                    <option>Confirmed</option>
+                                    <option>Reconfirmed</option>
+                                    <option>Done</option>
+                                    <option>Rescheduled</option>
+                                    <option>Cancelled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-roster-data" data-bs-toggle="dropdown">
+                            <span class="irName"></span>
+                            <span class="plan_status badge rounded-pill"></span>
+                        </button>
+                        <div class="dropdown-menu p-4 ">
+                            <div class="mb-3">
+                                <input type="text" class="form-control" value="" onkeyup="rosterUpdate(this)" onchange="rosterUpdate(this)">
+                            </div>
+                            <div class="mb-3">
+                                <select class="form-select form-select-sm" onchange="changePlanStatus(this)">
+                                    <option>-select-</option>
+                                    <option>Confirmed</option>
+                                    <option>Reconfirmed</option>
+                                    <option>Done</option>
+                                    <option>Rescheduled</option>
+                                    <option>Cancelled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-roster-data" data-bs-toggle="dropdown">
+                            <span class="irName"></span>
+                            <span class="plan_status badge rounded-pill"></span>
+                        </button>
+                        <div class="dropdown-menu p-4 ">
+                            <div class="mb-3">
+                                <input type="text" class="form-control" value="" onkeyup="rosterUpdate(this)" onchange="rosterUpdate(this)">
+                            </div>
+                            <div class="mb-3">
+                                <select class="form-select form-select-sm" onchange="changePlanStatus(this)">
+                                    <option>-select-</option>
+                                    <option>Confirmed</option>
+                                    <option>Reconfirmed</option>
+                                    <option>Done</option>
+                                    <option>Rescheduled</option>
+                                    <option>Cancelled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-roster-data" data-bs-toggle="dropdown">
+                            <span class="irName"></span>
+                            <span class="plan_status badge rounded-pill"></span>
+                        </button>
+                        <div class="dropdown-menu p-4 ">
+                            <div class="mb-3">
+                                <input type="text" class="form-control" value="" onkeyup="rosterUpdate(this)" onchange="rosterUpdate(this)">
+                            </div>
+                            <div class="mb-3">
+                                <select class="form-select form-select-sm" onchange="changePlanStatus(this)">
+                                    <option>-select-</option>
+                                    <option>Confirmed</option>
+                                    <option>Reconfirmed</option>
+                                    <option>Done</option>
+                                    <option>Rescheduled</option>
+                                    <option>Cancelled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-roster-data" data-bs-toggle="dropdown">
+                            <span class="irName"></span>
+                            <span class="plan_status badge rounded-pill"></span>
+                        </button>
+                        <div class="dropdown-menu p-4 ">
+                            <div class="mb-3">
+                                <input type="text" class="form-control" value="" onkeyup="rosterUpdate(this)" onchange="rosterUpdate(this)">
+                            </div>
+                            <div class="mb-3">
+                                <select class="form-select form-select-sm" onchange="changePlanStatus(this)">
+                                    <option>-select-</option>
+                                    <option>Confirmed</option>
+                                    <option>Reconfirmed</option>
+                                    <option>Done</option>
+                                    <option>Rescheduled</option>
+                                    <option>Cancelled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-roster-data" data-bs-toggle="dropdown">
+                            <span class="irName"></span>
+                            <span class="plan_status badge rounded-pill"></span>
+                        </button>
+                        <div class="dropdown-menu p-4 ">
+                            <div class="mb-3">
+                                <input type="text" class="form-control" value="" onkeyup="rosterUpdate(this)" onchange="rosterUpdate(this)">
+                            </div>
+                            <div class="mb-3">
+                                <select class="form-select form-select-sm" onchange="changePlanStatus(this)">
+                                    <option>-select-</option>
+                                    <option>Confirmed</option>
+                                    <option>Reconfirmed</option>
+                                    <option>Done</option>
+                                    <option>Rescheduled</option>
+                                    <option>Cancelled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                   
                 </tr>
                 <tr>
                     <th scope="row">1PM</th>
@@ -88,9 +217,60 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
     <script>
-        $(document).ready(function () {
+        function rosterUpdate(elem) {
+            const val = $(elem).val()
+            $(elem).parent().parent().siblings("button").children(".irName").html(val);
+        }
 
-        });
+        function changePlanStatus(elem) {
+            const val = $(elem).val();
+
+            if (val == "Confirmed") {
+                $(elem).parent().parent().siblings("button").children(".plan_status").html("C");
+                $(elem).parent().parent().siblings("button").children(".plan_status")
+                    .removeClass("text-bg-danger")
+                    .removeClass("text-bg-secondary")
+                    .removeClass("text-bg-primary")
+                    .addClass("text-bg-success");
+            } else if (val == "Reconfirmed") {
+                $(elem).parent().parent().siblings("button").children(".plan_status").html("RC");
+                $(elem).parent().parent().siblings("button").children(".plan_status")
+                    .removeClass("text-bg-danger")
+                    .removeClass("text-bg-primary")
+                    .removeClass("text-bg-secondary")
+                    .addClass("text-bg-success");
+            } else if (val == "Done") {
+                $(elem).parent().parent().siblings("button").children(".plan_status").html("DN");
+                $(elem).parent().parent().siblings("button").children(".plan_status")
+                    .removeClass("text-bg-danger")
+                    .removeClass("text-bg-secondary")
+                    .removeClass("text-bg-success")
+                    .addClass("text-bg-primary");
+            } else if (val == "Rescheduled") {
+                $(elem).parent().parent().siblings("button").children(".plan_status").html("RS");
+                $(elem).parent().parent().siblings("button").children(".plan_status")
+                    .removeClass("text-bg-success")
+                    .removeClass("text-bg-danger")
+                    .removeClass("text-bg-primary")
+                    .addClass("text-bg-secondary");
+
+            } else if (val == "Cancelled") {
+                $(elem).parent().parent().siblings("button").children(".plan_status").html("CN");
+                $(elem).parent().parent().siblings("button").children(".plan_status")
+                    .removeClass("text-bg-success")
+                    .removeClass("text-bg-secondary")
+                    .removeClass("text-bg-primary")
+                    .addClass("text-bg-danger");
+            }else{
+                $(elem).parent().parent().siblings("button").children(".plan_status").html("");
+                $(elem).parent().parent().siblings("button").children(".plan_status")
+                    .removeClass("text-bg-success")
+                    .removeClass("text-bg-secondary")
+                    .removeClass("text-bg-primary")
+                    .removeClass("text-bg-danger");
+            }
+
+        }
     </script>
 
 </body>
