@@ -435,15 +435,15 @@ select {
 }
 
 .roster .has_data {
-    background-color: #d0d0f6 !important;
+    background-color: #e5e5fa !important;
 }
 
 .roster .has_data:focus {
-    background-color: #bbbbf1 !important;
+    background-color: #d0d0f6 !important;
 }
 
 .roster .has_data:hover {
-    background-color: #bbbbf1 !important;
+    background-color: #d0d0f6 !important;
 }
 
 .btn-roster{
