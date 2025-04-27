@@ -462,28 +462,32 @@ function getTommorrow(dt) {
   return moment(dt, "DD-MM-YYYY").add(1, "days").format("DD-MM-YYYY");
 }
 
-// function loadPlanRoster() {
-//   $.ajax({
-//     url: "/roster/getRoster",
-//     type: "GET",
-//     dataType: "json",
-//     success: function (data) {
-//       generatePlanRosterUI(data);
-//       $(".slots_plan").removeClass("hide");
-//       $(".loading_roster_agenda").addClass("hide");
-//     },
-//     error: function (xhr, status, error) {
-//       console.error("Error loading roster:", error);
-//     },
-//   });
-// }
-
 function generatePlanRosterUI(data) {
-  $("#plan11AM").html(data[0].data["11AM"]);
-  $("#plan1PM").html(data[0].data["1PM"]);
-  $("#plan3PM").html(data[0].data["3PM"]);
-  $("#plan5PM").html(data[0].data["5PM"]);
-  $("#plan7PM").html(data[0].data["7PM"]);
+  $("#plan11AM").html(getIRNameRoster(data[0].data["11AM"]) + " " + generatePlanStatusAgenda(getPlanStatus(data[0].data["11AM"])));
+  $("#plan1PM").html(getIRNameRoster(data[0].data["1PM"]) + " " + generatePlanStatusAgenda(getPlanStatus(data[0].data["1PM"])));
+  $("#plan3PM").html(getIRNameRoster(data[0].data["3PM"]) + " " + generatePlanStatusAgenda(getPlanStatus(data[0].data["3PM"])));
+  $("#plan5PM").html(getIRNameRoster(data[0].data["5PM"]) + " " + generatePlanStatusAgenda(getPlanStatus(data[0].data["5PM"])));
+  $("#plan7PM").html(getIRNameRoster(data[0].data["7PM"]) + " " + generatePlanStatusAgenda(getPlanStatus(data[0].data["7PM"])));
+}
+
+function generatePlanStatusAgenda(val){
+  var pill = "";
+
+  if (val == "Confirmed") {
+      pill = `<span class="plan_status badge rounded-pill text-bg-success">Confirmed</span>`;
+  } else if (val == "Reconfirmed") {
+      pill = `<span class="plan_status badge rounded-pill text-bg-success">ReConfirmed</span>`;
+  } else if (val == "Done") {
+      pill = `<span class="plan_status badge rounded-pill text-bg-primary">Done</span>`;
+  } else if (val == "Rescheduled") {
+      pill = `<span class="plan_status badge rounded-pill text-bg-secondary">Reschedule</span>`;
+  } else if (val == "Cancelled") {
+      pill = `<span class="plan_status badge rounded-pill text-bg-danger">Cancelled</span>`;
+  } else {
+      pill = `<span class="plan_status badge rounded-pill"></span>`;
+  }
+
+  return pill;
 }
 
 setToday();

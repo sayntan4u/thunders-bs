@@ -406,7 +406,7 @@ select {
     text-align: center !important;
 }
 
-.roster input[type="text"] {
+/* .roster input[type="text"] {
     padding: 12px !important;
     font-weight: bold !important;
     background-color: transparent !important;
@@ -419,8 +419,8 @@ select {
     border: none !important;
     outline: none !important;
     box-shadow: none !important;
-    /* background-color: transparent !important; */
-}
+
+} */
 
 .roster td {
     padding: 0 !important;
@@ -462,4 +462,22 @@ select {
 
 .modal-header, .modal-footer{
     border: none !important;
+}
+
+.btn-roster-data {
+    min-width: 130px !important;
+    width: 100% !important;
+    height: 50px !important;
+    font-weight: bold;
+    border-radius: 0px;
+    border: none !important;
+}
+
+.irName
+{
+    font-size: 12px !important;
+}
+
+.plan_status {
+    font-size: 10px !important;
 }

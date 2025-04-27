@@ -49,7 +49,7 @@
                             <span class="plan_status badge rounded-pill"></span>
                         </button>
                         <div class="dropdown-menu p-4 ">
-                            <div class="mb-3">
+                            <div class="txt mb-3">
                                 <input type="text" class="form-control" value="" onkeyup="rosterUpdate(this)" onchange="rosterUpdate(this)">
                             </div>
                             <div class="mb-3">
@@ -70,7 +70,7 @@
                             <span class="plan_status badge rounded-pill"></span>
                         </button>
                         <div class="dropdown-menu p-4 ">
-                            <div class="mb-3">
+                            <div class="txt mb-3">
                                 <input type="text" class="form-control" value="" onkeyup="rosterUpdate(this)" onchange="rosterUpdate(this)">
                             </div>
                             <div class="mb-3">
@@ -91,7 +91,7 @@
                             <span class="plan_status badge rounded-pill"></span>
                         </button>
                         <div class="dropdown-menu p-4 ">
-                            <div class="mb-3">
+                            <div class="txt mb-3">
                                 <input type="text" class="form-control" value="" onkeyup="rosterUpdate(this)" onchange="rosterUpdate(this)">
                             </div>
                             <div class="mb-3">
@@ -112,7 +112,7 @@
                             <span class="plan_status badge rounded-pill"></span>
                         </button>
                         <div class="dropdown-menu p-4 ">
-                            <div class="mb-3">
+                            <div class="txt mb-3">
                                 <input type="text" class="form-control" value="" onkeyup="rosterUpdate(this)" onchange="rosterUpdate(this)">
                             </div>
                             <div class="mb-3">
@@ -133,7 +133,7 @@
                             <span class="plan_status badge rounded-pill"></span>
                         </button>
                         <div class="dropdown-menu p-4 ">
-                            <div class="mb-3">
+                            <div class="txt mb-3">
                                 <input type="text" class="form-control" value="" onkeyup="rosterUpdate(this)" onchange="rosterUpdate(this)">
                             </div>
                             <div class="mb-3">
@@ -154,7 +154,7 @@
                             <span class="plan_status badge rounded-pill"></span>
                         </button>
                         <div class="dropdown-menu p-4 ">
-                            <div class="mb-3">
+                            <div class="txt mb-3">
                                 <input type="text" class="form-control" value="" onkeyup="rosterUpdate(this)" onchange="rosterUpdate(this)">
                             </div>
                             <div class="mb-3">
@@ -175,7 +175,7 @@
                             <span class="plan_status badge rounded-pill"></span>
                         </button>
                         <div class="dropdown-menu p-4 ">
-                            <div class="mb-3">
+                            <div class="txt mb-3">
                                 <input type="text" class="form-control" value="" onkeyup="rosterUpdate(this)" onchange="rosterUpdate(this)">
                             </div>
                             <div class="mb-3">
@@ -190,6 +190,8 @@
                             </div>
                         </div>
                     </td>
+
+                   
                    
                 </tr>
                 <tr>
@@ -217,6 +219,11 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
     <script>
+
+        $(".btn-roster-data").click(function(){
+            $(this).siblings("div").children(".txt").children("input").focus();
+        });
+
         function rosterUpdate(elem) {
             const val = $(elem).val()
             $(elem).parent().parent().siblings("button").children(".irName").html(val);
@@ -271,7 +278,8 @@
             }
 
         }
-    </script>
+   
+   </script>
 
 </body>
 
