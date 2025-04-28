@@ -480,7 +480,7 @@ function generatePlanStatusAgenda(val){
   } else if (val == "Done") {
       pill = `<span class="plan_status badge rounded-pill text-bg-primary">Done</span>`;
   } else if (val == "Rescheduled") {
-      pill = `<span class="plan_status badge rounded-pill text-bg-secondary">Reschedule</span>`;
+      pill = `<span class="plan_status badge rounded-pill text-bg-secondary">Rescheduled</span>`;
   } else if (val == "Cancelled") {
       pill = `<span class="plan_status badge rounded-pill text-bg-danger">Cancelled</span>`;
   } else {
