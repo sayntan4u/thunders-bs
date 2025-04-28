@@ -465,7 +465,7 @@ select {
 }
 
 .btn-roster-data {
-    min-width: 130px !important;
+    min-width: 140px !important;
     width: 100% !important;
     height: 50px !important;
     font-weight: bold;
