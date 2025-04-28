@@ -10,7 +10,7 @@ const requireAuth = (req, res, next) => {
     }
 }
 
-router.get('/getRoster', requireAuth, async function (req, res) {
+router.post('/getRoster', requireAuth, async function (req, res) {
     const data = await dbm.getRosterData();
     res.send(data);
 });

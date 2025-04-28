@@ -3,7 +3,7 @@ var rosterData = [];
 function loadRoster() {
     $.ajax({
         url: '/roster/getRoster',
-        type: 'GET',
+        type: 'POST',
         dataType: 'json',
         success: function (data) {
             rosterData = data;
