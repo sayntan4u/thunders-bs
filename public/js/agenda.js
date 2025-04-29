@@ -259,7 +259,7 @@ function addAgendaUI(task, id) {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="row task align-middle">
+                                                <div class="row task align-items-center">
                                                     <div class="col">
                                                         <a class="btn btn-drag text-muted"><i
                                                             class="material-icons">drag_indicator</i></a>
