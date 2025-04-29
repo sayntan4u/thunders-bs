@@ -66,7 +66,7 @@ function deleteAgendaUI(id) {
   $(".tasks")
     .children()
     .each(function () {
-      if ($(this).children(".task").children(".task_id").html() == id) {
+      if ($(this).children(".task").children(".col-9").children(".task_id").html() == id) {
         $(this).remove();
       }
     });
@@ -81,21 +81,22 @@ $(document).on("click", ".tasks .btn-checkbox", function () {
   updateTaskCount("Delete");
   const date = $(".date").html();
   updateConfirmAgendaFB(
-    $(this).siblings(".task_id").html(),
+    $(this).parent().siblings(".col-9").children(".task_id").html(),
     moment().format("LT"),
     date
   );
   addCompletedNotification(
-    $(this).siblings(".task_id").html(),
-    $(this).siblings("span").html(),
+    $(this).parent().siblings(".col-9").children(".task_id").html(),
+    $(this).parent().siblings(".col-9").children(".task_content").html(),
     moment().format("LT")
   );
-  $(this).parent().parent().remove();
+  $(this).parent().parent().parent().remove();
 });
 
 $(document).on("click", ".tasks .btn-edit", function () {
-  const val = $(this).parent().siblings(".task_content").html();
+  const val = $(this).parent().parent().siblings(".col-9").children(".task_content").html();
   $(this)
+    .parent()
     .parent()
     .parent()
     .siblings(".update-card")
@@ -103,9 +104,10 @@ $(document).on("click", ".tasks .btn-edit", function () {
     .children(".input-task")
     .val(val);
 
-  $(this).parent().parent().addClass("hide");
-  $(this).parent().parent().siblings(".update-card").removeClass("hide");
+  $(this).parent().parent().parent().addClass("hide");
+  $(this).parent().parent().parent().siblings(".update-card").removeClass("hide");
   $(this)
+    .parent()
     .parent()
     .parent()
     .siblings(".update-card")
@@ -242,40 +244,83 @@ function checkKeyNewAgenda(e, elem) {
 
 function addAgendaUI(task, id) {
   $(".tasks").append(`
-        <div>
-                                            <div class="card update-card hide">
-                                                <div class="card-body">
-                                                    <input type="text" class="form-control input-task"
-                                                        placeholder="to add new agenda click here.."
-                                                        onkeydown="valueChangedUpdateAgenda(this)" onkeyup="checkKeyUpdateAgenda(event, this)"/>
-                                                    <div class="float-end controls-edit">
-                                                        <button class="btn bg-secondary-subtle text-secondary-emphasis"
-                                                            onclick="hideUpdateCard(this)">Cancel</button>
-                                                        <button
-                                                            class="btn bg-danger-subtle text-danger-emphasis btn-update"
-                                                            onclick="updateAgenda(this, '${id}')">Update</button>
+         <div>
+                                                <div class="card update-card hide">
+                                                    <div class="card-body">
+                                                        <input type="text" class="form-control input-task"
+                                                            placeholder="to add new agenda click here.."
+                                                            onkeydown="valueChangedUpdateAgenda(this)" onkeyup="checkKeyUpdateAgenda(event, this)"/>
+                                                        <div class="float-end controls-edit">
+                                                            <button class="btn bg-secondary-subtle text-secondary-emphasis"
+                                                                onclick="hideUpdateCard(this)">Cancel</button>
+                                                            <button
+                                                                class="btn bg-danger-subtle text-danger-emphasis btn-update"
+                                                                onclick="updateAgenda(this, '${id}')">Update</button>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="task align-middle">
-                                                <a class="btn btn-drag text-muted"><i
-                                                        class="material-icons">drag_indicator</i></a>
-                                                <a href="#" class="btn btn-checkbox"><i
-                                                        class="material-icons">check_box_outline_blank</i></a>
-                                                <span class="task_content">${task}</span>
-                                                <span class="task_id hide">${id}</span>
-                                                <div class="float-end">
-                                                    <a class="btn btn-edit text-muted"><i
-                                                            class="material-icons">edit_note</i></a>
-                                                    <a class="btn btn-delete text-muted" data-bs-toggle="modal" data-bs-target="#deleteAgendaModal" data-bs-id="${id}" data-bs-task="${task}"><i
-                                                            class="material-icons">delete_forever</i></a>
+                                                <div class="row task align-middle">
+                                                    <div class="col">
+                                                        <a class="btn btn-drag text-muted"><i
+                                                            class="material-icons">drag_indicator</i></a>
+                                                        <a href="#" class="btn btn-checkbox"><i
+                                                            class="material-icons">check_box_outline_blank</i></a>
+                                                    </div>
+                                                    <div class="col-9">
+                                                        <span class="task_content">${task}</span>
+                                                        <span class="task_id hide">${id}</span>
+                                                    </div>
+                                                    <div class="col">
+                                                        <div class="float-end">
+                                                            <a class="btn btn-edit text-muted"><i
+                                                                    class="material-icons">edit_note</i></a>
+                                                            <a class="btn btn-delete text-muted" data-bs-toggle="modal" data-bs-target="#deleteAgendaModal" data-bs-id="${id}" data-bs-task="${task}"><i
+                                                                    class="material-icons">delete_forever</i></a>
+                                                        </div>
+                                                    </div>  
                                                 </div>
+                                                <hr>
                                             </div>
-                                            <hr>
-                                        </div>
                                         
         `);
 }
+
+// function addAgendaUI(task, id) {
+//   $(".tasks").append(`
+//         <div>
+//                                             <div class="card update-card hide">
+//                                                 <div class="card-body">
+//                                                     <input type="text" class="form-control input-task"
+//                                                         placeholder="to add new agenda click here.."
+//                                                         onkeydown="valueChangedUpdateAgenda(this)" onkeyup="checkKeyUpdateAgenda(event, this)"/>
+//                                                     <div class="float-end controls-edit">
+//                                                         <button class="btn bg-secondary-subtle text-secondary-emphasis"
+//                                                             onclick="hideUpdateCard(this)">Cancel</button>
+//                                                         <button
+//                                                             class="btn bg-danger-subtle text-danger-emphasis btn-update"
+//                                                             onclick="updateAgenda(this, '${id}')">Update</button>
+//                                                     </div>
+//                                                 </div>
+//                                             </div>
+//                                             <div class="task align-middle">
+//                                                 <a class="btn btn-drag text-muted"><i
+//                                                         class="material-icons">drag_indicator</i></a>
+//                                                 <a href="#" class="btn btn-checkbox"><i
+//                                                         class="material-icons">check_box_outline_blank</i></a>
+//                                                 <span class="task_content">${task}</span>
+//                                                 <span class="task_id hide">${id}</span>
+//                                                 <div class="float-end">
+//                                                     <a class="btn btn-edit text-muted"><i
+//                                                             class="material-icons">edit_note</i></a>
+//                                                     <a class="btn btn-delete text-muted" data-bs-toggle="modal" data-bs-target="#deleteAgendaModal" data-bs-id="${id}" data-bs-task="${task}"><i
+//                                                             class="material-icons">delete_forever</i></a>
+//                                                 </div>
+//                                             </div>
+//                                             <hr>
+//                                         </div>
+                                        
+//         `);
+// }
 
 //update card functions
 
@@ -291,6 +336,7 @@ function checkKeyUpdateAgenda(e, elem) {
         .parent()
         .parent()
         .siblings(".task")
+        .children(".col-9")
         .children(".task_id")
         .html();
       const date = $(".date").html();
@@ -299,6 +345,7 @@ function checkKeyUpdateAgenda(e, elem) {
         .parent()
         .parent()
         .siblings(".task")
+        .children(".col-9")
         .children(".task_content")
         .html(task);
       $(elem).parent().parent().addClass("hide");
@@ -331,6 +378,7 @@ function updateAgenda(elem, id) {
     .parent()
     .parent()
     .siblings(".task")
+    .children(".col-9")
     .children(".task_content")
     .html(task);
   $(elem).parent().parent().parent().addClass("hide");
