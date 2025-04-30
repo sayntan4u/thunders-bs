@@ -25,4 +25,12 @@ router.post('/', requireAuth, async function (req, res) {
     res.send(docArray);
 });
 
+router.post('/onlyNames', requireAuth, async function (req, res) {
+    const group = req.body.group;
+    // console.log(group);
+    var docArray = [];
+    docArray = await dbm.getOnlyUserNames(group);
+    res.send(docArray);
+});
+
 module.exports = router;

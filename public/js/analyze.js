@@ -307,13 +307,13 @@ function generateNameDropDown() {
         $("#name").append("<option>-select-</option>");
 
         for (let i = 0; i < response.length; i++) {
-            $("#name").append("<option>" + response[i].name + "</option>");
+            $("#name").append("<option>" + response[i] + "</option>");
         }
         $("#groupSelect").prop('disabled', false);
 
 
     }
-    xhttp.open("POST", "getUserName");
+    xhttp.open("POST", "/getUserName/onlyNames");
     xhttp.setRequestHeader('Content-Type', 'application/json');
     if (group == "SKB") {
         data = { group: "SKB" };
