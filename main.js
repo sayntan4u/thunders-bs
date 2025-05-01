@@ -11,6 +11,7 @@ function createWindow() {
       nodeIntegration: true,
     },
   });
+  mainWindow.maximize();
  
   mainWindow.loadURL("http://localhost:8080");
   mainWindow.on("closed", function () {
