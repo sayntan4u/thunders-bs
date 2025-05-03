@@ -1,5 +1,5 @@
 Thunders
-v 5.0
+v 6.0
 
 App for tracking activity of Node & Sapphires
 
