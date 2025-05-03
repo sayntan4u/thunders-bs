@@ -10,12 +10,13 @@ const port = process.env.PORT || 8080;
 var dir = ['./backup', './public/legal', './uploads'];
 
 dir.forEach(function (currentValue, index, arr) {
-  if (!fs.existsSync(currentValue)) {
-    fs.mkdirSync(currentValue);
+  if (!fs.existsSync(path.join(__dirname, currentValue))) {
+    fs.mkdirSync(path.join(__dirname, currentValue));
   }
 });
 
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views')); 
 app.use(session({
   secret: 'Sapphire2025',
   resave: false,
